@@ -25,9 +25,6 @@ spl_autoload_register(
 
 			if ( file_exists( $file_path ) ) {
 				include_once $file_path;
-				// error_log( "SmartForms: Included $file_path" );
-			} else {
-				// error_log( "SmartForms: Autoloader failed to load $file_path" );
 			}
 		}
 	}

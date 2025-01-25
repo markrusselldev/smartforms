@@ -19,7 +19,7 @@ class Admin_Menu {
 		add_action( 'admin_menu', array( $this, 'add_smartforms_menu' ) );
 		add_action( 'admin_menu', array( $this, 'rename_first_submenu' ), 11 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_gutenberg_assets' ) );
-		// error_log( 'SmartForms: Admin_Menu constructor called.' );
+		add_action( 'admin_head', array( $this, 'set_active_menu' ) );
 	}
 
 	/**
@@ -29,24 +29,23 @@ class Admin_Menu {
 	 */
 	public function add_smartforms_menu() {
 		add_menu_page(
-			'SmartForms',                // Page title.
-			'SmartForms',                // Menu title.
-			'manage_options',            // Capability.
-			'smartforms',                // Menu slug.
-			array( $this, 'render_dashboard' ), // Callback for the main dashboard page.
-			'dashicons-feedback',        // Icon.
-			20                           // Position.
+			esc_html__( 'SmartForms', 'smartforms' ),
+			esc_html__( 'SmartForms', 'smartforms' ),
+			'manage_options',
+			'smartforms',
+			array( $this, 'render_dashboard' ),
+			'dashicons-feedback',
+			20
 		);
 
 		add_submenu_page(
-			'smartforms',                // Parent menu slug.
-			'Create Form',               // Page title.
-			'Create Form',               // Menu title.
-			'manage_options',            // Capability.
-			'smartforms-create',         // Menu slug.
-			array( $this, 'render_create_form_page' ) // Callback function.
+			'smartforms',
+			esc_html__( 'Create Form', 'smartforms' ),
+			esc_html__( 'Create Form', 'smartforms' ),
+			'manage_options',
+			'smartforms-create',
+			array( $this, 'render_create_form_page' )
 		);
-		// error_log( 'SmartForms: Menu and submenu added.' );
 	}
 
 	/**
@@ -56,11 +55,28 @@ class Admin_Menu {
 	 */
 	public function rename_first_submenu() {
 		global $submenu;
+
+		// Check if the SmartForms menu exists and has submenu items.
 		if ( isset( $submenu['smartforms'] ) && isset( $submenu['smartforms'][0] ) ) {
-			$submenu['smartforms'][0][0] = 'Dashboard'; // Rename the first submenu item.
-			// error_log( "SmartForms: Submenu renamed to 'Dashboard'." );
-		} else {
-			// error_log( 'SmartForms: Submenu not found for renaming.' );
+			$submenu['smartforms'][0][0] = esc_html__( 'Dashboard', 'smartforms' ); // Rename the first submenu.
+		}
+	}
+
+	/**
+	 * Set the active menu and submenu.
+	 *
+	 * @return void
+	 */
+	public function set_active_menu() {
+		$current_screen = get_current_screen();
+
+		if ( $current_screen && 'smartforms_page_smartforms-create' === $current_screen->id ) {
+			add_filter(
+				'parent_file',
+				function () {
+					return 'smartforms';
+				}
+			);
 		}
 	}
 
@@ -72,11 +88,10 @@ class Admin_Menu {
 	public function render_dashboard() {
 		?>
 		<div class="wrap">
-			<h1>SmartForms Dashboard</h1>
-			<p>Welcome to SmartForms. Use the "Create Form" option to build your forms.</p>
+			<h1><?php echo esc_html__( 'SmartForms Dashboard', 'smartforms' ); ?></h1>
+			<p><?php echo esc_html__( 'Welcome to SmartForms. Use the "Create Form" option to build your forms.', 'smartforms' ); ?></p>
 		</div>
 		<?php
-		// error_log( 'SmartForms: Rendered Dashboard page.' );
 	}
 
 	/**
@@ -85,16 +100,20 @@ class Admin_Menu {
 	 * @return void
 	 */
 	public function render_create_form_page() {
-		$form_id = filter_input( INPUT_GET, 'form_id', FILTER_VALIDATE_INT ) ?? 0;
+		$form_id = isset( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : 0;
 
-		if ( $form_id ) {
-			echo '<h1>Edit Form</h1>';
-		} else {
-			echo '<h1>Create Form</h1>';
+		// Nonce verification.
+		if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'smartforms_form_nonce' ) ) {
+			wp_die( esc_html__( 'Invalid request. Nonce verification failed.', 'smartforms' ) );
 		}
 
-		echo '<div id="smartforms-editor"></div>'; // Gutenberg editor placeholder.
-		// error_log( 'SmartForms: Rendered Create Form page.' );
+		if ( $form_id ) {
+			echo '<h1>' . esc_html__( 'Edit Form', 'smartforms' ) . '</h1>';
+		} else {
+			echo '<h1>' . esc_html__( 'Create Form', 'smartforms' ) . '</h1>';
+		}
+
+		echo '<div id="smartforms-editor"></div>';
 	}
 
 	/**
@@ -126,7 +145,6 @@ class Admin_Menu {
 				array(),
 				'1.0.0'
 			);
-			// error_log( 'SmartForms: Enqueued Gutenberg assets.' );
 		}
 	}
 }

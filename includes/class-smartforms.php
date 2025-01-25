@@ -29,8 +29,6 @@ class Smartforms {
 	public static function get_instance() {
 		if ( null === self::$instance ) {
 			self::$instance = new self();
-			// Uncomment the following line if logging is needed in a development environment.
-			// error_log( 'SmartForms: Singleton instance created.' );
 		}
 		return self::$instance;
 	}
@@ -42,8 +40,6 @@ class Smartforms {
 	 */
 	public static function activate() {
 		add_option( 'smartforms_version', '1.0.0' );
-		// Uncomment the following line if logging is needed in a development environment.
-		// error_log( 'SmartForms: Plugin activated.' );
 	}
 
 	/**
@@ -53,8 +49,6 @@ class Smartforms {
 	 */
 	public static function deactivate() {
 		delete_option( 'smartforms_version' );
-		// Uncomment the following line if logging is needed in a development environment.
-		// error_log( 'SmartForms: Plugin deactivated.' );
 	}
 
 	/**
@@ -63,13 +57,7 @@ class Smartforms {
 	 * Initializes the plugin and admin-specific functionality.
 	 */
 	private function __construct() {
-		// Uncomment the following line if logging is needed in a development environment.
-		// error_log( 'SmartForms: Constructor called.' );
-
 		if ( is_admin() ) {
-			// Uncomment the following line if logging is needed in a development environment.
-			// error_log( 'SmartForms: Admin environment detected.' );
-
 			add_action( 'init', array( $this, 'initialize_admin' ) );
 			add_action( 'init', array( $this, 'register_custom_post_type' ) );
 		}
@@ -81,14 +69,8 @@ class Smartforms {
 	 * @return void
 	 */
 	public function initialize_admin() {
-		// Uncomment the following line if logging is needed in a development environment.
-		// error_log( 'SmartForms: Initializing admin functionality.' );
-
-		if ( class_exists( 'Smartforms\Admin_Menu' ) ) {
+		if ( class_exists( 'Smartforms\\Admin_Menu' ) ) {
 			new Admin_Menu();
-		} else {
-			// Uncomment the following line if logging is needed in a development environment.
-			// error_log( 'SmartForms: Admin_Menu class not found.' );
 		}
 	}
 
@@ -101,15 +83,14 @@ class Smartforms {
 		register_post_type(
 			'smart_form',
 			array(
-				'label'    => 'Forms',
-				'public'   => false,
-				'show_ui'  => false, // Hide it from the default admin menu.
-				'supports' => array( 'title', 'editor' ),
-				'rewrite'  => false,
+				'label'        => esc_html__( 'Forms', 'smartforms' ),
+				'public'       => false,
+				'show_ui'      => true,
+				'show_in_menu' => false, // Prevents the "Forms" menu from appearing in the admin sidebar.
+				'show_in_rest' => true,
+				'supports'     => array( 'title', 'editor', 'custom-fields' ),
+				'rewrite'      => false,
 			)
 		);
-
-		// Uncomment the following line if logging is needed in a development environment.
-		// error_log( "SmartForms: Custom post type 'smart_form' registered." );
 	}
 }
