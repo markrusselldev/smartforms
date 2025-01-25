@@ -1,14 +1,19 @@
 <?xml version="1.0"?>
-<ruleset name="SmartForms Project">
-    <description>PHPCS rules for the SmartForms plugin.</description>
+<ruleset name="SmartForms Coding Standards">
+    <description>PHP_CodeSniffer rules for the SmartForms plugin.</description>
 
-    <!-- Set the standard -->
-    <rule ref="WordPress" />
+    <!-- Include specific WordPress Coding Standards -->
+    <rule ref="WordPress-Core" />
+    <rule ref="WordPress-Docs" />
+    <rule ref="WordPress-Extra" />
 
-    <!-- Include these file types -->
-    <file>./</file>
-
-    <!-- Exclude specific directories -->
+    <!-- Exclude irrelevant folders/files -->
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/assets/*</exclude-pattern>
+    <exclude-pattern>*/templates/*</exclude-pattern>
+    <exclude-pattern>*/tests/*</exclude-pattern>
+
+    <!-- Include only PHP files -->
+    <file>*.php</file>
 </ruleset>
