@@ -16,9 +16,9 @@ class Admin_Menu {
 	 * Constructor to hook into WordPress actions.
 	 */
 	public function __construct() {
-		add_action( 'admin_menu', [ $this, 'add_smartforms_menu' ] );
-		add_action( 'admin_menu', [ $this, 'rename_first_submenu' ], 11 );
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_gutenberg_assets' ] );
+		add_action( 'admin_menu', array( $this, 'add_smartforms_menu' ) );
+		add_action( 'admin_menu', array( $this, 'rename_first_submenu' ), 11 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_gutenberg_assets' ) );
 		// error_log( 'SmartForms: Admin_Menu constructor called.' );
 	}
 
@@ -33,7 +33,7 @@ class Admin_Menu {
 			'SmartForms',                // Menu title.
 			'manage_options',            // Capability.
 			'smartforms',                // Menu slug.
-			[ $this, 'render_dashboard' ], // Callback for the main dashboard page.
+			array( $this, 'render_dashboard' ), // Callback for the main dashboard page.
 			'dashicons-feedback',        // Icon.
 			20                           // Position.
 		);
@@ -44,7 +44,7 @@ class Admin_Menu {
 			'Create Form',               // Menu title.
 			'manage_options',            // Capability.
 			'smartforms-create',         // Menu slug.
-			[ $this, 'render_create_form_page' ] // Callback function.
+			array( $this, 'render_create_form_page' ) // Callback function.
 		);
 		// error_log( 'SmartForms: Menu and submenu added.' );
 	}
@@ -109,13 +109,13 @@ class Admin_Menu {
 			wp_enqueue_script(
 				'smartforms-editor',
 				plugins_url( '/assets/js/smartforms-editor.js', __FILE__ ),
-				[
+				array(
 					'wp-blocks',
 					'wp-editor',
 					'wp-element',
 					'wp-components',
 					'wp-data',
-				],
+				),
 				'1.0.0',
 				true
 			);
@@ -123,7 +123,7 @@ class Admin_Menu {
 			wp_enqueue_style(
 				'smartforms-editor',
 				plugins_url( '/assets/css/smartforms-editor.css', __FILE__ ),
-				[],
+				array(),
 				'1.0.0'
 			);
 			// error_log( 'SmartForms: Enqueued Gutenberg assets.' );

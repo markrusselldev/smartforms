@@ -34,8 +34,8 @@ spl_autoload_register(
 );
 
 // Activation and deactivation hooks.
-register_activation_hook( __FILE__, [ 'Smartforms\\Smartforms', 'activate' ] );
-register_deactivation_hook( __FILE__, [ 'Smartforms\\Smartforms', 'deactivate' ] );
+register_activation_hook( __FILE__, array( 'Smartforms\\Smartforms', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'Smartforms\\Smartforms', 'deactivate' ) );
 
 // Initialize the plugin.
 add_action(

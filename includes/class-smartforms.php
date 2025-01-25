@@ -70,8 +70,8 @@ class Smartforms {
 			// Uncomment the following line if logging is needed in a development environment.
 			// error_log( 'SmartForms: Admin environment detected.' );
 
-			add_action( 'init', [ $this, 'initialize_admin' ] );
-			add_action( 'init', [ $this, 'register_custom_post_type' ] );
+			add_action( 'init', array( $this, 'initialize_admin' ) );
+			add_action( 'init', array( $this, 'register_custom_post_type' ) );
 		}
 	}
 
