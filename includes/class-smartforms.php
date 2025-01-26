@@ -36,42 +36,48 @@ class Smartforms {
 	/**
 	 * Activation hook for the plugin.
 	 *
+	 * Sets up the plugin, such as adding default options.
+	 *
 	 * @return void
 	 */
 	public static function activate() {
+		// Set a default option for plugin version.
 		add_option( 'smartforms_version', '1.0.0' );
+
+		// Register the custom post type to flush rewrite rules on activation.
+		self::register_custom_post_type();
+		flush_rewrite_rules();
 	}
 
 	/**
 	 * Deactivation hook for the plugin.
 	 *
+	 * Cleans up the plugin, such as removing options.
+	 *
 	 * @return void
 	 */
 	public static function deactivate() {
+		// Remove plugin version option.
 		delete_option( 'smartforms_version' );
+
+		// Flush rewrite rules to clean up the custom post type.
+		flush_rewrite_rules();
 	}
 
 	/**
 	 * Constructor.
 	 *
-	 * Initializes the plugin and admin-specific functionality.
+	 * Initializes the plugin components and hooks.
 	 */
 	private function __construct() {
-		if ( is_admin() ) {
-			add_action( 'init', array( $this, 'initialize_admin' ) );
-			add_action( 'init', array( $this, 'register_custom_post_type' ) );
-		}
-	}
+		// Initialize the admin menu.
+		new Admin_Menu();
 
-	/**
-	 * Initialize admin functionality.
-	 *
-	 * @return void
-	 */
-	public function initialize_admin() {
-		if ( class_exists( 'Smartforms\\Admin_Menu' ) ) {
-			new Admin_Menu();
-		}
+		// Initialize the form handler.
+		new SmartForms_Handler();
+
+		// Register the custom post type.
+		add_action( 'init', array( $this, 'register_custom_post_type' ) );
 	}
 
 	/**
@@ -79,14 +85,14 @@ class Smartforms {
 	 *
 	 * @return void
 	 */
-	public function register_custom_post_type() {
+	public static function register_custom_post_type() {
 		register_post_type(
 			'smart_form',
 			array(
 				'label'        => esc_html__( 'Forms', 'smartforms' ),
 				'public'       => false,
 				'show_ui'      => true,
-				'show_in_menu' => false, // Prevents the "Forms" menu from appearing in the admin sidebar.
+				'show_in_menu' => false, // We'll manage the menu ourselves.
 				'show_in_rest' => true,
 				'supports'     => array( 'title', 'editor', 'custom-fields' ),
 				'rewrite'      => false,

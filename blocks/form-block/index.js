@@ -3,14 +3,14 @@ import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, TextControl } from '@wordpress/components';
 
-// Register a new block
+// Register the "Form Field" block.
 registerBlockType('smartforms/form-field', {
     title: __('Form Field', 'smartforms'),
-    description: __('Add a field to your SmartForm.', 'smartforms'),
+    description: __('Add a customizable field to your SmartForm.', 'smartforms'),
     category: 'widgets',
     icon: 'forms',
     supports: {
-        html: false,
+        html: false, // Prevents raw HTML editing for this block.
     },
     attributes: {
         label: {
