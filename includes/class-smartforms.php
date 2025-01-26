@@ -2,12 +2,13 @@
 /**
  * Core plugin functionality.
  *
- * Handles plugin initialization, activation, and admin setup.
- *
  * @package SmartForms
  */
 
 namespace Smartforms;
+
+// Ensure the Block Editor Loader class is included.
+require_once plugin_dir_path( __FILE__ ) . 'class-block-editor-loader.php';
 
 /**
  * Main SmartForms class.
@@ -41,7 +42,6 @@ class Smartforms {
 	 * @return void
 	 */
 	public static function activate() {
-		// Set a default option for plugin version.
 		add_option( 'smartforms_version', '1.0.0' );
 
 		// Register the custom post type to flush rewrite rules on activation.
@@ -57,7 +57,6 @@ class Smartforms {
 	 * @return void
 	 */
 	public static function deactivate() {
-		// Remove plugin version option.
 		delete_option( 'smartforms_version' );
 
 		// Flush rewrite rules to clean up the custom post type.
@@ -70,18 +69,24 @@ class Smartforms {
 	 * Initializes the plugin components and hooks.
 	 */
 	private function __construct() {
+		// Register the custom post type.
+		add_action( 'init', array( $this, 'register_custom_post_type' ) );
+
 		// Initialize the admin menu.
 		new Admin_Menu();
 
 		// Initialize the form handler.
 		new SmartForms_Handler();
 
-		// Register the custom post type.
-		add_action( 'init', array( $this, 'register_custom_post_type' ) );
+		// Initialize the block editor loader.
+		//new Block_Editor_Loader();
+		Block_Editor_Loader::get_instance();
 	}
 
 	/**
 	 * Register the custom post type for forms.
+	 *
+	 * Ensures the custom post type is properly linked to the SmartForms menu.
 	 *
 	 * @return void
 	 */
@@ -89,11 +94,24 @@ class Smartforms {
 		register_post_type(
 			'smart_form',
 			array(
-				'label'        => esc_html__( 'Forms', 'smartforms' ),
+				'labels' => array(
+					'name'               => esc_html__( 'SmartForms', 'smartforms' ),
+					'singular_name'      => esc_html__( 'Form', 'smartforms' ),
+					'add_new'            => esc_html__( 'Add New Form', 'smartforms' ),
+					'add_new_item'       => esc_html__( 'Add New Form', 'smartforms' ),
+					'edit_item'          => esc_html__( 'Edit Form', 'smartforms' ),
+					'new_item'           => esc_html__( 'New Form', 'smartforms' ),
+					'view_item'          => esc_html__( 'View Form', 'smartforms' ),
+					'view_items'         => esc_html__( 'View Forms', 'smartforms' ),
+					'search_items'       => esc_html__( 'Search Forms', 'smartforms' ),
+					'all_items'          => esc_html__( 'Forms', 'smartforms' ), // Renamed to Forms.
+					'not_found'          => esc_html__( 'No forms found.', 'smartforms' ),
+					'not_found_in_trash' => esc_html__( 'No forms found in Trash.', 'smartforms' ),
+				),
 				'public'       => false,
 				'show_ui'      => true,
-				'show_in_menu' => false, // We'll manage the menu ourselves.
-				'show_in_rest' => true,
+				'show_in_menu' => 'smartforms', // Attach the custom post type under the SmartForms menu.
+				'show_in_rest' => true, // Enable REST API for the block editor.
 				'supports'     => array( 'title', 'editor', 'custom-fields' ),
 				'rewrite'      => false,
 			)

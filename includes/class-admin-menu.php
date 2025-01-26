@@ -1,6 +1,6 @@
 <?php
 /**
- * Handles admin menu and related functionality.
+ * Handles admin menu and related functionality, including custom columns and bulk actions.
  *
  * @package SmartForms
  */
@@ -17,6 +17,12 @@ class Admin_Menu {
 	 */
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'add_smartforms_menu' ) );
+		add_filter( 'parent_file', array( $this, 'set_active_menu' ) );
+		add_filter( 'submenu_file', array( $this, 'set_active_submenu' ) );
+		add_filter( 'manage_smart_form_posts_columns', array( $this, 'add_custom_columns' ) );
+		add_action( 'manage_smart_form_posts_custom_column', array( $this, 'render_custom_columns' ), 10, 2 );
+		add_filter( 'bulk_actions-edit-smart_form', array( $this, 'register_bulk_action' ) );
+		add_action( 'handle_bulk_actions-edit-smart_form', array( $this, 'handle_bulk_duplicate_action' ), 10, 3 );
 	}
 
 	/**
@@ -31,115 +37,145 @@ class Admin_Menu {
 			esc_html__( 'SmartForms', 'smartforms' ),
 			'manage_options',
 			'smartforms',
-			array( $this, 'render_dashboard' ),
+			array( $this, 'render_forms_list' ), // Default to the Forms page.
 			'dashicons-feedback',
 			20
 		);
-
-		// Add the Dashboard submenu (this duplicates the top-level menu for submenus).
-		add_submenu_page(
-			'smartforms',
-			esc_html__( 'Dashboard', 'smartforms' ),
-			esc_html__( 'Dashboard', 'smartforms' ),
-			'manage_options',
-			'smartforms',
-			array( $this, 'render_dashboard' )
-		);
-
-		// Add the Create Form submenu.
-		add_submenu_page(
-			'smartforms',
-			esc_html__( 'Create Form', 'smartforms' ),
-			esc_html__( 'Create Form', 'smartforms' ),
-			'manage_options',
-			'smartforms-create',
-			array( $this, 'render_create_form_page' )
-		);
 	}
 
 	/**
-	 * Render the main Dashboard page.
+	 * Render the main Forms page.
+	 *
+	 * Redirects to the default post type list page for smart_form.
 	 *
 	 * @return void
 	 */
-	public function render_dashboard() {
-		?>
-		<div class="wrap">
-			<h1><?php echo esc_html__( 'SmartForms Dashboard', 'smartforms' ); ?></h1>
-			<p><?php echo esc_html__( 'Welcome to SmartForms. Use the "Create Form" option to build your forms.', 'smartforms' ); ?></p>
-		</div>
-		<?php
+	public function render_forms_list() {
+		wp_redirect( admin_url( 'edit.php?post_type=smart_form' ) );
+		exit;
 	}
 
 	/**
-	 * Render the "Create Form" admin page.
+	 * Set the active parent menu item.
 	 *
-	 * @return void
+	 * Ensures the SmartForms top-level menu is highlighted on relevant screens.
+	 *
+	 * @param string $parent_file The current parent file.
+	 * @return string The modified parent file.
 	 */
-	public function render_create_form_page() {
-		$form_id = isset( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : 0;
+	public function set_active_menu( $parent_file ) {
+		$screen = get_current_screen();
 
-		// If a form ID is provided, redirect to the block editor for that form.
-		if ( $form_id ) {
-			wp_redirect( admin_url( 'post.php?post=' . $form_id . '&action=edit' ) );
-			exit;
+		// Highlight the SmartForms menu for smart_form post type screens.
+		if ( $screen && 'smart_form' === $screen->post_type ) {
+			return 'smartforms';
 		}
 
-		// Otherwise, list all forms with options to create, edit, or delete.
-		?>
-		<div class="wrap">
-			<h1><?php esc_html_e( 'Create Form', 'smartforms' ); ?></h1>
-			<p>
-				<a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=smart_form' ) ); ?>" class="button button-primary">
-					<?php esc_html_e( 'New Form', 'smartforms' ); ?>
-				</a>
-			</p>
-			<table class="wp-list-table widefat fixed striped">
-				<thead>
-					<tr>
-						<th><?php esc_html_e( 'Title', 'smartforms' ); ?></th>
-						<th><?php esc_html_e( 'Date', 'smartforms' ); ?></th>
-						<th><?php esc_html_e( 'Actions', 'smartforms' ); ?></th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php
-					$forms = get_posts(
-						array(
-							'post_type'      => 'smart_form',
-							'post_status'    => 'publish',
-							'posts_per_page' => -1,
-						)
-					);
+		return $parent_file;
+	}
 
-					if ( ! empty( $forms ) ) {
-						foreach ( $forms as $form ) {
-							?>
-							<tr>
-								<td><?php echo esc_html( $form->post_title ); ?></td>
-								<td><?php echo esc_html( get_the_date( '', $form ) ); ?></td>
-								<td>
-									<a href="<?php echo esc_url( admin_url( 'post.php?post=' . $form->ID . '&action=edit' ) ); ?>" class="button">
-										<?php esc_html_e( 'Edit', 'smartforms' ); ?>
-									</a>
-									<a href="<?php echo esc_url( admin_url( 'admin-post.php?action=smartforms_delete_form&form_id=' . $form->ID ) ); ?>" class="button button-secondary" onclick="return confirm('<?php esc_attr_e( 'Are you sure you want to delete this form?', 'smartforms' ); ?>');">
-										<?php esc_html_e( 'Delete', 'smartforms' ); ?>
-									</a>
-								</td>
-							</tr>
-							<?php
-						}
-					} else {
-						?>
-						<tr>
-							<td colspan="3"><?php esc_html_e( 'No forms found.', 'smartforms' ); ?></td>
-						</tr>
-						<?php
-					}
-					?>
-				</tbody>
-			</table>
-		</div>
-		<?php
+	/**
+	 * Set the active submenu item.
+	 *
+	 * Ensures the Forms submenu is highlighted on relevant screens.
+	 *
+	 * @param string $submenu_file The current submenu file.
+	 * @return string The modified submenu file.
+	 */
+	public function set_active_submenu( $submenu_file ) {
+		$screen = get_current_screen();
+
+		// Highlight the Forms submenu for smart_form post type screens.
+		if ( $screen && 'smart_form' === $screen->post_type ) {
+			return 'edit.php?post_type=smart_form';
+		}
+
+		return $submenu_file;
+	}
+
+	/**
+	 * Add custom columns to the Forms list page.
+	 *
+	 * @param array $columns The current columns.
+	 * @return array The modified columns.
+	 */
+	public function add_custom_columns( $columns ) {
+		$columns['number_of_fields'] = esc_html__( 'Number of Fields', 'smartforms' );
+		$columns['last_modified'] = esc_html__( 'Last Modified', 'smartforms' );
+		return $columns;
+	}
+
+	/**
+	 * Render custom column content.
+	 *
+	 * @param string $column The name of the column.
+	 * @param int    $post_id The post ID.
+	 * @return void
+	 */
+	public function render_custom_columns( $column, $post_id ) {
+		switch ( $column ) {
+			case 'number_of_fields':
+				// Example: Retrieve the number of fields stored in post meta.
+				$field_count = get_post_meta( $post_id, '_smart_form_field_count', true );
+				echo intval( $field_count ) ?: '0';
+				break;
+
+			case 'last_modified':
+				$last_modified = get_post_modified_time( 'Y/m/d H:i', false, $post_id );
+				echo esc_html( $last_modified );
+				break;
+		}
+	}
+
+	/**
+	 * Register the "Duplicate" bulk action.
+	 *
+	 * @param array $bulk_actions The current bulk actions.
+	 * @return array The modified bulk actions.
+	 */
+	public function register_bulk_action( $bulk_actions ) {
+		$bulk_actions['duplicate'] = esc_html__( 'Duplicate', 'smartforms' );
+		return $bulk_actions;
+	}
+
+	/**
+	 * Handle the "Duplicate" bulk action.
+	 *
+	 * @param string $redirect_url The redirect URL.
+	 * @param string $action The action name.
+	 * @param array  $post_ids The selected post IDs.
+	 * @return string The modified redirect URL.
+	 */
+	public function handle_bulk_duplicate_action( $redirect_url, $action, $post_ids ) {
+		if ( 'duplicate' !== $action ) {
+			return $redirect_url;
+		}
+
+		foreach ( $post_ids as $post_id ) {
+			// Get the original post.
+			$post = get_post( $post_id );
+
+			// Create a copy of the post.
+			$new_post_id = wp_insert_post(
+				array(
+					'post_title'   => $post->post_title . ' (Copy)',
+					'post_content' => $post->post_content,
+					'post_status'  => $post->post_status,
+					'post_type'    => $post->post_type,
+				)
+			);
+
+			// Copy post meta.
+			$meta = get_post_meta( $post_id );
+			foreach ( $meta as $key => $values ) {
+				foreach ( $values as $value ) {
+					add_post_meta( $new_post_id, $key, maybe_unserialize( $value ) );
+				}
+			}
+		}
+
+		// Add a notice and redirect back.
+		$redirect_url = add_query_arg( 'bulk_duplicate', count( $post_ids ), $redirect_url );
+		return $redirect_url;
 	}
 }
