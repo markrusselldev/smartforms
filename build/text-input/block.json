@@ -1,0 +1,25 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "smartforms/text-input",
+  "title": "Text Input",
+  "category": "smartforms",
+  "icon": "edit",
+  "description": "A text input field for SmartForms.",
+  "attributes": {
+    "placeholder": {
+      "type": "string",
+      "default": "Enter text here"
+    },
+    "label": {
+      "type": "string",
+      "default": "Label"
+    },
+    "required": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "editorScript": "file:./index.js",
+  "style": "file:./index.css"
+}

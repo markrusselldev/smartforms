@@ -79,8 +79,10 @@ class Smartforms {
 		new SmartForms_Handler();
 
 		// Initialize the block editor loader.
-		//new Block_Editor_Loader();
 		Block_Editor_Loader::get_instance();
+
+		// Register Gutenberg blocks.
+		add_action( 'init', array( $this, 'register_gutenberg_blocks' ) );
 	}
 
 	/**
@@ -116,5 +118,23 @@ class Smartforms {
 				'rewrite'      => false,
 			)
 		);
+	}
+
+	/**
+	 * Dynamically register all Gutenberg blocks in the plugin.
+	 *
+	 * Scans the blocks directory and includes all block PHP files.
+	 *
+	 * @return void
+	 */
+	public function register_gutenberg_blocks() {
+		$blocks_dir  = plugin_dir_path( __FILE__ ) . '../blocks/';
+		$block_files = glob( $blocks_dir . '*.php' );
+
+		if ( ! empty( $block_files ) ) {
+			foreach ( $block_files as $block_file ) {
+				require_once $block_file;
+			}
+		}
 	}
 }

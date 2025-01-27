@@ -1,0 +1,32 @@
+{
+	"name": "smartforms",
+	"version": "1.0.0",
+	"description": "SmartForms is a WordPress plugin that enables users to create chatbot-style questionnaires with GPT-powered recommendations. This plugin leverages modern WordPress standards and AI technology to provide an intuitive and powerful tool for form creation.",
+	"main": "index.js",
+	"scripts": {
+		"build": "wp-scripts build",
+		"start": "wp-scripts start",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/markrusselldev/smartforms.git"
+	},
+	"keywords": [
+		"wordpress",
+		"plugin",
+		"gutenberg",
+		"blocks",
+		"forms",
+		"AI"
+	],
+	"author": "Mark Russell <mark@markrussell.io>",
+	"license": "GPL-2.0-or-later",
+	"bugs": {
+		"url": "https://github.com/markrusselldev/smartforms/issues"
+	},
+	"homepage": "https://github.com/markrusselldev/smartforms#readme",
+	"devDependencies": {
+		"@wordpress/scripts": "^30.9.0"
+	}
+}

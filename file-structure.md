@@ -249,3 +249,23 @@ Development Notes
 3.  **Adherence to Standards**:
 
     -   Uses WordPress best practices, including the REST API, block editor, and action/filter hooks.
+
+    ## Block building structure
+```
+    smartforms/
+├── build/               # Compiled output for all blocks
+├── src/                 # Source files for all blocks
+│   ├── block-text-input/
+│   │   ├── index.js     # Block registration and settings
+│   │   ├── edit.js      # Block editor logic
+│   │   ├── save.js      # Block frontend rendering
+│   │   ├── block.json   # Gutenberg block metadata
+│   └── block-checkbox/
+│       ├── index.js
+│       ├── edit.js
+│       ├── save.js
+│       ├── block.json
+├── package.json         # Centralized dependencies
+├── webpack.config.js    # Single Webpack config for all blocks
+└── smartforms.php       # WordPress plugin bootstrap
+```
