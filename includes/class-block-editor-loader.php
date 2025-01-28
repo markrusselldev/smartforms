@@ -10,7 +10,7 @@ namespace Smartforms;
 /**
  * Block Editor Loader Class.
  *
- * Ensures that Gutenberg blocks and related assets for SmartForms are loaded.
+ * Dynamically registers Gutenberg blocks located in the build directory.
  */
 class Block_Editor_Loader {
 
@@ -20,13 +20,6 @@ class Block_Editor_Loader {
 	 * @var Block_Editor_Loader|null
 	 */
 	private static $instance = null;
-
-	/**
-	 * Static counter for debugging initialization.
-	 *
-	 * @var int
-	 */
-	private static $load_count = 0;
 
 	/**
 	 * Get or create the singleton instance.
@@ -41,70 +34,123 @@ class Block_Editor_Loader {
 	}
 
 	/**
-	 * Constructor to hook into WordPress actions and filters.
+	 * Constructor.
 	 *
-	 * Initializes the loader by adding the required actions and filters.
+	 * Hooks into WordPress actions and filters to load blocks.
 	 */
 	private function __construct() {
-		// Increment the static counter for debugging.
-		self::$load_count++;
-		error_log( 'Block Editor Loader initialized. Count: ' . self::$load_count );
-
-		// Hook into WordPress to enqueue block assets.
 		add_action( 'init', array( $this, 'register_blocks' ) );
-
-		// Add a custom block category for SmartForms blocks.
 		add_filter( 'block_categories_all', array( $this, 'add_smartforms_block_category' ), 10, 2 );
+		add_filter( 'allowed_block_types_all', array( $this, 'restrict_blocks_for_smartforms' ), 10, 2 );
 	}
 
 	/**
-	 * Register blocks using block.json files.
+	 * Register all SmartForms blocks dynamically.
 	 *
-	 * Automatically registers all blocks in the /blocks/ directory.
+	 * Scans the build directory for blocks and registers them.
 	 *
 	 * @return void
 	 */
 	public function register_blocks() {
-		// Debug log for block registration.
-		error_log( 'Registering SmartForms blocks.' );
+		$blocks_dir = plugin_dir_path( __FILE__ ) . '../build/';
 
-		$blocks_dir = plugin_dir_path( __DIR__ ) . 'blocks/';
-		$blocks     = scandir( $blocks_dir );
+		// Log the directory being scanned.
+		error_log( '[DEBUG] Registering blocks from directory: ' . esc_url( $blocks_dir ) );
 
-		foreach ( $blocks as $block ) {
-			$block_json = $blocks_dir . $block . '/block.json';
-			if ( file_exists( $block_json ) ) {
-				register_block_type( $block_json );
-				error_log( 'Block registered: ' . esc_html( $block ) );
+		// Check if the build directory exists.
+		if ( ! is_dir( $blocks_dir ) ) {
+			error_log( '[ERROR] SmartForms build directory not found: ' . esc_url( $blocks_dir ) );
+			return;
+		}
+
+		// Scan for subdirectories in the build directory.
+		$block_folders = glob( $blocks_dir . '*', GLOB_ONLYDIR );
+
+		// Register each block based on its block.json file.
+		foreach ( $block_folders as $block_folder ) {
+			$block_json_path = $block_folder . '/block.json';
+
+			if ( file_exists( $block_json_path ) ) {
+				$result = register_block_type_from_metadata( $block_json_path );
+
+				/**
+				 * Check if $result is a WP_Error before calling get_error_message().
+				 *
+				 * @var \WP_Error $result
+				 */
+				if ( is_wp_error( $result ) ) {
+					error_log(
+						'[ERROR] Failed to register block: ' . esc_url( $block_folder ) .
+						' - ' . esc_html( $result->get_error_message() )
+					);
+				} else {
+					error_log( '[DEBUG] Block successfully registered: ' . esc_url( $block_json_path ) );
+				}
+			} else {
+				// Log if block.json is not found.
+				error_log( '[ERROR] block.json not found in: ' . esc_url( $block_folder ) );
 			}
 		}
 	}
 
 	/**
-	 * Add a custom block category for SmartForms blocks.
+	 * Add the SmartForms block category for the SmartForms post type.
 	 *
-	 * Registers a custom block category to group all SmartForms blocks.
+	 * Ensures the SmartForms category appears in the block editor.
 	 *
 	 * @param array  $categories Existing block categories.
-	 * @param object $post       The current post object.
+	 * @param object $context    The current editor context.
 	 * @return array Modified block categories.
 	 */
-	public function add_smartforms_block_category( $categories, $post ) {
-		// Debug log to include request context.
-		error_log( 'SmartForms block category is being added.' );
+	public function add_smartforms_block_category( $categories, $context ) {
+		error_log( '[DEBUG] Adding SmartForms block category.' );
 
-		// Add the SmartForms Blocks category at the top of the list.
-		return array_merge(
-			array(
-				array(
-					'slug'  => 'smartforms',
-					'title' => esc_html__( 'SmartForms Blocks', 'smartforms' ),
-				),
-			),
-			$categories
+		// Define the SmartForms category.
+		$smartforms_category = array(
+			'slug'  => 'smartforms',
+			'title' => __( 'SmartForms Blocks', 'smartforms' ),
 		);
+
+		// Prepend the SmartForms category to the categories list.
+		array_unshift( $categories, $smartforms_category );
+
+		// Log the updated categories list for debugging.
+		error_log( '[DEBUG] SmartForms block category moved to the top.' );
+
+		return $categories;
+	}
+
+	/**
+	 * Restrict blocks for the SmartForms post type.
+	 *
+	 * Dynamically allows all blocks registered in the SmartForms build directory.
+	 *
+	 * @param array  $allowed_block_types Existing allowed block types.
+	 * @param object $context             The current editor context.
+	 * @return array Modified allowed block types.
+	 */
+	public function restrict_blocks_for_smartforms( $allowed_block_types, $context ) {
+		error_log( '[DEBUG] Restricting blocks for editor context.' );
+
+		// Restrict blocks to SmartForms post types.
+		if ( isset( $context->post ) && 'smartform' === $context->post->post_type ) {
+			$allowed_blocks = array();
+
+			// Scan the build directory for registered blocks.
+			$blocks_dir = plugin_dir_path( __FILE__ ) . '../build/';
+			$block_folders = glob( $blocks_dir . '*', GLOB_ONLYDIR );
+
+			foreach ( $block_folders as $block_folder ) {
+				$block_name = basename( $block_folder );
+				$allowed_blocks[] = 'smartforms/' . $block_name;
+			}
+
+			// Log allowed blocks for SmartForms.
+			error_log( '[DEBUG] Allowed blocks for SmartForms: ' . wp_json_encode( $allowed_blocks ) );
+			return $allowed_blocks;
+		}
+
+		// Allow all blocks for other post types.
+		return $allowed_block_types;
 	}
 }
-
-// Instantiate the Block Editor Loader class.
-Block_Editor_Loader::get_instance();

@@ -1,6 +1,6 @@
 <?php
 /**
- * Handles form actions like saving and deleting.
+ * Handles form processing for SmartForms.
  *
  * @package SmartForms
  */
@@ -8,58 +8,114 @@
 namespace Smartforms;
 
 /**
- * Class SmartForms_Handler
+ * Smartforms_Handler Class.
  *
- * Handles saving, deleting, and other actions for forms.
+ * This class manages form processing logic for the SmartForms plugin, including
+ * handling form submissions, validating and sanitizing data, and redirecting
+ * after block editor actions.
  */
-class SmartForms_Handler {
+class Smartforms_Handler {
 
 	/**
-	 * Constructor to hook into WordPress actions.
+	 * Singleton instance.
+	 *
+	 * @var Smartforms_Handler|null
 	 */
-	public function __construct() {
-		add_action( 'admin_post_smartforms_delete_form', array( $this, 'handle_form_deletion' ) );
-		add_filter( 'redirect_post_location', array( $this, 'redirect_after_block_editor' ), 10, 2 );
+	private static $instance = null;
+
+	/**
+	 * Get or create the singleton instance.
+	 *
+	 * @return Smartforms_Handler The singleton instance.
+	 */
+	public static function get_instance() {
+		if ( null === self::$instance ) {
+			self::$instance = new self();
+		}
+		return self::$instance;
 	}
 
 	/**
-	 * Handle form deletion.
+	 * Constructor.
 	 *
-	 * Deletes a form based on its ID. Verifies nonce before performing the action.
+	 * Initializes the form processing logic.
+	 */
+	private function __construct() {
+		// Hook for handling form submissions.
+		add_action( 'admin_post_process_form', array( $this, 'process_form_submission' ) );
+
+		// Hook for redirecting after block editor actions.
+		add_action( 'admin_init', array( $this, 'redirect_after_block_editor' ) );
+	}
+
+	/**
+	 * Process a form submission.
+	 *
+	 * Handles form data, performs validations, and redirects back to the admin page.
 	 *
 	 * @return void
 	 */
-	public function handle_form_deletion() {
-		// Verify nonce and permissions.
-		if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'smartforms_delete_form' ) ) {
-			wp_die( esc_html__( 'Invalid request. Nonce verification failed.', 'smartforms' ) );
+	public function process_form_submission() {
+		// Log the form submission for debugging purposes.
+		error_log( '[DEBUG] Processing form submission.' );
+
+		// Example form submission handling logic.
+		if ( isset( $_POST['smartforms_nonce'] ) && wp_verify_nonce( $_POST['smartforms_nonce'], 'smartforms_submit' ) ) {
+			// Sanitize and process form data here.
+			error_log( '[DEBUG] Form data successfully processed.' );
+		} else {
+			error_log( '[ERROR] Invalid nonce or missing form data.' );
 		}
 
-		$form_id = isset( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : 0;
-
-		if ( $form_id ) {
-			wp_delete_post( $form_id, true );
-		}
-
-		// Redirect back to the "Create Form" page.
-		wp_safe_redirect( admin_url( 'admin.php?page=smartforms-create' ) );
+		// Redirect back to the SmartForms admin page.
+		wp_redirect( admin_url( 'admin.php?page=smartforms' ) );
 		exit;
 	}
 
 	/**
-	 * Redirect "Back to WordPress" button to the "Create Form" admin page.
+	 * Redirect after using the block editor.
 	 *
-	 * Modifies the redirect location after saving or publishing a form in the block editor.
+	 * Ensures users are redirected to the appropriate page after editing a block.
 	 *
-	 * @param string $location The default redirect URL.
-	 * @param int    $post_id  The ID of the current post being edited.
-	 * @return string The modified redirect URL.
+	 * @return void
 	 */
-	public function redirect_after_block_editor( $location, $post_id ) {
-		if ( get_post_type( $post_id ) === 'smart_form' ) {
-			// Redirect back to the plugin's "Create Form" page.
-			$location = admin_url( 'admin.php?page=smartforms-create' );
+	public function redirect_after_block_editor() {
+		if ( isset( $_GET['post'] ) && isset( $_GET['action'] ) && 'edit' === $_GET['action'] ) {
+			$post_id = intval( $_GET['post'] );
+
+			// Check if the post belongs to the 'smartform' post type.
+			if ( 'smartform' === get_post_type( $post_id ) ) {
+				wp_safe_redirect( admin_url( 'admin.php?page=smartforms' ) );
+				exit;
+			}
 		}
-		return $location;
+	}
+
+	/**
+	 * Example method for validating form data.
+	 *
+	 * This method could be used for additional server-side validation.
+	 *
+	 * @param array $form_data The form data to validate.
+	 * @return bool True if validation passes, false otherwise.
+	 */
+	public function validate_form_data( $form_data ) {
+		// Add your validation logic here.
+		error_log( '[DEBUG] Validating form data.' );
+		return true; // Example: Always returns true for now.
+	}
+
+	/**
+	 * Example method for sanitizing form data.
+	 *
+	 * Ensures that data is properly sanitized before processing or saving.
+	 *
+	 * @param array $form_data The form data to sanitize.
+	 * @return array The sanitized form data.
+	 */
+	public function sanitize_form_data( $form_data ) {
+		// Add your sanitization logic here.
+		error_log( '[DEBUG] Sanitizing form data.' );
+		return array_map( 'sanitize_text_field', $form_data );
 	}
 }

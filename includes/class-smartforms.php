@@ -7,11 +7,17 @@
 
 namespace Smartforms;
 
-// Ensure the Block Editor Loader class is included.
+// Ensure the required classes are included.
 require_once plugin_dir_path( __FILE__ ) . 'class-block-editor-loader.php';
+require_once plugin_dir_path( __FILE__ ) . 'class-smartforms-handler.php';
+require_once plugin_dir_path( __FILE__ ) . 'class-admin-menu.php';
 
 /**
  * Main SmartForms class.
+ *
+ * This is the central class for the SmartForms plugin. It initializes all
+ * components, registers custom post types, and manages activation and
+ * deactivation hooks.
  */
 class Smartforms {
 
@@ -37,14 +43,14 @@ class Smartforms {
 	/**
 	 * Activation hook for the plugin.
 	 *
-	 * Sets up the plugin, such as adding default options.
+	 * Adds default options and flushes rewrite rules.
 	 *
 	 * @return void
 	 */
 	public static function activate() {
 		add_option( 'smartforms_version', '1.0.0' );
 
-		// Register the custom post type to flush rewrite rules on activation.
+		// Register the custom post type to ensure it's available during activation.
 		self::register_custom_post_type();
 		flush_rewrite_rules();
 	}
@@ -52,7 +58,7 @@ class Smartforms {
 	/**
 	 * Deactivation hook for the plugin.
 	 *
-	 * Cleans up the plugin, such as removing options.
+	 * Cleans up options and flushes rewrite rules.
 	 *
 	 * @return void
 	 */
@@ -66,29 +72,20 @@ class Smartforms {
 	/**
 	 * Constructor.
 	 *
-	 * Initializes the plugin components and hooks.
+	 * Initializes the plugin components and hooks into WordPress actions.
 	 */
 	private function __construct() {
 		// Register the custom post type.
 		add_action( 'init', array( $this, 'register_custom_post_type' ) );
 
-		// Initialize the admin menu.
-		new Admin_Menu();
-
-		// Initialize the form handler.
-		new SmartForms_Handler();
-
-		// Initialize the block editor loader.
-		Block_Editor_Loader::get_instance();
-
-		// Register Gutenberg blocks.
-		add_action( 'init', array( $this, 'register_gutenberg_blocks' ) );
+		// Initialize related plugin classes.
+		$this->initialize_classes();
 	}
 
 	/**
-	 * Register the custom post type for forms.
+	 * Register the custom post type for SmartForms.
 	 *
-	 * Ensures the custom post type is properly linked to the SmartForms menu.
+	 * Creates a custom post type for managing forms in the plugin.
 	 *
 	 * @return void
 	 */
@@ -96,7 +93,7 @@ class Smartforms {
 		register_post_type(
 			'smart_form',
 			array(
-				'labels' => array(
+				'labels'       => array(
 					'name'               => esc_html__( 'SmartForms', 'smartforms' ),
 					'singular_name'      => esc_html__( 'Form', 'smartforms' ),
 					'add_new'            => esc_html__( 'Add New Form', 'smartforms' ),
@@ -106,14 +103,14 @@ class Smartforms {
 					'view_item'          => esc_html__( 'View Form', 'smartforms' ),
 					'view_items'         => esc_html__( 'View Forms', 'smartforms' ),
 					'search_items'       => esc_html__( 'Search Forms', 'smartforms' ),
-					'all_items'          => esc_html__( 'Forms', 'smartforms' ), // Renamed to Forms.
+					'all_items'          => esc_html__( 'Forms', 'smartforms' ),
 					'not_found'          => esc_html__( 'No forms found.', 'smartforms' ),
 					'not_found_in_trash' => esc_html__( 'No forms found in Trash.', 'smartforms' ),
 				),
 				'public'       => false,
 				'show_ui'      => true,
-				'show_in_menu' => 'smartforms', // Attach the custom post type under the SmartForms menu.
-				'show_in_rest' => true, // Enable REST API for the block editor.
+				'show_in_menu' => 'smartforms',
+				'show_in_rest' => true,
 				'supports'     => array( 'title', 'editor', 'custom-fields' ),
 				'rewrite'      => false,
 			)
@@ -121,20 +118,29 @@ class Smartforms {
 	}
 
 	/**
-	 * Dynamically register all Gutenberg blocks in the plugin.
+	 * Initialize other plugin classes.
 	 *
-	 * Scans the blocks directory and includes all block PHP files.
+	 * Loads and initializes all necessary classes for the plugin.
 	 *
 	 * @return void
 	 */
-	public function register_gutenberg_blocks() {
-		$blocks_dir  = plugin_dir_path( __FILE__ ) . '../blocks/';
-		$block_files = glob( $blocks_dir . '*.php' );
+	private function initialize_classes() {
+		// Initialize the Block Editor Loader class.
+		Block_Editor_Loader::get_instance();
 
-		if ( ! empty( $block_files ) ) {
-			foreach ( $block_files as $block_file ) {
-				require_once $block_file;
-			}
+		// Initialize the SmartForms Handler class.
+		Smartforms_Handler::get_instance();
+
+		// Initialize the Admin Menu class.
+		if ( class_exists( 'Smartforms\\Admin_Menu' ) ) {
+			new Admin_Menu();
 		}
 	}
 }
+
+// Initialize the SmartForms plugin.
+Smartforms::get_instance();
+
+// Register activation and deactivation hooks.
+register_activation_hook( __FILE__, array( 'Smartforms\\Smartforms', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'Smartforms\\Smartforms', 'deactivate' ) );
