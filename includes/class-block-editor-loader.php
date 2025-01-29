@@ -10,7 +10,7 @@ namespace Smartforms;
 /**
  * Block Editor Loader Class.
  *
- * Dynamically registers Gutenberg blocks located in the build directory.
+ * Dynamically registers Gutenberg blocks inside the SmartForms editor.
  */
 class Block_Editor_Loader {
 
@@ -36,12 +36,24 @@ class Block_Editor_Loader {
 	/**
 	 * Constructor.
 	 *
-	 * Hooks into WordPress actions and filters to load blocks.
+	 * Hooks into WordPress actions and filters to load blocks inside the SmartForms editor.
 	 */
 	private function __construct() {
-		add_action( 'init', array( $this, 'register_blocks' ) );
+		add_action( 'enqueue_block_editor_assets', array( $this, 'conditionally_register_blocks' ) );
 		add_filter( 'block_categories_all', array( $this, 'add_smartforms_block_category' ), 10, 2 );
-		add_filter( 'allowed_block_types_all', array( $this, 'restrict_blocks_for_smartforms' ), 10, 2 );
+	}
+
+	/**
+	 * Conditionally register blocks only inside SmartForms post type editor.
+	 *
+	 * @return void
+	 */
+	public function conditionally_register_blocks() {
+		$screen = get_current_screen();
+
+		if ( $screen && isset( $screen->post_type ) && 'smart_form' === $screen->post_type ) {
+			$this->register_blocks();
+		}
 	}
 
 	/**
@@ -51,7 +63,7 @@ class Block_Editor_Loader {
 	 *
 	 * @return void
 	 */
-	public function register_blocks() {
+	private function register_blocks() {
 		$blocks_dir = plugin_dir_path( __FILE__ ) . '../build/';
 
 		// Log the directory being scanned.
@@ -119,38 +131,4 @@ class Block_Editor_Loader {
 
 		return $categories;
 	}
-
-	/**
-	 * Restrict blocks for the SmartForms post type.
-	 *
-	 * Dynamically allows all blocks registered in the SmartForms build directory.
-	 *
-	 * @param array  $allowed_block_types Existing allowed block types.
-	 * @param object $context             The current editor context.
-	 * @return array Modified allowed block types.
-	 */
-	public function restrict_blocks_for_smartforms( $allowed_block_types, $context ) {
-		error_log( '[DEBUG] Restricting blocks for editor context.' );
-
-		// Restrict blocks to SmartForms post types.
-		if ( isset( $context->post ) && 'smartform' === $context->post->post_type ) {
-			$allowed_blocks = array();
-
-			// Scan the build directory for registered blocks.
-			$blocks_dir = plugin_dir_path( __FILE__ ) . '../build/';
-			$block_folders = glob( $blocks_dir . '*', GLOB_ONLYDIR );
-
-			foreach ( $block_folders as $block_folder ) {
-				$block_name = basename( $block_folder );
-				$allowed_blocks[] = 'smartforms/' . $block_name;
-			}
-
-			// Log allowed blocks for SmartForms.
-			error_log( '[DEBUG] Allowed blocks for SmartForms: ' . wp_json_encode( $allowed_blocks ) );
-			return $allowed_blocks;
-		}
-
-		// Allow all blocks for other post types.
-		return $allowed_block_types;
-	}
-}
+} // End of class
