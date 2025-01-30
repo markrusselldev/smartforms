@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "smartforms/radio-button",
+  "title": "Radio Button",
+  "category": "smartforms",
+  "icon": "admin-generic",
+  "description": "Radio Button field for SmartForms.",
+  "attributes": {
+    "label": {
+      "type": "string",
+      "default": "Radio Button"
+    },
+    "value": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "editorScript": "file:./index.js",
+  "style": "file:./index.css"
+}

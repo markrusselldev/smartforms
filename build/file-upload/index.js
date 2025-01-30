@@ -1,0 +1,1 @@
+(()=>{"use strict";const e=window.wp.blocks,t=window.wp.blockEditor,o=window.ReactJSXRuntime;(0,e.registerBlockType)("smartforms/file-upload",{edit:e=>(0,o.jsx)("button",{...(0,t.useBlockProps)(),children:e.attributes.label||"File Upload"}),save:e=>(0,o.jsx)("button",{...t.useBlockProps.save(),children:e.attributes.label||"File Upload"})})})();

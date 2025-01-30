@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "smartforms/step-back-button",
+  "title": "Step Back Button",
+  "category": "smartforms",
+  "icon": "block-default",
+  "description": "A step back button field for SmartForms.",
+  "attributes": {
+    "label": {
+      "type": "string",
+      "default": "Label"
+    },
+    "required": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "editorScript": "file:./index.js",
+  "style": "file:./index.css"
+}

@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 2,
+    "name": "smartforms/number",
+    "title": "Number",
+    "category": "smartforms",
+    "icon": "admin-generic",
+    "description": "Number field for SmartForms.",
+    "attributes": {
+        "label": {
+            "type": "string",
+            "default": "Number"
+        },
+        "value": {
+            "type": "string",
+            "default": ""
+        }
+    },
+    "editorScript": "file:./index.js",
+    "style": "file:./index.css"
+}

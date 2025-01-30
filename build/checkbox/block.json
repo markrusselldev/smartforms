@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "smartforms/checkbox",
+  "title": "Checkbox",
+  "category": "smartforms",
+  "icon": "admin-generic",
+  "description": "Checkbox field for SmartForms.",
+  "attributes": {
+    "label": {
+      "type": "string",
+      "default": "Checkbox"
+    },
+    "value": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "editorScript": "file:./index.js",
+  "style": "file:./index.css"
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "smartforms/date-picker",
+  "title": "Date Picker",
+  "category": "smartforms",
+  "icon": "block-default",
+  "description": "A date picker field for SmartForms.",
+  "attributes": {
+    "label": {
+      "type": "string",
+      "default": "Label"
+    },
+    "required": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "editorScript": "file:./index.js",
+  "style": "file:./index.css"
+}

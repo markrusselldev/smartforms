@@ -1,0 +1,1 @@
+(()=>{"use strict";const o=window.wp.blocks,t=window.wp.blockEditor,e=window.ReactJSXRuntime;(0,o.registerBlockType)("smartforms/dropdown",{edit:o=>(0,e.jsx)("button",{...(0,t.useBlockProps)(),children:o.attributes.label||"Dropdown"}),save:o=>(0,e.jsx)("button",{...t.useBlockProps.save(),children:o.attributes.label||"Dropdown"})})})();

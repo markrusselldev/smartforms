@@ -1,0 +1,1 @@
+(()=>{"use strict";const t=window.wp.blocks,e=window.wp.blockEditor,o=window.ReactJSXRuntime;(0,t.registerBlockType)("smartforms/step-next-button",{edit:t=>(0,o.jsx)("button",{...(0,e.useBlockProps)(),children:t.attributes.label||"Step Next Button"}),save:t=>(0,o.jsx)("button",{...e.useBlockProps.save(),children:t.attributes.label||"Step Next Button"})})})();

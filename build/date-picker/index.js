@@ -1,0 +1,1 @@
+(()=>{"use strict";const e=window.wp.blocks,t=window.wp.blockEditor,s=window.ReactJSXRuntime;(0,e.registerBlockType)("smartforms/date-picker",{edit:e=>(0,s.jsx)("button",{...(0,t.useBlockProps)(),children:e.attributes.label||"Date Picker"}),save:e=>(0,s.jsx)("button",{...t.useBlockProps.save(),children:e.attributes.label||"Date Picker"})})})();

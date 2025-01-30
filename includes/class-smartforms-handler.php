@@ -1,6 +1,6 @@
 <?php
 /**
- * Handles form processing for SmartForms.
+ * Handles SmartForms processing and submissions.
  *
  * @package SmartForms
  */
@@ -8,11 +8,9 @@
 namespace Smartforms;
 
 /**
- * Smartforms_Handler Class.
+ * Class Smartforms_Handler
  *
- * This class manages form processing logic for the SmartForms plugin, including
- * handling form submissions, validating and sanitizing data, and redirecting
- * after block editor actions.
+ * Processes SmartForms submissions via AJAX.
  */
 class Smartforms_Handler {
 
@@ -38,84 +36,65 @@ class Smartforms_Handler {
 	/**
 	 * Constructor.
 	 *
-	 * Initializes the form processing logic.
+	 * Hooks into WordPress actions and filters.
 	 */
 	private function __construct() {
-		// Hook for handling form submissions.
-		add_action( 'admin_post_process_form', array( $this, 'process_form_submission' ) );
-
-		// Hook for redirecting after block editor actions.
-		add_action( 'admin_init', array( $this, 'redirect_after_block_editor' ) );
+		add_action( 'init', array( $this, 'register_ajax_handlers' ) );
 	}
 
 	/**
-	 * Process a form submission.
+	 * Register AJAX handlers for processing SmartForms submissions.
 	 *
-	 * Handles form data, performs validations, and redirects back to the admin page.
+	 * Hooks into both public (non-logged-in) and authenticated AJAX requests.
+	 *
+	 * @return void
+	 */
+	public function register_ajax_handlers() {
+		add_action( 'wp_ajax_nopriv_process_smartform', array( $this, 'process_form_submission' ) );
+		add_action( 'wp_ajax_process_smartform', array( $this, 'process_form_submission' ) );
+	}
+
+	/**
+	 * Processes SmartForm submissions.
 	 *
 	 * @return void
 	 */
 	public function process_form_submission() {
-		// Log the form submission for debugging purposes.
-		error_log( '[DEBUG] Processing form submission.' );
-
-		// Example form submission handling logic.
-		if ( isset( $_POST['smartforms_nonce'] ) && wp_verify_nonce( $_POST['smartforms_nonce'], 'smartforms_submit' ) ) {
-			// Sanitize and process form data here.
-			error_log( '[DEBUG] Form data successfully processed.' );
-		} else {
-			error_log( '[ERROR] Invalid nonce or missing form data.' );
+		// Verify nonce security.
+		if ( ! isset( $_POST['smartform_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['smartform_nonce'] ) ), 'smartform_submit' ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Security check failed.', 'smartforms' ),
+				),
+				403
+			);
 		}
 
-		// Redirect back to the SmartForms admin page.
-		wp_redirect( admin_url( 'admin.php?page=smartforms' ) );
-		exit;
-	}
+		// Validate and sanitize inputs.
+		$form_id    = isset( $_POST['form_id'] ) ? intval( $_POST['form_id'] ) : 0;
+		$user_input = isset( $_POST['form_data'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['form_data'] ) ) : array();
 
-	/**
-	 * Redirect after using the block editor.
-	 *
-	 * Ensures users are redirected to the appropriate page after editing a block.
-	 *
-	 * @return void
-	 */
-	public function redirect_after_block_editor() {
-		if ( isset( $_GET['post'] ) && isset( $_GET['action'] ) && 'edit' === $_GET['action'] ) {
-			$post_id = intval( $_GET['post'] );
-
-			// Check if the post belongs to the 'smartform' post type.
-			if ( 'smartform' === get_post_type( $post_id ) ) {
-				wp_safe_redirect( admin_url( 'admin.php?page=smartforms' ) );
-				exit;
-			}
+		if ( empty( $form_id ) || empty( $user_input ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Invalid form submission.', 'smartforms' ),
+				),
+				400
+			);
 		}
-	}
 
-	/**
-	 * Example method for validating form data.
-	 *
-	 * This method could be used for additional server-side validation.
-	 *
-	 * @param array $form_data The form data to validate.
-	 * @return bool True if validation passes, false otherwise.
-	 */
-	public function validate_form_data( $form_data ) {
-		// Add your validation logic here.
-		error_log( '[DEBUG] Validating form data.' );
-		return true; // Example: Always returns true for now.
-	}
+		// Process form submission (this can be customized for saving to database, emailing, etc.).
+		$submission_data = array(
+			'form_id'   => $form_id,
+			'user_data' => $user_input,
+		);
 
-	/**
-	 * Example method for sanitizing form data.
-	 *
-	 * Ensures that data is properly sanitized before processing or saving.
-	 *
-	 * @param array $form_data The form data to sanitize.
-	 * @return array The sanitized form data.
-	 */
-	public function sanitize_form_data( $form_data ) {
-		// Add your sanitization logic here.
-		error_log( '[DEBUG] Sanitizing form data.' );
-		return array_map( 'sanitize_text_field', $form_data );
+		// Send success response.
+		wp_send_json_success(
+			array(
+				'message' => __( 'Form submitted successfully.', 'smartforms' ),
+				'data'    => $submission_data,
+			)
+		);
 	}
 }
