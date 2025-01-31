@@ -4,72 +4,122 @@ SmartForms Project Structure
 Overview
 --------
 
-SmartForms is an **AI-powered questionnaire tool** that dynamically adjusts based on user input. It is built as a Gutenberg-based system with multi-step forms, allowing users to receive intelligent recommendations powered by AI. This structure ensures flexibility, scalability, and proper integration with WordPress best practices.
+SmartForms is an **AI-powered questionnaire tool** that dynamically adjusts based on user input. It's built as a Gutenberg-based system featuring multi-step forms with parent, child, and grandchild block relationships. This structure ensures modularity, scalability, and proper adherence to WordPress best practices.
 
 * * * * *
 
 Directory Structure
 -------------------
-
 ```
 smartforms/
-├── assets/            # Static assets (CSS, images, icons, etc.)
-├── build/             # Compiled JavaScript & CSS assets for production
-├── includes/          # PHP backend logic (CPTs, form processing, AI handlers, API integration)
-├── src/               # JavaScript source files (Gutenberg blocks)
-│   ├── form/          # Parent Form block (handles navigation, AI processing, and user interaction)
-│   ├── step/          # Step block (contains form fields, next/back buttons, and AI-driven adjustments)
-│   ├── fields/        # Individual field blocks (text, checkbox, select, etc.)
-│   │   ├── text-input/
-│   │   ├── checkbox/
-│   │   ├── radio/
-│   │   ├── dropdown/
-│   │   ├── slider/
-│   ├── components/    # Shared React components (button UI, AI-driven responses, chat-like interface)
-│   ├── hooks/         # Custom React hooks for handling AI logic and form state
-├── templates/         # Optional PHP templates for AI-enhanced server-side rendering (if needed)
-├── smartforms.php     # Main plugin file (initialization, enqueue scripts, AI processing logic)
-├── package.json       # Dependencies & build scripts
-├── README.md          # Project documentation
-
+├── assets/             # Static assets (CSS, images, icons, etc.)
+├── build/              # Compiled JavaScript & CSS assets for production
+├── blocks/             # Gutenberg blocks registration and assets
+│   ├── form/           # Parent Form block
+│   │   ├── block.json  # Block metadata (name, title, category, etc.)
+│   │   ├── index.js    # Registers the block; may import edit.js/save.js if needed
+│   │   ├── edit.js     # Editor (backend) functionality (optional)
+│   │   ├── save.js     # Front-end save/render function (if not dynamic)
+│   │   ├── editor.scss # Editor-only styles
+│   │   └── style.scss  # Front-end styles
+│   ├── step/           # Child Step block (used within the Form block)
+│   │   ├── block.json
+│   │   ├── index.js
+│   │   ├── edit.js
+│   │   ├── save.js
+│   │   ├── editor.scss
+│   │   └── style.scss
+│   └── fields/         # Grandchild Field blocks (individual form inputs)
+│       ├── text-input/
+│       │   ├── block.json
+│       │   ├── index.js
+│       │   ├── edit.js
+│       │   ├── save.js
+│       │   ├── editor.scss
+│       │   ├── style.scss
+|       |   └── dynamic.php
+│       ├── checkbox/
+│       │   ├── block.json
+│       │   ├── index.js
+│       │   ├── edit.js
+│       │   ├── save.js
+│       │   ├── editor.scss
+│       │   └── style.scss
+|       |   └── dynamic.php
+│       ├── radio/
+│       │   ├── block.json
+│       │   ├── index.js
+│       │   ├── edit.js
+│       │   ├── save.js
+│       │   ├── editor.scss
+│       │   └── style.scss
+|       |   └── dynamic.php
+│       ├── dropdown/
+│       │   ├── block.json
+│       │   ├── index.js
+│       │   ├── edit.js
+│       │   ├── save.js
+│       │   ├── editor.scss
+│       │   └── style.scss
+|       |   └── dynamic.php
+│       └── slider/
+│           ├── block.json
+│           ├── index.js
+│           ├── edit.js
+│           ├── save.js
+│           ├── editor.scss
+│           ├── style.scss
+|           └── dynamic.php
+├── includes/           # PHP backend logic (custom post types, form processing, AI handlers, API integration, etc.)
+├── src/                # Shared JavaScript source files and utilities (non-block–specific)
+│   ├── components/     # Shared React components (buttons, chat UI, etc.)
+│   └── hooks/          # Custom React hooks for AI logic and form state management
+├── templates/          # Optional PHP templates for server-side rendering (if dynamic block rendering is needed)
+├── smartforms.php      # Main plugin file (initialization, block registration, enqueue scripts, AI processing logic)
+├── package.json        # Node package file (dependencies & build scripts)
+└── README.md           # Project documentation
 ```
-
-* * * * *
 
 Block Architecture
 ------------------
 
-### **1\. Form Block (`src/form/` - Parent Block)**
+### 1\. Form Block (Parent Block -- `blocks/form/`)
 
--   **Purpose:** Acts as the **main container** for AI-powered questionnaires.
--   **Stores global settings:** Form title, submission method, AI settings, validation rules.
--   **Handles navigation & AI logic:** Progress tracking, next/back buttons, API calls to AI models.
--   **Uses InnerBlocks** to hold Step blocks.
+-   **Purpose:**\
+    Serves as the main container for the AI-powered questionnaire.
+-   **Responsibilities:**
+    -   Stores global settings (form title, submission method, AI configurations, validation rules, etc.)
+    -   Manages navigation and AI interactions (progress tracking, API calls, etc.)
+    -   Contains an InnerBlocks area for the Step blocks
 
-### **2\. Step Block (`src/step/` - Child Block)**
+### 2\. Step Block (Child Block -- `blocks/step/`)
 
--   **Purpose:** Represents a single "page" in an AI-driven multi-step questionnaire.
--   **Contains:** Fields inside `InnerBlocks`, dynamically adjusted by AI.
--   **Navigation:** Has Next & Back buttons, with AI logic to determine the next step dynamically.
+-   **Purpose:**\
+    Represents a single "page" of the multi-step questionnaire.
+-   **Responsibilities:**
+    -   Contains an InnerBlocks area for placing Field blocks
+    -   Provides Next and Back navigation with integrated AI logic to adjust flow
 
-### **3\. Field Blocks (`src/fields/` - Grandchild Blocks)**
+### 3\. Field Blocks (Grandchild Blocks -- `blocks/fields/`)
 
--   **Purpose:** Individual form inputs (Text, Checkbox, Select, etc.) that interact with AI.
--   **Each field has:**
-    -   `edit.js`: Defines block settings & UI controls.
-    -   `index.js`: Registers the block in Gutenberg.
-    -   `style.scss`: Default styling.
-    -   AI hooks to process user input dynamically.
+-   **Purpose:**\
+    Individual form input components (e.g., text-input, checkbox, radio, dropdown, slider) that capture user data.
+-   **Each Field Block Contains:**
+    -   **block.json:** Metadata and asset declarations
+    -   **index.js (and optionally edit.js/save.js):** Registration and behavior definitions
+    -   **Styles:** Both editor (editor.scss) and front-end (style.scss) styles
+-   **Usage:**\
+    Field blocks are added as InnerBlocks within the Step block, allowing dynamic, AI-driven questionnaire construction.
 
 * * * * *
 
 Development Plan
 ----------------
 
-1.  **Implement the Form (Parent) block with AI interaction**
-2.  **Implement the Step block with AI-driven adjustments**
-3.  **Convert form fields into independent AI-interactive blocks**
-4.  **Implement AI-driven conditional logic (show/hide fields & steps dynamically based on AI responses)**
-5.  **Style & refine the UI, ensuring a chat-like experience**
+1.  **Implement the Form (Parent) block** with its AI integration and InnerBlocks for steps.
+2.  **Develop the Step block** to handle individual pages of the form with dynamic navigation.
+3.  **Create Field blocks** as independent, reusable components that integrate with AI for conditional logic.
+4.  **Incorporate AI-driven conditional logic** to show/hide fields and adjust steps based on responses.
+5.  **Refine styling and UI components** to deliver a chat-like, responsive user experience.
 
-This structure ensures a clean, maintainable, and WordPress-native AI-powered questionnaire experience. 🚀
+* * * * *

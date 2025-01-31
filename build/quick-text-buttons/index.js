@@ -1,1 +1,0 @@
-(()=>{"use strict";const t=window.wp.blocks,e=window.wp.blockEditor,s=window.ReactJSXRuntime;(0,t.registerBlockType)("smartforms/quick-text-buttons",{edit:t=>(0,s.jsx)("button",{...(0,e.useBlockProps)(),children:t.attributes.label||"Quick Text Buttons"}),save:t=>(0,s.jsx)("button",{...e.useBlockProps.save(),children:t.attributes.label||"Quick Text Buttons"})})})();
