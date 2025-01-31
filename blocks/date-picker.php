@@ -5,7 +5,7 @@
  * @package SmartForms
  */
 
-namespace Smartforms;
+namespace SmartForms;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Prevent direct access.
@@ -26,4 +26,4 @@ function smartforms_register_date_picker_block() {
 		error_log( '[ERROR] block.json not found at: ' . esc_url( $block_path ) );
 	}
 }
-add_action( 'init', 'Smartforms\smartforms_register_date_picker_block' );
+add_action( 'init', 'SmartForms\smartforms_register_date_picker_block' );

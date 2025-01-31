@@ -11,7 +11,7 @@
  * @package SmartForms
  */
 
-namespace Smartforms;
+namespace SmartForms;
 
 // Prevent direct access to the plugin file.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -21,8 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Autoload classes.
 spl_autoload_register(
 	function ( $class_name ) {
-		if ( strpos( $class_name, 'Smartforms\\' ) === 0 ) {
-			$relative_class = str_replace( 'Smartforms\\', '', $class_name );
+		if ( strpos( $class_name, 'SmartForms\\' ) === 0 ) {
+			$relative_class = str_replace( 'SmartForms\\', '', $class_name );
 			$file_path      = plugin_dir_path( __FILE__ ) . 'includes/class-' . strtolower( str_replace( '_', '-', $relative_class ) ) . '.php';
 
 			if ( file_exists( $file_path ) ) {
@@ -33,13 +33,13 @@ spl_autoload_register(
 );
 
 // Activation and deactivation hooks.
-register_activation_hook( __FILE__, array( 'Smartforms\\Smartforms', 'activate' ) );
-register_deactivation_hook( __FILE__, array( 'Smartforms\\Smartforms', 'deactivate' ) );
+register_activation_hook( __FILE__, array( 'SmartForms\\SmartForms', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'SmartForms\\SmartForms', 'deactivate' ) );
 
 // Initialize the plugin.
 add_action(
 	'plugins_loaded',
 	function () {
-		Smartforms::get_instance();
+		SmartForms::get_instance();
 	}
 );

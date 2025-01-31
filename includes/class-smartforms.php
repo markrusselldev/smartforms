@@ -5,7 +5,7 @@
  * @package SmartForms
  */
 
-namespace Smartforms;
+namespace SmartForms;
 
 // Ensure the required classes are included.
 require_once plugin_dir_path( __FILE__ ) . 'class-block-editor-loader.php';
@@ -19,19 +19,19 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/cpt/form.php';
  * This is the central class for the SmartForms plugin. It initializes all
  * components, manages activation/deactivation hooks, and loads the CPT.
  */
-class Smartforms {
+class SmartForms {
 
 	/**
 	 * Singleton instance of the plugin.
 	 *
-	 * @var Smartforms|null
+	 * @var SmartForms|null
 	 */
 	private static $instance = null;
 
 	/**
 	 * Get or create the singleton instance.
 	 *
-	 * @return Smartforms The singleton instance.
+	 * @return SmartForms The singleton instance.
 	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {
@@ -92,18 +92,18 @@ class Smartforms {
 		Block_Editor_Loader::get_instance();
 
 		// Initialize the SmartForms Handler class.
-		Smartforms_Handler::get_instance();
+		SmartForms_Handler::get_instance();
 
 		// Initialize the Admin Menu class.
-		if ( class_exists( 'Smartforms\\Admin_Menu' ) ) {
+		if ( class_exists( 'SmartForms\\Admin_Menu' ) ) {
 			new Admin_Menu();
 		}
 	}
 }
 
 // Initialize the SmartForms plugin.
-Smartforms::get_instance();
+SmartForms::get_instance();
 
 // Register activation and deactivation hooks.
-register_activation_hook( __FILE__, array( 'Smartforms\\Smartforms', 'activate' ) );
-register_deactivation_hook( __FILE__, array( 'Smartforms\\Smartforms', 'deactivate' ) );
+register_activation_hook( __FILE__, array( 'SmartForms\\SmartForms', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'SmartForms\\SmartForms', 'deactivate' ) );

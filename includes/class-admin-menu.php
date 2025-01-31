@@ -5,7 +5,7 @@
  * @package SmartForms
  */
 
-namespace Smartforms;
+namespace SmartForms;
 
 /**
  * Admin menu class for SmartForms plugin.

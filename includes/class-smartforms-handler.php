@@ -5,26 +5,26 @@
  * @package SmartForms
  */
 
-namespace Smartforms;
+namespace SmartForms;
 
 /**
- * Class Smartforms_Handler
+ * Class SmartForms_Handler
  *
  * Processes SmartForms submissions via AJAX.
  */
-class Smartforms_Handler {
+class SmartForms_Handler {
 
 	/**
 	 * Singleton instance.
 	 *
-	 * @var Smartforms_Handler|null
+	 * @var SmartForms_Handler|null
 	 */
 	private static $instance = null;
 
 	/**
 	 * Get or create the singleton instance.
 	 *
-	 * @return Smartforms_Handler The singleton instance.
+	 * @return SmartForms_Handler The singleton instance.
 	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {

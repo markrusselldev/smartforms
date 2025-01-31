@@ -5,7 +5,7 @@
  * @package SmartForms
  */
 
-namespace Smartforms;
+namespace SmartForms;
 
 /**
  * Block Editor Loader Class.
