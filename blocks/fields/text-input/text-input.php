@@ -1,29 +1,42 @@
 <?php
 /**
- * Registers the Text Input block for SmartForms.
+ * Dynamic rendering for the Text Input block.
+ *
+ * Generates the HTML output for the Text Input block on the front end.
  *
  * @package SmartForms
  */
 
-namespace SmartForms;
-
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Prevent direct access.
-}
-
 /**
- * Register the block using block.json.
+ * Render callback for the Text Input block.
  *
- * @return void
+ * @param array $attributes The block attributes.
+ * @return string HTML output for the block.
  */
-function smartforms_register_text_input_block() {
-	$block_path = plugin_dir_path( __FILE__ ) . 'build/text-input/block.json';
+function smartforms_render_text_input( $attributes ) {
+	$placeholder  = isset( $attributes['placeholder'] ) ? $attributes['placeholder'] : __( 'Enter text...', 'smartforms' );
+	$value        = isset( $attributes['value'] ) ? $attributes['value'] : '';
+	$label        = isset( $attributes['label'] ) ? $attributes['label'] : __( 'Text Input Field', 'smartforms' );
+	$required     = ! empty( $attributes['required'] ) ? ' required' : '';
+	$custom_class = isset( $attributes['customClass'] ) ? $attributes['customClass'] : '';
 
-	if ( file_exists( $block_path ) ) {
-		register_block_type_from_metadata( $block_path );
-		error_log( '[DEBUG] Text Input block registered successfully from: ' . esc_url( $block_path ) );
-	} else {
-		error_log( '[ERROR] block.json not found at: ' . esc_url( $block_path ) );
-	}
+	ob_start();
+	?>
+	<div class="smartforms-text-input <?php echo esc_attr( $custom_class ); ?>">
+		<?php if ( '' !== $label ) : ?>
+			<label><?php echo esc_html( $label ); ?></label>
+		<?php endif; ?>
+		<input type="text"
+			placeholder="<?php echo esc_attr( $placeholder ); ?>"
+			value="<?php echo esc_attr( $value ); ?>"<?php echo esc_attr( $required ); ?> />
+	</div>
+	<?php
+	return ob_get_clean();
 }
-add_action( 'init', 'SmartForms\\smartforms_register_text_input_block' );
+
+register_block_type(
+	__DIR__,
+	array(
+		'render_callback' => 'smartforms_render_text_input',
+	)
+);
