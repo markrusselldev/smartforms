@@ -4,22 +4,27 @@
     "name": "smartforms/text-input",
     "title": "Text Input",
     "category": "smartforms",
-    "icon": "edit",
+    "icon": "admin-customizer",
     "description": "A text input field for SmartForms.",
     "attributes": {
-        "placeholder": {
-            "type": "string",
-            "default": "Enter text here"
-        },
         "label": {
             "type": "string",
-            "default": "Label"
+            "default": "Your Question"
+        },
+        "placeholder": {
+            "type": "string",
+            "default": ""
         },
         "required": {
             "type": "boolean",
             "default": false
+        },
+        "value": {
+            "type": "string",
+            "default": ""
         }
     },
     "editorScript": "file:./index.js",
-    "style": "file:./index.css"
+    "editorStyle": "file:./editor.css",
+    "style": "file:./style.css"
 }

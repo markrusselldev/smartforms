@@ -11,13 +11,13 @@ namespace Smartforms;
 require_once plugin_dir_path( __FILE__ ) . 'class-block-editor-loader.php';
 require_once plugin_dir_path( __FILE__ ) . 'class-smartforms-handler.php';
 require_once plugin_dir_path( __FILE__ ) . 'class-admin-menu.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/cpt/form.php';
 
 /**
  * Main SmartForms class.
  *
  * This is the central class for the SmartForms plugin. It initializes all
- * components, registers custom post types, and manages activation and
- * deactivation hooks.
+ * components, manages activation/deactivation hooks, and loads the CPT.
  */
 class Smartforms {
 
@@ -48,10 +48,10 @@ class Smartforms {
 	 * @return void
 	 */
 	public static function activate() {
+		// Store the plugin version in the options table.
 		add_option( 'smartforms_version', '1.0.0' );
 
-		// Register the custom post type to ensure it's available during activation.
-		self::register_custom_post_type();
+		// Flush rewrite rules to ensure CPT permalinks work correctly.
 		flush_rewrite_rules();
 	}
 
@@ -63,9 +63,10 @@ class Smartforms {
 	 * @return void
 	 */
 	public static function deactivate() {
+		// Remove the stored plugin version.
 		delete_option( 'smartforms_version' );
 
-		// Flush rewrite rules to clean up the custom post type.
+		// Flush rewrite rules to clean up CPT permalinks.
 		flush_rewrite_rules();
 	}
 
@@ -75,46 +76,8 @@ class Smartforms {
 	 * Initializes the plugin components and hooks into WordPress actions.
 	 */
 	private function __construct() {
-		// Register the custom post type.
-		add_action( 'init', array( $this, 'register_custom_post_type' ) );
-
 		// Initialize related plugin classes.
 		$this->initialize_classes();
-	}
-
-	/**
-	 * Register the custom post type for SmartForms.
-	 *
-	 * Creates a custom post type for managing forms in the plugin.
-	 *
-	 * @return void
-	 */
-	public static function register_custom_post_type() {
-		register_post_type(
-			'smart_form',
-			array(
-				'labels'       => array(
-					'name'               => esc_html__( 'SmartForms', 'smartforms' ),
-					'singular_name'      => esc_html__( 'Form', 'smartforms' ),
-					'add_new'            => esc_html__( 'Add New Form', 'smartforms' ),
-					'add_new_item'       => esc_html__( 'Add New Form', 'smartforms' ),
-					'edit_item'          => esc_html__( 'Edit Form', 'smartforms' ),
-					'new_item'           => esc_html__( 'New Form', 'smartforms' ),
-					'view_item'          => esc_html__( 'View Form', 'smartforms' ),
-					'view_items'         => esc_html__( 'View Forms', 'smartforms' ),
-					'search_items'       => esc_html__( 'Search Forms', 'smartforms' ),
-					'all_items'          => esc_html__( 'Forms', 'smartforms' ),
-					'not_found'          => esc_html__( 'No forms found.', 'smartforms' ),
-					'not_found_in_trash' => esc_html__( 'No forms found in Trash.', 'smartforms' ),
-				),
-				'public'       => false,
-				'show_ui'      => true,
-				'show_in_menu' => 'smartforms',
-				'show_in_rest' => true,
-				'supports'     => array( 'title', 'editor', 'custom-fields' ),
-				'rewrite'      => false,
-			)
-		);
 	}
 
 	/**
