@@ -75,34 +75,58 @@ class Block_Editor_Loader {
 			return;
 		}
 
-		// Scan for subdirectories in the build directory.
-		$block_folders = glob( $blocks_dir . '*', GLOB_ONLYDIR );
+		// Recursively find all block.json files inside any nested directory.
+		$block_folders = $this->get_all_block_folders( $blocks_dir );
 
-		// Register each block based on its block.json file.
+		if ( empty( $block_folders ) ) {
+			error_log( '[ERROR] No valid blocks found inside build directory.' );
+		}
+
+		// Register each block found.
 		foreach ( $block_folders as $block_folder ) {
-			$block_json_path = $block_folder . '/block.json';
+			$block_json_path = trailingslashit( $block_folder ) . 'block.json';
 
 			if ( file_exists( $block_json_path ) ) {
 				$result = register_block_type_from_metadata( $block_json_path );
 
-				/**
-				 * Check if $result is a WP_Error before calling get_error_message().
-				 *
-				 * @var \WP_Error $result
-				 */
 				if ( is_wp_error( $result ) ) {
 					error_log(
-						'[ERROR] Failed to register block: ' . esc_url( $block_folder ) .
-						' - ' . esc_html( $result->get_error_message() )
+						sprintf(
+							'[ERROR] Failed to register block: %s - %s',
+							esc_url( $block_folder ),
+							esc_html( $result->get_error_message() )
+						)
 					);
 				} else {
 					error_log( '[DEBUG] Block successfully registered: ' . esc_url( $block_json_path ) );
 				}
 			} else {
-				// Log if block.json is not found.
 				error_log( '[ERROR] block.json not found in: ' . esc_url( $block_folder ) );
 			}
 		}
+	}
+
+	/**
+	 * Recursively retrieves all block folders that contain a block.json file.
+	 *
+	 * @param string $base_dir The base directory to search for block.json files.
+	 * @return array List of directories containing block.json files.
+	 */
+	private function get_all_block_folders( $base_dir ) {
+		$block_folders = array();
+
+		$iterator = new \RecursiveIteratorIterator(
+			new \RecursiveDirectoryIterator( $base_dir, \RecursiveDirectoryIterator::SKIP_DOTS ),
+			\RecursiveIteratorIterator::SELF_FIRST
+		);
+
+		foreach ( $iterator as $file ) {
+			if ( $file->getFilename() === 'block.json' ) {
+				$block_folders[] = dirname( $file->getPathname() );
+			}
+		}
+
+		return $block_folders;
 	}
 
 	/**
@@ -131,4 +155,4 @@ class Block_Editor_Loader {
 
 		return $categories;
 	}
-} // End of class
+} // End of class.
