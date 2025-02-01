@@ -39,7 +39,7 @@ function smartforms_register_form_cpt() {
 		'show_ui'            => true,
 		'show_in_menu'       => true,
 		'query_var'          => true,
-		'rewrite'            => array( 'slug' => 'smartforms_form' ),
+		'rewrite'            => array( 'slug' => 'smart_form' ),
 		'capability_type'    => 'post',
 		'has_archive'        => true,
 		'hierarchical'       => false,
@@ -48,7 +48,7 @@ function smartforms_register_form_cpt() {
 		'show_in_rest'       => true, // Enables Gutenberg editor.
 	);
 
-	register_post_type( 'smartforms_form', $args );
+	register_post_type( 'smart_form', $args );
 }
 
 add_action( 'init', 'smartforms_register_form_cpt' );

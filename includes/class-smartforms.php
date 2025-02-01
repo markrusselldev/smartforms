@@ -11,7 +11,7 @@ namespace SmartForms;
 require_once plugin_dir_path( __FILE__ ) . 'class-block-editor-loader.php';
 require_once plugin_dir_path( __FILE__ ) . 'class-smartforms-handler.php';
 require_once plugin_dir_path( __FILE__ ) . 'class-admin-menu.php';
-require_once plugin_dir_path( __FILE__ ) . 'includes/cpt/form.php';
+require_once plugin_dir_path( __FILE__ ) . 'cpt/form.php';
 
 /**
  * Main SmartForms class.

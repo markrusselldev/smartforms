@@ -13,6 +13,8 @@
 
 namespace SmartForms;
 
+ob_start();
+
 // Prevent direct access to the plugin file.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
