@@ -4,7 +4,7 @@
 	"description": "SmartForms is a WordPress plugin that enables users to create chatbot-style questionnaires with GPT-powered recommendations. This plugin leverages modern WordPress standards and AI technology to provide an intuitive and powerful tool for form creation.",
 	"main": "index.js",
 	"scripts": {
-		"build": "node build.js",
+		"build": "wp-scripts build",
 		"start": "wp-scripts start",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
