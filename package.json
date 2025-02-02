@@ -27,6 +27,6 @@
 	},
 	"homepage": "https://github.com/markrusselldev/smartforms#readme",
 	"devDependencies": {
-		"@wordpress/scripts": "^30.9.0"
+		"@wordpress/scripts": "^30.10.0"
 	}
 }

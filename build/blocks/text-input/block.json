@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "smartforms/text-input",
+  "title": "Text Input",
+  "category": "smartforms",
+  "icon": "admin-customizer",
+  "description": "A text input field for SmartForms.",
+  "attributes": {
+    "label": {
+      "type": "string",
+      "default": "Your Question"
+    },
+    "placeholder": {
+      "type": "string",
+      "default": ""
+    },
+    "required": {
+      "type": "boolean",
+      "default": false
+    },
+    "value": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./editor.scss",
+  "style": "file:./style.scss"
+}

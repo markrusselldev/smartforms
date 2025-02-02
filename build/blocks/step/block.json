@@ -1,0 +1,18 @@
+{
+  "apiVersion": 2,
+  "name": "smartforms/step",
+  "title": "SmartForms Step",
+  "category": "smartforms",
+  "supports": {
+    "html": false
+  },
+  "attributes": {
+    "stepTitle": {
+      "type": "string",
+      "default": "New Step"
+    }
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./editor.scss",
+  "style": "file:./style.scss"
+}
