@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
-import { PanelBody, TextControl, ToggleControl, SelectControl } from '@wordpress/components';
+import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
 import './editor.scss';
 
 export default function Edit({ attributes, setAttributes }) {
@@ -43,7 +43,7 @@ export default function Edit({ attributes, setAttributes }) {
                     <input
                         type="text"
                         value={value}
-                        placeholder={placeholder}
+                        placeholder={placeholder || "Enter text..."}
                         className={`mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${cssClass}`}
                         onChange={(event) => setAttributes({ value: event.target.value })}
                         required={required}

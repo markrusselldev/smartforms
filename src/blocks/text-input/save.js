@@ -1,7 +1,7 @@
 import { useBlockProps } from '@wordpress/block-editor';
 
 export default function save({ attributes }) {
-    const { label, placeholder, required } = attributes;
+    const { label, placeholder = "Enter text here...", required } = attributes;
 
     return (
         <div {...useBlockProps.save()}>

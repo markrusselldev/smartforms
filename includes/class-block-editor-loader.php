@@ -47,27 +47,24 @@ class Block_Editor_Loader {
 	/**
 	 * Register all SmartForms blocks dynamically.
 	 *
-	 * Scans the `src/blocks/` directory for `block.json` files and registers them.
+	 * Scans the `build/blocks/` directory for `block.json` files and registers them.
 	 *
 	 * @return void
 	 */
 	public function register_blocks() {
-		$blocks_dir = plugin_dir_path( __FILE__ ) . '../src/blocks/';
+		$blocks_dir = plugin_dir_path( __FILE__ ) . '../build/blocks/';
 
-		// Log the directory being scanned.
-		error_log( '[DEBUG] Registering blocks from directory: ' . esc_url( $blocks_dir ) );
-
-		// Check if the blocks directory exists.
-		if ( false === is_dir( $blocks_dir ) ) {
+		// Ensure the directory exists.
+		if ( ! is_dir( $blocks_dir ) ) {
 			error_log( '[ERROR] SmartForms blocks directory not found: ' . esc_url( $blocks_dir ) );
 			return;
 		}
 
-		// Get all block folders inside `src/blocks/`.
+		// Get all block folders inside `build/blocks/`.
 		$block_folders = scandir( $blocks_dir );
 
 		if ( false === $block_folders || empty( $block_folders ) ) {
-			error_log( '[ERROR] No valid blocks found inside src/blocks/ directory.' );
+			error_log( '[ERROR] No valid blocks found inside build/blocks/ directory.' );
 			return;
 		}
 
@@ -79,7 +76,7 @@ class Block_Editor_Loader {
 
 			$block_path = $blocks_dir . $folder;
 
-			if ( true === is_dir( $block_path ) && true === file_exists( $block_path . '/block.json' ) ) {
+			if ( is_dir( $block_path ) && file_exists( $block_path . '/block.json' ) ) {
 				$result = register_block_type_from_metadata( $block_path );
 
 				// Ensure `$result` is an instance of `WP_Error` before calling `get_error_message()`.
@@ -117,11 +114,8 @@ class Block_Editor_Loader {
 	public function enqueue_block_assets() {
 		$build_dir = plugin_dir_path( __FILE__ ) . '../build/blocks/';
 
-		// Log the directory being scanned.
-		error_log( '[DEBUG] Enqueuing block assets from directory: ' . esc_url( $build_dir ) );
-
-		// Check if the build directory exists.
-		if ( false === is_dir( $build_dir ) ) {
+		// Ensure the directory exists.
+		if ( ! is_dir( $build_dir ) ) {
 			error_log( '[ERROR] SmartForms build directory not found for assets: ' . esc_url( $build_dir ) );
 			return;
 		}
@@ -143,7 +137,7 @@ class Block_Editor_Loader {
 			$script_path = $block_path . '/index.js';
 			$style_path  = $block_path . '/index.css';
 
-			// Enqueue JavaScript as an ES module.
+			// Enqueue JavaScript.
 			if ( file_exists( $script_path ) ) {
 				wp_enqueue_script(
 					'smartforms-' . $folder . '-editor-script',
@@ -181,16 +175,12 @@ class Block_Editor_Loader {
 	public function add_smartforms_block_category( $categories, $context ) {
 		error_log( '[DEBUG] Adding SmartForms block category.' );
 
-		// Define the SmartForms category.
 		$smartforms_category = array(
 			'slug'  => 'smartforms',
 			'title' => __( 'SmartForms Blocks', 'smartforms' ),
 		);
 
-		// Prepend the SmartForms category to the categories list.
 		array_unshift( $categories, $smartforms_category );
-
-		// Log the updated categories list for debugging.
 		error_log( '[DEBUG] SmartForms block category moved to the top.' );
 
 		return $categories;

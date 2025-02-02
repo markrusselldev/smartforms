@@ -13,7 +13,7 @@
     },
     "placeholder": {
       "type": "string",
-      "default": ""
+      "default": "Enter text..."
     },
     "required": {
       "type": "boolean",
@@ -25,6 +25,6 @@
     }
   },
   "editorScript": "file:./index.js",
-  "editorStyle": "file:./editor.scss",
-  "style": "file:./style.scss"
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css"
 }
