@@ -1,0 +1,56 @@
+{
+  "apiVersion": 2,
+  "name": "smartforms/number",
+  "title": "Number Input",
+  "category": "smartforms",
+  "icon": "editor-table",
+  "description": "A number input field for SmartForms.",
+  "supports": {
+    "html": false,
+    "color": {
+      "background": true,
+      "text": true,
+      "gradients": true
+    },
+    "spacing": {
+      "margin": true,
+      "padding": true
+    },
+    "typography": {
+      "fontSize": true,
+      "lineHeight": true
+    }
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "default": "Number Input"
+    },
+    "required": {
+      "type": "boolean",
+      "default": false
+    },
+    "className": {
+      "type": "string"
+    },
+    "placeholder": {
+      "type": "string",
+      "default": "Enter number input..."
+    },
+    "min": {
+      "type": "number",
+      "default": 0
+    },
+    "max": {
+      "type": "number",
+      "default": 100
+    },
+    "step": {
+      "type": "number",
+      "default": 1
+    }
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./editor.css",
+  "style": "file:./style.css"
+}

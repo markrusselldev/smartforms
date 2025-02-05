@@ -1,0 +1,44 @@
+{
+  "apiVersion": 2,
+  "name": "smartforms/textarea",
+  "title": "Textarea",
+  "category": "smartforms",
+  "icon": "editor-paragraph",
+  "description": "A multi-line text input field.",
+  "supports": {
+    "html": false,
+    "color": {
+      "background": true,
+      "text": true,
+      "gradients": true
+    },
+    "spacing": {
+      "margin": true,
+      "padding": true
+    },
+    "typography": {
+      "fontSize": true,
+      "lineHeight": true
+    }
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "default": "Textarea"
+    },
+    "required": {
+      "type": "boolean",
+      "default": false
+    },
+    "className": {
+      "type": "string"
+    },
+    "placeholder": {
+      "type": "string",
+      "default": "Enter textarea..."
+    }
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./editor.css",
+  "style": "file:./style.css"
+}

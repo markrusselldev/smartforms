@@ -1,0 +1,44 @@
+{
+  "apiVersion": 2,
+  "name": "smartforms/text",
+  "title": "Text Input",
+  "category": "smartforms",
+  "icon": "editor-text",
+  "description": "A text input field for SmartForms.",
+  "supports": {
+    "html": false,
+    "color": {
+      "background": true,
+      "text": true,
+      "gradients": true
+    },
+    "spacing": {
+      "margin": true,
+      "padding": true
+    },
+    "typography": {
+      "fontSize": true,
+      "lineHeight": true
+    }
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "default": "Text Input"
+    },
+    "required": {
+      "type": "boolean",
+      "default": false
+    },
+    "className": {
+      "type": "string"
+    },
+    "placeholder": {
+      "type": "string",
+      "default": "Enter text input..."
+    }
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./editor.css",
+  "style": "file:./style.css"
+}

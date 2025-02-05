@@ -1,0 +1,47 @@
+{
+  "apiVersion": 2,
+  "name": "smartforms/checkbox",
+  "title": "Checkbox",
+  "category": "smartforms",
+  "icon": "yes",
+  "description": "A checkbox field for selecting options.",
+  "supports": {
+    "html": false,
+    "color": {
+      "background": true,
+      "text": true,
+      "gradients": true
+    },
+    "spacing": {
+      "margin": true,
+      "padding": true
+    },
+    "typography": {
+      "fontSize": true,
+      "lineHeight": true
+    }
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "default": "Checkbox"
+    },
+    "required": {
+      "type": "boolean",
+      "default": false
+    },
+    "className": {
+      "type": "string"
+    },
+    "options": {
+      "type": "array",
+      "default": [
+        "Option 1",
+        "Option 2"
+      ]
+    }
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./editor.css",
+  "style": "file:./style.css"
+}
