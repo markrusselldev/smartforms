@@ -1,9 +1,11 @@
 import { registerBlockType } from '@wordpress/blocks';
-import Edit from './edit';
+import edit from './edit';
 import save from './save';
+import './editor.scss';
 import './style.scss';
 
-registerBlockType('smartforms/smartforms-checkbox', {
-    edit: Edit,
+registerBlockType('smartforms/checkbox', {
+    edit,
     save,
-}/*  */);
+  });
+

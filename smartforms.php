@@ -34,6 +34,9 @@ spl_autoload_register(
 	}
 );
 
+// Ensure core plugin class is loaded.
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-smartforms.php';
+
 // Activation and deactivation hooks.
 register_activation_hook( __FILE__, array( 'SmartForms\\SmartForms', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'SmartForms\\SmartForms', 'deactivate' ) );

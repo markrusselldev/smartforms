@@ -13,6 +13,12 @@ require_once plugin_dir_path( __FILE__ ) . 'class-smartforms-handler.php';
 require_once plugin_dir_path( __FILE__ ) . 'class-admin-menu.php';
 require_once plugin_dir_path( __FILE__ ) . 'cpt/form.php';
 
+// Load additional functionality.
+require_once plugin_dir_path( __FILE__ ) . 'class-api.php'; // REST API for form data.
+require_once plugin_dir_path( __FILE__ ) . 'class-preview.php'; // Preview functionality.
+require_once plugin_dir_path( __FILE__ ) . 'admin/class-meta-box.php'; // Auto-generates JSON from Gutenberg blocks.
+require_once plugin_dir_path( __FILE__ ) . 'admin/class-preview-button.php'; // Modifies the Gutenberg preview button.
+
 /**
  * Main SmartForms class.
  *
