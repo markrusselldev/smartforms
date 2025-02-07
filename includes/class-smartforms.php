@@ -1,6 +1,6 @@
 <?php
 /**
- * Core plugin functionality.
+ * Core plugin functionality for SmartForms.
  *
  * @package SmartForms
  */
@@ -22,8 +22,7 @@ require_once plugin_dir_path( __FILE__ ) . 'admin/class-preview-button.php'; // 
 /**
  * Main SmartForms class.
  *
- * This is the central class for the SmartForms plugin. It initializes all
- * components, manages activation/deactivation hooks, and loads the CPT.
+ * This class initializes all components, manages activation/deactivation hooks, and centralizes logging.
  */
 class SmartForms {
 
@@ -104,6 +103,39 @@ class SmartForms {
 		if ( class_exists( 'SmartForms\\Admin_Menu' ) ) {
 			new Admin_Menu();
 		}
+	}
+
+	/**
+	 * Logs errors and debug messages with WP_DEBUG check.
+	 *
+	 * Ensures errors are logged only when WP_DEBUG is enabled.
+	 *
+	 * @param string         $message  The log message.
+	 * @param \WP_Error|null $wp_error Optional WP_Error object for additional details.
+	 * @return void
+	 */
+	public static function log_error( $message, $wp_error = null ) {
+		if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
+			return;
+		}
+
+		// Sanitize the message.
+		$message = is_string( $message ) ? sanitize_text_field( $message ) : wp_json_encode( $message );
+
+		// Append WP_Error details if provided.
+		if ( is_wp_error( $wp_error ) ) {
+			$error_messages = implode( ' | ', $wp_error->get_error_messages() );
+			$message       .= ' | WP_Error: ' . sanitize_text_field( $error_messages );
+		}
+
+		// Format log entry with timestamp.
+		$log_entry = sprintf(
+			'[%s] SmartForms: %s',
+			wp_date( 'Y-m-d H:i:s' ),
+			$message
+		);
+
+		error_log( $log_entry );
 	}
 }
 

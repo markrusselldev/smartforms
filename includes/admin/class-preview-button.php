@@ -5,78 +5,58 @@
  * @package SmartForms
  */
 
+namespace SmartForms\Admin;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Prevent direct access.
 }
 
 /**
- * Ensure Preview button is present and override its URL for SmartForms CPT.
+ * Overrides the preview link for SmartForms.
+ *
+ * @param string  $preview_link Default preview link.
+ * @param WP_Post $post The post object.
+ * @return string Modified preview URL.
  */
-function smartforms_override_preview_button() {
-	$screen = get_current_screen();
+function smartforms_override_preview_link( $preview_link, $post ) {
+	if ( 'smart_form' === get_post_type( $post ) ) {
+		$preview_link = home_url( '/?smartforms_preview=1&form_id=' . $post->ID );
 
-	// Ensure we are inside the SmartForms post type editor.
-	if ( empty( $screen ) || 'smart_form' !== $screen->post_type ) {
-		return;
+		// Log the override using the centralized logging function.
+		if ( class_exists( '\SmartForms\SmartForms' ) ) {
+			\SmartForms\SmartForms::log_error( '[DEBUG] SmartForms preview link overridden: ' . esc_url( $preview_link ) );
+		}
 	}
-
-	?>
-	<script type="text/javascript">
-		document.addEventListener("DOMContentLoaded", function() {
-			// Ensure jQuery is available.
-			if (typeof jQuery === "undefined") {
-				return;
-			}
-
-			let $ = jQuery;
-
-			// Wait until the preview button is available.
-			let interval = setInterval(function() {
-				let previewButton = $("#post-preview");
-				if (previewButton.length) {
-					clearInterval(interval); // Stop checking once the button is found.
-
-					// Get the post ID dynamically.
-					let postId = $("#post_ID").val();
-					if (!postId) {
-						return;
-					}
-
-					// Dynamically generate the preview URL.
-					let previewUrl = window.location.origin + "/?smartforms_preview=1&form_id=" + postId;
-
-					// Override the preview button behavior.
-					previewButton.attr("href", previewUrl).attr("target", "_blank");
-
-					// Ensure the Preview button saves before opening preview.
-					previewButton.off("click").on("click", function(e) {
-						e.preventDefault();
-						$("#publish").click(); // Trigger save
-						setTimeout(() => {
-							window.open(previewUrl, "_blank");
-						}, 1500);
-					});
-				}
-			}, 500); // Check every 500ms
-		});
-	</script>
-	<?php
+	return esc_url( $preview_link );
 }
-
-add_action( 'admin_footer', 'smartforms_override_preview_button' );
+add_filter( 'preview_post_link', __NAMESPACE__ . '\\smartforms_override_preview_link', 10, 2 );
 
 /**
- * Force enable the Preview button for SmartForms CPT.
+ * Ensures the preview button appears in SmartForms CPT.
+ *
+ * @param array $actions Post row actions.
+ * @return array Modified actions.
  */
-function smartforms_force_enable_preview_button( $actions ) {
+function smartforms_enable_preview_button( $actions ) {
 	global $post;
 
 	if ( isset( $post->post_type ) && 'smart_form' === $post->post_type ) {
-		// Ensure Preview button is available.
-		$actions['view'] = '<a href="#" id="post-preview" class="preview button">Preview</a>';
+		$preview_url = home_url( '/?smartforms_preview=1&form_id=' . $post->ID );
+
+		// Ensure escaping for URL and attributes.
+		$actions['view'] = sprintf(
+			'<a href="%s" target="_blank" class="preview button">%s</a>',
+			esc_url( $preview_url ),
+			esc_html__( 'Preview', 'smartforms' )
+		);
+
+		// Log the preview button addition using the centralized logging function.
+		if ( class_exists( '\SmartForms\SmartForms' ) ) {
+			\SmartForms\SmartForms::log_error( '[DEBUG] SmartForms preview button added: ' . esc_url( $preview_url ) );
+		}
 	}
 
 	return $actions;
 }
-add_filter( 'post_row_actions', 'smartforms_force_enable_preview_button' );
-add_filter( 'page_row_actions', 'smartforms_force_enable_preview_button' );
+add_filter( 'post_row_actions', __NAMESPACE__ . '\\smartforms_enable_preview_button', 10, 1 );
+add_filter( 'page_row_actions', __NAMESPACE__ . '\\smartforms_enable_preview_button', 10, 1 );

@@ -62,12 +62,9 @@ class SmartForms_Handler {
 	public function process_form_submission() {
 		// Verify nonce security.
 		if ( ! isset( $_POST['smartform_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['smartform_nonce'] ) ), 'smartform_submit' ) ) {
-			wp_send_json_error(
-				array(
-					'message' => __( 'Security check failed.', 'smartforms' ),
-				),
-				403
-			);
+			$error = new \WP_Error( 'invalid_nonce', __( 'Security check failed.', 'smartforms' ), array( 'status' => 403 ) );
+			SmartForms::log_error( 'Invalid nonce detected during form submission.', $error );
+			wp_send_json_error( $error->get_error_message(), 403 );
 		}
 
 		// Validate and sanitize inputs.
@@ -75,12 +72,9 @@ class SmartForms_Handler {
 		$user_input = isset( $_POST['form_data'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['form_data'] ) ) : array();
 
 		if ( empty( $form_id ) || empty( $user_input ) ) {
-			wp_send_json_error(
-				array(
-					'message' => __( 'Invalid form submission.', 'smartforms' ),
-				),
-				400
-			);
+			$error = new \WP_Error( 'invalid_submission', __( 'Invalid form submission.', 'smartforms' ), array( 'status' => 400 ) );
+			SmartForms::log_error( 'Invalid form submission detected.', $error );
+			wp_send_json_error( $error->get_error_message(), 400 );
 		}
 
 		// Process form submission (this can be customized for saving to database, emailing, etc.).
@@ -88,6 +82,9 @@ class SmartForms_Handler {
 			'form_id'   => $form_id,
 			'user_data' => $user_input,
 		);
+
+		// Log successful form submission.
+		SmartForms::log_error( 'Form submitted successfully. Form ID: ' . $form_id );
 
 		// Send success response.
 		wp_send_json_success(

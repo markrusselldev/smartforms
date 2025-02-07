@@ -5,6 +5,8 @@
  * @package SmartForms
  */
 
+namespace SmartForms;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Prevent direct access.
 }
@@ -20,39 +22,42 @@ function smartforms_register_form_cpt() {
 		'singular_name'      => _x( 'SmartForm Entry', 'post type singular name', 'smartforms' ),
 		'menu_name'          => _x( 'SmartForms', 'admin menu', 'smartforms' ),
 		'name_admin_bar'     => _x( 'SmartForm', 'add new on admin bar', 'smartforms' ),
-		'add_new'            => _x( 'Add New', 'form', 'smartforms' ),
-		'add_new_item'       => __( 'Add New SmartForm', 'smartforms' ),
-		'new_item'           => __( 'New SmartForm', 'smartforms' ),
-		'edit_item'          => __( 'Edit SmartForm', 'smartforms' ),
-		'view_item'          => __( 'View SmartForm', 'smartforms' ),
-		'all_items'          => __( 'All SmartForms', 'smartforms' ),
-		'search_items'       => __( 'Search SmartForms', 'smartforms' ),
-		'parent_item_colon'  => __( 'Parent Forms:', 'smartforms' ),
-		'not_found'          => __( 'No SmartForms found.', 'smartforms' ),
-		'not_found_in_trash' => __( 'No SmartForms found in Trash.', 'smartforms' ),
+		'add_new'            => esc_html_x( 'Add New', 'form', 'smartforms' ),
+		'add_new_item'       => esc_html__( 'Add New SmartForm', 'smartforms' ),
+		'new_item'           => esc_html__( 'New SmartForm', 'smartforms' ),
+		'edit_item'          => esc_html__( 'Edit SmartForm', 'smartforms' ),
+		'view_item'          => esc_html__( 'View SmartForm', 'smartforms' ),
+		'all_items'          => esc_html__( 'All SmartForms', 'smartforms' ),
+		'search_items'       => esc_html__( 'Search SmartForms', 'smartforms' ),
+		'parent_item_colon'  => esc_html__( 'Parent Forms:', 'smartforms' ),
+		'not_found'          => esc_html__( 'No SmartForms found.', 'smartforms' ),
+		'not_found_in_trash' => esc_html__( 'No SmartForms found in Trash.', 'smartforms' ),
 	);
 
 	$args = array(
 		'labels'             => $labels,
 		'public'             => true,
-		'publicly_queryable' => false,
+		'publicly_queryable' => true,
 		'show_ui'            => true,
-		'show_in_menu'       => true,
+		'show_in_menu'       => 'smartforms',
 		'query_var'          => false,
-		'rewrite'            => false, // ❗ No need for frontend URLs since chatbot loads the forms.
+		'rewrite'            => false, // No need for frontend URLs since chatbot loads the forms.
 		'capability_type'    => 'post',
-		'has_archive'        => false, // ❗ No need for an archive page.
+		'has_archive'        => false, // No need for an archive page.
 		'hierarchical'       => false,
 		'menu_position'      => null,
 		'show_in_admin_bar'  => true,
-		'supports'           => array( 'title', 'editor', 'revision' ),
+		'supports'           => array( 'title', 'editor', 'revisions' ),
 		'show_in_rest'       => true, // Enables Gutenberg editor.
 	);
 
-	register_post_type( 'smart_form', $args ); // ✅ Keeping original CPT name
-}
+	$registered = register_post_type( 'smart_form', $args );
 
-add_action( 'init', 'smartforms_register_form_cpt', 5 );
+	if ( is_wp_error( $registered ) ) {
+		SmartForms::log_error( 'Failed to register custom post type: smart_form', $registered );
+	}
+}
+add_action( 'init', __NAMESPACE__ . '\\smartforms_register_form_cpt', 5 );
 
 /**
  * Ensures the form block outputs a proper `<form>` wrapper.
@@ -62,13 +67,17 @@ add_action( 'init', 'smartforms_register_form_cpt', 5 );
  * @return string Wrapped form output.
  */
 function smartforms_render_form_block( $attributes, $content ) {
+	if ( ! is_string( $content ) ) {
+		$content = '';
+	}
+
 	// Ensure a proper form wrapper with method="post" by default.
-	return '<form class="smartforms-form" method="post">' . do_shortcode( $content ) . '</form>';
+	return '<form class="smartforms-form" method="post">' . do_shortcode( wp_kses_post( $content ) ) . '</form>';
 }
 
 register_block_type(
 	'smartforms/form',
 	array(
-		'render_callback' => 'smartforms_render_form_block',
+		'render_callback' => __NAMESPACE__ . '\\smartforms_render_form_block',
 	)
 );
