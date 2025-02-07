@@ -40,15 +40,15 @@ function smartforms_register_form_cpt() {
 		'publicly_queryable' => true,
 		'show_ui'            => true,
 		'show_in_menu'       => 'smartforms',
-		'query_var'          => false,
-		'rewrite'            => false, // No need for frontend URLs since chatbot loads the forms.
+		'query_var'          => true,
+		'rewrite'            => array( 'slug' => 'smart_form', 'with_front' => false ),
 		'capability_type'    => 'post',
-		'has_archive'        => false, // No need for an archive page.
+		'has_archive'        => false,
 		'hierarchical'       => false,
 		'menu_position'      => null,
 		'show_in_admin_bar'  => true,
 		'supports'           => array( 'title', 'editor', 'revisions' ),
-		'show_in_rest'       => true, // Enables Gutenberg editor.
+		'show_in_rest'       => true,
 	);
 
 	$registered = register_post_type( 'smart_form', $args );
@@ -57,7 +57,7 @@ function smartforms_register_form_cpt() {
 		SmartForms::log_error( 'Failed to register custom post type: smart_form', $registered );
 	}
 }
-add_action( 'init', __NAMESPACE__ . '\\smartforms_register_form_cpt', 5 );
+add_action( 'init', __NAMESPACE__ . '\smartforms_register_form_cpt', 5 );
 
 /**
  * Ensures the form block outputs a proper `<form>` wrapper.
@@ -72,12 +72,12 @@ function smartforms_render_form_block( $attributes, $content ) {
 	}
 
 	// Ensure a proper form wrapper with method="post" by default.
-	return '<form class="smartforms-form" method="post">' . do_shortcode( wp_kses_post( $content ) ) . '</form>';
+	return '<form class="smartforms-form" method="post" novalidate>' . do_shortcode( wp_kses_post( $content ) ) . '</form>';
 }
 
 register_block_type(
 	'smartforms/form',
 	array(
-		'render_callback' => __NAMESPACE__ . '\\smartforms_render_form_block',
+		'render_callback' => __NAMESPACE__ . '\smartforms_render_form_block',
 	)
 );

@@ -13,8 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Generate a standalone preview mode for a SmartForm.
  */
 function smartforms_preview_mode() {
-	if ( isset( $_GET['smartforms_preview'], $_GET['form_id'] ) ) {
-		$form_id = absint( $_GET['form_id'] );
+	if ( isset( $_GET['smartforms_preview'] ) ) {
+		$form_id = isset( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : 0;
 
 		// Validate form ID.
 		if ( empty( $form_id ) ) {
@@ -22,8 +22,8 @@ function smartforms_preview_mode() {
 				'invalid_form_id',
 				esc_html__( 'Invalid form ID.', 'smartforms' )
 			);
-			\SmartForms\SmartForms::log_error( 'Invalid form ID for preview.', $error ); // ✅ Fully qualified class reference
-			wp_die( esc_html( $error->get_error_message() ) );
+			\SmartForms\SmartForms::log_error( 'Invalid form ID for preview.', $error ); 
+			wp_die( esc_html( $error->get_error_message() ), 400 );
 		}
 
 		$form = get_post( $form_id );
@@ -35,7 +35,7 @@ function smartforms_preview_mode() {
 				esc_html__( 'Form not found.', 'smartforms' )
 			);
 			\SmartForms\SmartForms::log_error( 'Form not found for preview. ID: ' . $form_id, $error );
-			wp_die( esc_html( $error->get_error_message() ) );
+			wp_die( esc_html( $error->get_error_message() ), 404 );
 		}
 
 		// Fetch stored form meta data (JSON config).
@@ -48,7 +48,7 @@ function smartforms_preview_mode() {
 				esc_html__( 'No form data available.', 'smartforms' )
 			);
 			\SmartForms\SmartForms::log_error( 'No form data found for preview. ID: ' . $form_id, $error );
-			wp_die( esc_html( $error->get_error_message() ) );
+			wp_die( esc_html( $error->get_error_message() ), 500 );
 		}
 
 		\SmartForms\SmartForms::log_error( 'Loading preview for Form ID: ' . $form_id );
@@ -132,4 +132,4 @@ function smartforms_preview_mode() {
 		exit;
 	}
 }
-add_action( 'init', 'smartforms_preview_mode' );
+add_action( 'template_redirect', 'smartforms_preview_mode' );
