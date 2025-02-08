@@ -15,9 +15,8 @@ require_once plugin_dir_path( __FILE__ ) . 'cpt/form.php';
 
 // Load additional functionality.
 require_once plugin_dir_path( __FILE__ ) . 'class-api.php'; // REST API for form data.
-require_once plugin_dir_path( __FILE__ ) . 'class-preview.php'; // Preview functionality.
+require_once plugin_dir_path( __FILE__ ) . 'class-chat-ui.php'; // Chat UI and preview functionality.
 require_once plugin_dir_path( __FILE__ ) . 'admin/class-meta-box.php'; // Auto-generates JSON from Gutenberg blocks.
-require_once plugin_dir_path( __FILE__ ) . 'admin/class-preview-button.php'; // Modifies the Gutenberg preview button.
 
 /**
  * Main SmartForms class.
@@ -81,8 +80,15 @@ class SmartForms {
 	 * Initializes the plugin components and hooks into WordPress actions.
 	 */
 	private function __construct() {
+		// Enqueue assets.
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+
 		// Initialize related plugin classes.
 		$this->initialize_classes();
+
+		// Register page template for SmartForms.
+		add_filter( 'theme_page_templates', array( $this, 'register_template' ) );
+		add_filter( 'template_include', array( $this, 'load_template' ) );
 	}
 
 	/**
@@ -103,6 +109,60 @@ class SmartForms {
 		if ( class_exists( 'SmartForms\\Admin_Menu' ) ) {
 			new Admin_Menu();
 		}
+	}
+
+	/**
+	 * Enqueue Bootstrap styles and scripts.
+	 *
+	 * This method ensures that Bootstrap is available for frontend rendering.
+	 *
+	 * @return void
+	 */
+	public function enqueue_assets() {
+		// Enqueue Bootstrap CSS.
+		wp_enqueue_style(
+			'bootstrap-css',
+			'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
+			array(),
+			'5.3.3'
+		);
+
+		// Enqueue Bootstrap JavaScript.
+		wp_enqueue_script(
+			'bootstrap-js',
+			'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
+			array(),
+			'5.3.3',
+			true
+		);
+	}
+
+	/**
+	 * Registers the SmartForms template so it appears in the page template dropdown.
+	 *
+	 * @param array $templates List of existing templates.
+	 * @return array Updated list of templates.
+	 */
+	public function register_template( $templates ) {
+		$templates['templates/single-smart_form.php'] = __( 'SmartForms Chat UI', 'smartforms' );
+		return $templates;
+	}
+
+	/**
+	 * Loads the correct template for SmartForms single posts.
+	 *
+	 * @param string $template The existing template path.
+	 * @return string The new template path if SmartForms post type is detected.
+	 */
+	public function load_template( $template ) {
+		if ( is_singular( 'smart_form' ) ) {
+			$custom_template = plugin_dir_path( __DIR__ ) . 'templates/single-smart_form.php';
+
+			if ( file_exists( $custom_template ) ) {
+				return $custom_template;
+			}
+		}
+		return $template;
 	}
 
 	/**
