@@ -7,6 +7,11 @@
     <rule ref="WordPress-Docs" />
     <rule ref="WordPress-Extra" />
 
+    <!-- Disable the file naming sniff -->
+    <rule ref="WordPress.Files.FileName">
+        <severity>0</severity>
+    </rule>
+
     <!-- Exclude irrelevant folders/files -->
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/node_modules/*</exclude-pattern>
