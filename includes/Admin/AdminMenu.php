@@ -8,7 +8,7 @@
 namespace SmartForms\Admin;
 
 use WP_Error;
-use SmartForms\SmartForms; // Import the core SmartForms class for logging.
+use SmartForms\Core\SmartForms; // Import the core SmartForms class for logging.
 
 /**
  * Admin menu class for SmartForms plugin.
@@ -110,7 +110,8 @@ class AdminMenu {
 		switch ( $column ) {
 			case 'number_of_fields':
 				$field_count = get_post_meta( $post_id, '_smart_form_field_count', true );
-				echo esc_html( intval( $field_count ) ?: '0' );
+				// Replace short ternary with explicit ternary operator.
+				echo esc_html( intval( $field_count ) ? intval( $field_count ) : '0' );
 				break;
 
 			case 'last_modified':
