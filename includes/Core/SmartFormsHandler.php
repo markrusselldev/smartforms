@@ -5,26 +5,29 @@
  * @package SmartForms
  */
 
-namespace SmartForms;
+namespace SmartForms\Core;
+
+use WP_Error;
+use SmartForms\Core\SmartForms; // Import the core SmartForms class for logging.
 
 /**
- * Class SmartForms_Handler
+ * Class SmartFormsHandler
  *
  * Processes SmartForms submissions via AJAX.
  */
-class SmartForms_Handler {
+class SmartFormsHandler {
 
 	/**
 	 * Singleton instance.
 	 *
-	 * @var SmartForms_Handler|null
+	 * @var SmartFormsHandler|null
 	 */
 	private static $instance = null;
 
 	/**
 	 * Get or create the singleton instance.
 	 *
-	 * @return SmartForms_Handler The singleton instance.
+	 * @return SmartFormsHandler The singleton instance.
 	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {
@@ -63,7 +66,7 @@ class SmartForms_Handler {
 		// Verify nonce security.
 		if ( ! isset( $_POST['smartform_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['smartform_nonce'] ) ), 'smartform_submit' ) ) {
 			$error = new \WP_Error( 'invalid_nonce', __( 'Security check failed.', 'smartforms' ), array( 'status' => 403 ) );
-			SmartForms::log_error( 'Invalid nonce detected during form submission.', $error );
+			\SmartForms\Core\SmartForms::log_error( 'Invalid nonce detected during form submission.', $error );
 			wp_send_json_error( $error->get_error_message(), 403 );
 		}
 
@@ -73,7 +76,7 @@ class SmartForms_Handler {
 
 		if ( empty( $form_id ) || empty( $user_input ) ) {
 			$error = new \WP_Error( 'invalid_submission', __( 'Invalid form submission.', 'smartforms' ), array( 'status' => 400 ) );
-			SmartForms::log_error( 'Invalid form submission detected.', $error );
+			\SmartForms\Core\SmartForms::log_error( 'Invalid form submission detected.', $error );
 			wp_send_json_error( $error->get_error_message(), 400 );
 		}
 
@@ -84,7 +87,7 @@ class SmartForms_Handler {
 		);
 
 		// Log successful form submission.
-		SmartForms::log_error( 'Form submitted successfully. Form ID: ' . $form_id );
+		\SmartForms\Core\SmartForms::log_error( 'Form submitted successfully. Form ID: ' . $form_id );
 
 		// Send success response.
 		wp_send_json_success(

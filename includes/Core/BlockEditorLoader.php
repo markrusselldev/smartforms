@@ -5,7 +5,7 @@
  * @package SmartForms
  */
 
-namespace SmartForms;
+namespace SmartForms\Core;
 
 use WP_Error;
 
@@ -14,19 +14,19 @@ use WP_Error;
  *
  * Dynamically registers Gutenberg blocks inside the SmartForms editor.
  */
-class Block_Editor_Loader {
+class BlockEditorLoader {
 
 	/**
 	 * Singleton instance.
 	 *
-	 * @var Block_Editor_Loader|null
+	 * @var BlockEditorLoader|null
 	 */
 	private static $instance = null;
 
 	/**
 	 * Get or create the singleton instance.
 	 *
-	 * @return Block_Editor_Loader The singleton instance.
+	 * @return BlockEditorLoader The singleton instance.
 	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {
@@ -70,8 +70,11 @@ class Block_Editor_Loader {
 			'smartforms-progress',
 		);
 
+		// Use __DIR__ to build the path: current __DIR__ is "smartforms/includes/Core".
+		$build_dir = __DIR__ . '/../../build/blocks/';
+
 		foreach ( $blocks as $block ) {
-			$block_path = dirname( __DIR__ ) . '/build/blocks/' . $block;
+			$block_path = $build_dir . $block;
 
 			// Ensure block.json exists before registration.
 			if ( file_exists( $block_path . '/block.json' ) ) {
@@ -83,19 +86,19 @@ class Block_Editor_Loader {
 				 * @var WP_Error $result Ensures Intelephense recognizes this as WP_Error.
 				 */
 				if ( is_wp_error( $result ) ) {
-					SmartForms::log_error(
+					\SmartForms\Core\SmartForms::log_error(
 						sprintf(
 							'Failed to register block: %s - %s',
 							esc_url( $block_path ),
-							$result->get_error_message() // Intelephense needs the comment above to recognize this method.
+							$result->get_error_message()
 						),
 						$result
 					);
 				} else {
-					SmartForms::log_error( '[DEBUG] Block successfully registered: ' . esc_url( $block_path ) );
+					\SmartForms\Core\SmartForms::log_error( '[DEBUG] Block successfully registered: ' . esc_url( $block_path ) );
 				}
 			} else {
-				SmartForms::log_error( '[ERROR] block.json not found in: ' . esc_url( $block_path ) );
+				\SmartForms\Core\SmartForms::log_error( '[ERROR] block.json not found in: ' . esc_url( $block_path ) );
 			}
 		}
 	}
@@ -108,18 +111,21 @@ class Block_Editor_Loader {
 	 * @return void
 	 */
 	public function enqueue_block_assets() {
-		$build_dir = plugin_dir_path( __FILE__ ) . '../build/blocks/';
+		$build_dir = __DIR__ . '/../../build/blocks/';
 
 		if ( ! is_dir( $build_dir ) ) {
-			SmartForms::log_error( '[ERROR] SmartForms build directory not found for assets: ' . esc_url( $build_dir ) );
+			\SmartForms\Core\SmartForms::log_error( '[ERROR] SmartForms build directory not found for assets: ' . esc_url( $build_dir ) );
 			return;
 		}
 
 		$block_folders = scandir( $build_dir );
 		if ( false === $block_folders || empty( $block_folders ) ) {
-			SmartForms::log_error( '[ERROR] No compiled blocks found inside build/blocks/ directory.' );
+			\SmartForms\Core\SmartForms::log_error( '[ERROR] No compiled blocks found inside build/blocks/ directory.' );
 			return;
 		}
+
+		// Define the plugin root path: from __DIR__ (smartforms/includes/Core) go up two levels to the plugin root.
+		$plugin_root = __DIR__ . '/../../smartforms.php';
 
 		foreach ( $block_folders as $folder ) {
 			if ( '.' === $folder || '..' === $folder ) {
@@ -133,7 +139,7 @@ class Block_Editor_Loader {
 			if ( file_exists( $script_path ) ) {
 				wp_enqueue_script(
 					'smartforms-' . $folder . '-editor-script',
-					plugins_url( 'build/blocks/' . $folder . '/index.js', dirname( __DIR__ ) . '/smartforms.php' ),
+					plugins_url( 'build/blocks/' . $folder . '/index.js', $plugin_root ),
 					array( 'wp-blocks', 'wp-element', 'wp-editor' ),
 					filemtime( $script_path ),
 					true
@@ -144,7 +150,7 @@ class Block_Editor_Loader {
 			if ( file_exists( $style_path ) ) {
 				wp_enqueue_style(
 					'smartforms-' . $folder . '-editor-style',
-					plugins_url( 'build/blocks/' . $folder . '/index.css', dirname( __DIR__ ) . '/smartforms.php' ),
+					plugins_url( 'build/blocks/' . $folder . '/index.css', $plugin_root ),
 					array(),
 					filemtime( $style_path )
 				);
@@ -161,7 +167,7 @@ class Block_Editor_Loader {
 	 * @return array Modified block categories.
 	 */
 	public function add_smartforms_block_category( $categories ) {
-		SmartForms::log_error( '[DEBUG] Adding SmartForms block category.' );
+		\SmartForms\Core\SmartForms::log_error( '[DEBUG] Adding SmartForms block category.' );
 
 		$smartforms_category = array(
 			'slug'  => 'smartforms',
@@ -169,7 +175,7 @@ class Block_Editor_Loader {
 		);
 
 		array_unshift( $categories, $smartforms_category );
-		SmartForms::log_error( '[DEBUG] SmartForms block category moved to the top.' );
+		\SmartForms\Core\SmartForms::log_error( '[DEBUG] SmartForms block category moved to the top.' );
 
 		return $categories;
 	}

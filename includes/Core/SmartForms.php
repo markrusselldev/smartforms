@@ -5,23 +5,16 @@
  * @package SmartForms
  */
 
-namespace SmartForms;
+namespace SmartForms\Core;
 
-// Ensure the required classes are included.
-require_once plugin_dir_path( __FILE__ ) . 'class-block-editor-loader.php';
-require_once plugin_dir_path( __FILE__ ) . 'class-smartforms-handler.php';
-require_once plugin_dir_path( __FILE__ ) . 'class-admin-menu.php';
-require_once plugin_dir_path( __FILE__ ) . 'cpt/form.php';
-
-// Load additional functionality.
-require_once plugin_dir_path( __FILE__ ) . 'class-api.php'; // REST API for form data.
-require_once plugin_dir_path( __FILE__ ) . 'class-chat-ui.php'; // Chat UI and preview functionality.
-require_once plugin_dir_path( __FILE__ ) . 'admin/class-meta-box.php'; // Auto-generates JSON from Gutenberg blocks.
+// Since we're using Composer's autoloader, we no longer need manual require_once calls.
+// All classes (BlockEditorLoader, SmartFormsHandler, AdminMenu, etc.) will be autoloaded.
 
 /**
  * Main SmartForms class.
  *
  * This class initializes all components, manages activation/deactivation hooks, and centralizes logging.
+ * It uses the singleton pattern so that it is only instantiated once.
  */
 class SmartForms {
 
@@ -54,7 +47,6 @@ class SmartForms {
 	public static function activate() {
 		// Store the plugin version in the options table.
 		add_option( 'smartforms_version', '1.0.0' );
-
 		// Flush rewrite rules to ensure CPT permalinks work correctly.
 		flush_rewrite_rules();
 	}
@@ -69,7 +61,6 @@ class SmartForms {
 	public static function deactivate() {
 		// Remove the stored plugin version.
 		delete_option( 'smartforms_version' );
-
 		// Flush rewrite rules to clean up CPT permalinks.
 		flush_rewrite_rules();
 	}
@@ -82,10 +73,8 @@ class SmartForms {
 	private function __construct() {
 		// Enqueue assets.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
-
 		// Initialize related plugin classes.
 		$this->initialize_classes();
-
 		// Register page template for SmartForms.
 		add_filter( 'theme_page_templates', array( $this, 'register_template' ) );
 		add_filter( 'template_include', array( $this, 'load_template' ) );
@@ -95,19 +84,32 @@ class SmartForms {
 	 * Initialize other plugin classes.
 	 *
 	 * Loads and initializes all necessary classes for the plugin.
+	 * Each class is instantiated only once:
+	 * - Singleton classes (BlockEditorLoader, SmartFormsHandler, MetaBox) are accessed via get_instance().
+	 * - Other classes (AdminMenu, FormCPT, API) are instantiated with new only once here.
 	 *
 	 * @return void
 	 */
 	private function initialize_classes() {
-		// Initialize the Block Editor Loader class.
-		Block_Editor_Loader::get_instance();
-
-		// Initialize the SmartForms Handler class.
-		SmartForms_Handler::get_instance();
-
-		// Initialize the Admin Menu class.
-		if ( class_exists( 'SmartForms\\Admin_Menu' ) ) {
-			new Admin_Menu();
+		// Initialize the Block Editor Loader (singleton).
+		\SmartForms\Core\BlockEditorLoader::get_instance();
+		// Initialize the SmartForms Handler (singleton).
+		\SmartForms\Core\SmartFormsHandler::get_instance();
+		// Initialize the Admin Menu class (instantiated once).
+		if ( class_exists( 'SmartForms\\Admin\\AdminMenu' ) ) {
+			new \SmartForms\Admin\AdminMenu();
+		}
+		// Initialize the Custom Post Type class (instantiated once).
+		if ( class_exists( 'SmartForms\\CPT\\FormCPT' ) ) {
+			new \SmartForms\CPT\FormCPT();
+		}
+		// Initialize the MetaBox class (singleton).
+		if ( class_exists( 'SmartForms\\Admin\\MetaBox' ) ) {
+			\SmartForms\Admin\MetaBox::get_instance();
+		}
+		// Initialize the API endpoints (instantiated once).
+		if ( class_exists( 'SmartForms\\Core\\API' ) ) {
+			new \SmartForms\Core\API();
 		}
 	}
 
@@ -126,7 +128,6 @@ class SmartForms {
 			array(),
 			'5.3.3'
 		);
-
 		// Enqueue Bootstrap JavaScript.
 		wp_enqueue_script(
 			'bootstrap-js',
@@ -156,8 +157,8 @@ class SmartForms {
 	 */
 	public function load_template( $template ) {
 		if ( is_singular( 'smart_form' ) ) {
-			$custom_template = plugin_dir_path( __DIR__ ) . 'templates/single-smart_form.php';
-
+			// Since this file is now in includes/Core, go up two levels to the plugin root.
+			$custom_template = dirname( __DIR__, 2 ) . '/templates/single-smart_form.php';
 			if ( file_exists( $custom_template ) ) {
 				return $custom_template;
 			}
@@ -178,23 +179,19 @@ class SmartForms {
 		if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
 			return;
 		}
-
 		// Sanitize the message.
 		$message = is_string( $message ) ? sanitize_text_field( $message ) : wp_json_encode( $message );
-
 		// Append WP_Error details if provided.
 		if ( is_wp_error( $wp_error ) ) {
 			$error_messages = implode( ' | ', $wp_error->get_error_messages() );
 			$message       .= ' | WP_Error: ' . sanitize_text_field( $error_messages );
 		}
-
 		// Format log entry with timestamp.
 		$log_entry = sprintf(
 			'[%s] SmartForms: %s',
 			wp_date( 'Y-m-d H:i:s' ),
 			$message
 		);
-
 		error_log( $log_entry );
 	}
 }
@@ -202,6 +199,6 @@ class SmartForms {
 // Initialize the SmartForms plugin.
 SmartForms::get_instance();
 
-// Register activation and deactivation hooks.
-register_activation_hook( __FILE__, array( 'SmartForms\\SmartForms', 'activate' ) );
-register_deactivation_hook( __FILE__, array( 'SmartForms\\SmartForms', 'deactivate' ) );
+// Register activation and deactivation hooks using the correct namespace.
+register_activation_hook( dirname( __DIR__, 2 ) . '/smartforms.php', array( '\SmartForms\Core\SmartForms', 'activate' ) );
+register_deactivation_hook( dirname( __DIR__, 2 ) . '/smartforms.php', array( '\SmartForms\Core\SmartForms', 'deactivate' ) );

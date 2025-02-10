@@ -5,7 +5,7 @@
  * @package SmartForms
  */
 
-\SmartForms\SmartForms::log_error( 'single-smart_form.php loaded for Form ID: ' . get_the_ID() );
+\SmartForms\Core\SmartForms::log_error( 'single-smart_form.php loaded for Form ID: ' . get_the_ID() );
 
 // Prevent WordPress from loading the default theme layout.
 define( 'DONOTCACHEPAGE', true ); // Prevent caching if necessary.
@@ -33,32 +33,32 @@ ob_start();
 
             if ( empty( $form_id ) ) {
                 $error = new \WP_Error( 'missing_form_id', __( 'Form ID is missing.', 'smartforms' ) );
-                \SmartForms\SmartForms::log_error( 'single-smart_form.php failed: Missing form ID.', $error );
+                \SmartForms\Core\SmartForms::log_error( 'single-smart_form.php failed: Missing form ID.', $error );
                 echo '<p class="text-danger">' . esc_html__( 'Error: Form ID is missing.', 'smartforms' ) . '</p>';
                 return;
             }
 
-            \SmartForms\SmartForms::log_error( 'single-smart_form.php rendering Form ID: ' . $form_id );
-
-            if ( function_exists( '\SmartForms\smartforms_render_chat_ui' ) ) {
-                $chat_ui_output = \SmartForms\smartforms_render_chat_ui( $form_id );
+            \SmartForms\Core\SmartForms::log_error( 'single-smart_form.php rendering Form ID: ' . $form_id );
+            
+            if ( method_exists( '\SmartForms\Core\ChatUI', 'render' ) ) {
+                $chat_ui_output = \SmartForms\Core\ChatUI::render( $form_id );
 
                 if ( empty( $chat_ui_output ) ) {
                     $error = new \WP_Error( 'chat_ui_render_failed', __( 'Chat UI rendering failed.', 'smartforms' ) );
-                    \SmartForms\SmartForms::log_error( 'single-smart_form.php failed: Chat UI did not render.', $error );
+                    \SmartForms\Core\SmartForms::log_error( 'single-smart_form.php failed: Chat UI did not render.', $error );
                     echo '<p class="text-danger">' . esc_html__( 'Error: Chat UI could not be loaded.', 'smartforms' ) . '</p>';
                 } else {
                     echo $chat_ui_output;
                 }
             } else {
                 $error = new \WP_Error( 'function_not_found', __( 'smartforms_render_chat_ui function not found.', 'smartforms' ) );
-                \SmartForms\SmartForms::log_error( 'single-smart_form.php failed: Function smartforms_render_chat_ui not found.', $error );
+                \SmartForms\Core\SmartForms::log_error( 'single-smart_form.php failed: Function smartforms_render_chat_ui not found.', $error );
                 echo '<p class="text-danger">' . esc_html__( 'Error: Chat UI function missing.', 'smartforms' ) . '</p>';
             }
         endwhile;
     else :
         $error = new \WP_Error( 'no_posts_found', __( 'No form post found.', 'smartforms' ) );
-        \SmartForms\SmartForms::log_error( 'single-smart_form.php failed: No post found.', $error );
+        \SmartForms\Core\SmartForms::log_error( 'single-smart_form.php failed: No post found.', $error );
         echo '<p class="text-danger">' . esc_html__( 'Error: No form found.', 'smartforms' ) . '</p>';
     endif;
     ?>

@@ -11,38 +11,18 @@
  * @package SmartForms
  */
 
-namespace SmartForms;
-
-// Prevent direct access to the plugin file.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Autoload classes.
-spl_autoload_register(
-	function ( $class_name ) {
-		if ( strpos( $class_name, 'SmartForms\\' ) === 0 ) {
-			$relative_class = str_replace( 'SmartForms\\', '', $class_name );
-			$file_path      = plugin_dir_path( __FILE__ ) . 'includes/class-' . strtolower( str_replace( '_', '-', $relative_class ) ) . '.php';
+// Include Composer autoloader.
+if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+	require_once __DIR__ . '/vendor/autoload.php';
+}
 
-			if ( file_exists( $file_path ) ) {
-				include_once $file_path;
-			}
-		}
-	}
-);
+// Initialize the SmartForms plugin using the core namespace.
+\SmartForms\Core\SmartForms::get_instance();
 
-// Ensure core plugin class is loaded.
-require_once plugin_dir_path( __FILE__ ) . 'includes/class-smartforms.php';
-
-// Activation and deactivation hooks.
-register_activation_hook( __FILE__, array( 'SmartForms\\SmartForms', 'activate' ) );
-register_deactivation_hook( __FILE__, array( 'SmartForms\\SmartForms', 'deactivate' ) );
-
-// Initialize the plugin.
-add_action(
-	'plugins_loaded',
-	function () {
-		SmartForms::get_instance();
-	}
-);
+// Register activation and deactivation hooks.
+register_activation_hook( __FILE__, array( '\SmartForms\Core\SmartForms', 'activate' ) );
+register_deactivation_hook( __FILE__, array( '\SmartForms\Core\SmartForms', 'deactivate' ) );

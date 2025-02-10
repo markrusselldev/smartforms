@@ -5,14 +5,15 @@
  * @package SmartForms
  */
 
-namespace SmartForms;
+namespace SmartForms\Admin;
 
 use WP_Error;
+use SmartForms\SmartForms; // Import the core SmartForms class for logging.
 
 /**
  * Admin menu class for SmartForms plugin.
  */
-class Admin_Menu {
+class AdminMenu {
 
 	/**
 	 * Constructor to hook into WordPress actions.
