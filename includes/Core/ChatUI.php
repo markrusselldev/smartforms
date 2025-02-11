@@ -37,22 +37,31 @@ class ChatUI {
 
 		// If no JSON data is available, log the raw meta value for debugging.
 		if ( empty( $form_json ) || empty( $form_json['fields'] ) ) {
-			\SmartForms\Core\SmartForms::log_error( '[DEBUG] No form data available for form ID: ' . $form_id . '. Raw meta: ' . $form_data );
+			\SmartForms\Core\SmartForms::log_error( '[DEBUG] No form data available for form ID: ' . esc_html( $form_id ) . '. Raw meta: ' . $form_data );
 			return '<p>' . esc_html__( 'No form fields available.', 'smartforms' ) . '</p>';
 		}
+
+		// Get style settings for the form.
+		$width         = get_post_meta( $form_id, '_smartforms_width', true );
+		$border_radius = get_post_meta( $form_id, '_smartforms_border_radius', true );
+		// Build inline style string.
+		$inline_style = 'width: ' . $width . '; border-radius: ' . $border_radius . 'px;';
 
 		ob_start();
 		?>
 		<div class="container mt-4">
 			<div class="card shadow-lg p-3">
-				<div class="card-body">
+				<!-- Note that we escape the inline style output -->
+				<div class="card-body" style="<?php echo esc_attr( $inline_style ); ?>">
 					<h2 class="text-center"><?php echo esc_html( get_the_title( $form_id ) ); ?></h2>
-					<div id="smartforms-chat-ui" data-form-id="<?php echo esc_attr( $form_id ); ?>"></div>
-					
-					<div class="d-flex justify-content-between mt-3">
-						<button id="prev-btn" class="btn btn-secondary" style="display: none;"><?php esc_html_e( 'Back', 'smartforms' ); ?></button>
-						<button id="next-btn" class="btn btn-primary"><?php esc_html_e( 'Next', 'smartforms' ); ?></button>
-					</div>
+					<!-- Wrap the chat UI in an HTML form for proper semantics -->
+					<form method="post" action="">
+						<div id="smartforms-chat-ui" data-form-id="<?php echo esc_attr( $form_id ); ?>"></div>
+						<div class="d-flex justify-content-between mt-3">
+							<button type="button" id="prev-btn" class="btn btn-secondary" style="display: none;"><?php esc_html_e( 'Back', 'smartforms' ); ?></button>
+							<button type="button" id="next-btn" class="btn btn-primary"><?php esc_html_e( 'Next', 'smartforms' ); ?></button>
+						</div>
+					</form>
 				</div>
 			</div>
 		</div>
@@ -142,6 +151,14 @@ class ChatUI {
 						if (steps.length > 0) {
 							steps[0].classList.remove("d-none");
 						}
+
+						function updateButtons() {
+							const prevButton = document.getElementById("prev-btn");
+							const nextButton = document.getElementById("next-btn");
+							prevButton.style.display = currentStep > 0 ? "inline-block" : "none";
+							nextButton.innerText = currentStep === steps.length - 1 ? "Submit" : "Next";
+						}
+
 						updateButtons();
 					})
 					.catch(function(error) {
@@ -151,11 +168,6 @@ class ChatUI {
 
 				const prevButton = document.getElementById("prev-btn");
 				const nextButton = document.getElementById("next-btn");
-
-				function updateButtons() {
-					prevButton.style.display = currentStep > 0 ? "inline-block" : "none";
-					nextButton.innerText = currentStep === steps.length - 1 ? "Submit" : "Next";
-				}
 
 				nextButton.addEventListener("click", function() {
 					if (currentStep < steps.length - 1) {

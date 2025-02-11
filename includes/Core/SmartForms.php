@@ -111,6 +111,10 @@ class SmartForms {
 		if ( class_exists( 'SmartForms\\Core\\API' ) ) {
 			new \SmartForms\Core\API();
 		}
+		// Initialize the settings for our "form" custom post type.
+		if ( class_exists( 'SmartForms\\CPT\\SmartFormsCPTSettings' ) ) {
+			\SmartForms\CPT\SmartFormsCPTSettings::get_instance();
+		}
 	}
 
 	/**
