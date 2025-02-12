@@ -111,9 +111,13 @@ class SmartForms {
 		if ( class_exists( 'SmartForms\\Core\\API' ) ) {
 			new \SmartForms\Core\API();
 		}
-		// Initialize the settings for our "form" custom post type.
+		// Initialize the CPT settings for SmartForms.
 		if ( class_exists( 'SmartForms\\CPT\\SmartFormsCPTSettings' ) ) {
 			\SmartForms\CPT\SmartFormsCPTSettings::get_instance();
+		}
+		// Initialize global Chat UI Settings.
+		if ( class_exists( 'SmartForms\\CPT\\ChatUISettings' ) ) {
+			\SmartForms\CPT\ChatUISettings::get_instance();
 		}
 	}
 

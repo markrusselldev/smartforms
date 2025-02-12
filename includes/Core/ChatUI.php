@@ -41,11 +41,45 @@ class ChatUI {
 			return '<p>' . esc_html__( 'No form fields available.', 'smartforms' ) . '</p>';
 		}
 
-		// Get style settings for the form.
-		$width         = get_post_meta( $form_id, '_smartforms_width', true );
-		$border_radius = get_post_meta( $form_id, '_smartforms_border_radius', true );
-		// Build inline style string.
-		$inline_style = 'width: ' . $width . '; border-radius: ' . $border_radius . 'px;';
+		/*
+		 * Retrieve per‑form styling from post meta.
+		 * Here we use the per‑form width, but we use the global settings for
+		 * the remaining visual properties.
+		 */
+		$width = get_post_meta( $form_id, '_smartforms_width', true );
+		$width = $width ? $width : '400px'; // Fallback default width.
+
+		// Get global chat UI style settings from the options table.
+		$global_styles = get_option(
+			'smartforms_chat_ui_styles',
+			array(
+				'background_color' => '#ffffff',
+				'border_color'     => '#cccccc',
+				'border_style'     => 'solid',
+				'border_width'     => 1,
+				'border_radius'    => 10,
+				'box_shadow'       => 'none',
+			)
+		);
+
+		$global_bg_color      = ! empty( $global_styles['background_color'] ) ? $global_styles['background_color'] : '#ffffff';
+		$global_border_color  = ! empty( $global_styles['border_color'] ) ? $global_styles['border_color'] : '#cccccc';
+		$global_border_style  = ! empty( $global_styles['border_style'] ) ? $global_styles['border_style'] : 'solid';
+		$global_border_width  = ! empty( $global_styles['border_width'] ) ? absint( $global_styles['border_width'] ) : 1;
+		$global_border_radius = ! empty( $global_styles['border_radius'] ) ? absint( $global_styles['border_radius'] ) : 10;
+		$global_box_shadow    = ! empty( $global_styles['box_shadow'] ) ? $global_styles['box_shadow'] : 'none';
+
+		// Build inline style string incorporating both per‑form and global settings.
+		$inline_style = sprintf(
+			'width: %s; background-color: %s; border: %dpx %s %s; border-radius: %dpx; box-shadow: %s;',
+			esc_attr( $width ),
+			esc_attr( $global_bg_color ),
+			absint( $global_border_width ),
+			esc_attr( $global_border_style ),
+			esc_attr( $global_border_color ),
+			absint( $global_border_radius ),
+			esc_attr( $global_box_shadow )
+		);
 
 		ob_start();
 		?>

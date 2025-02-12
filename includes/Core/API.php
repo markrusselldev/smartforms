@@ -34,12 +34,24 @@ class API {
 	 * @return void
 	 */
 	public function register_routes() {
+		// Route for form data.
 		register_rest_route(
 			'smartforms/v1',
 			'/form/(?P<id>\d+)',
 			array(
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'get_form_data' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+
+		// New route for global chatbox styling.
+		register_rest_route(
+			'smartforms/v1',
+			'/global-styles',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'get_global_styles' ),
 				'permission_callback' => '__return_true',
 			)
 		);
@@ -95,5 +107,20 @@ class API {
 
 		SmartForms::log_error( '[DEBUG] Returning form data for ID: ' . esc_html( $form_id ) );
 		return new WP_REST_Response( $form_json, 200 );
+	}
+
+	/**
+	 * Returns the global chatbox styling options.
+	 *
+	 * @return WP_REST_Response The global styling settings.
+	 */
+	public function get_global_styles() {
+		// Return the options stored under 'smartforms_chatbox_styles'.
+		$default = array(
+			'background_color' => '#ffffff',
+			'border_radius'    => 10,
+		);
+		$styles = get_option( 'smartforms_chatbox_styles', $default );
+		return new WP_REST_Response( $styles, 200 );
 	}
 }
