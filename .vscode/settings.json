@@ -1,0 +1,5 @@
+{
+    "phpcs.executablePath": "${workspaceFolder}/vendor/bin/phpcs",
+    "phpcbf.executablePath": "${workspaceFolder}/vendor/bin/phpcbf",
+    "phpcs.standard": "WordPress-Core"
+}

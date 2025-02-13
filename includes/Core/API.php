@@ -45,7 +45,7 @@ class API {
 			)
 		);
 
-		// New route for global chatbox styling.
+		// Route for global chat UI styling.
 		register_rest_route(
 			'smartforms/v1',
 			'/global-styles',
@@ -110,17 +110,22 @@ class API {
 	}
 
 	/**
-	 * Returns the global chatbox styling options.
+	 * Returns the global chat UI styling options.
 	 *
 	 * @return WP_REST_Response The global styling settings.
 	 */
 	public function get_global_styles() {
-		// Return the options stored under 'smartforms_chatbox_styles'.
+		// Define default styles matching the ChatUISettings configuration.
 		$default = array(
 			'background_color' => '#ffffff',
+			'border_color'     => '#cccccc',
+			'border_style'     => 'solid',
+			'border_width'     => 1,
 			'border_radius'    => 10,
+			'box_shadow'       => 'none',
 		);
-		$styles = get_option( 'smartforms_chatbox_styles', $default );
+		// Retrieve styles using the correct option key as registered in ChatUISettings.php.
+		$styles = get_option( 'smartforms_chat_ui_styles', $default );
 		return new WP_REST_Response( $styles, 200 );
 	}
 }
