@@ -93,7 +93,9 @@ class MetaBox {
 			if ( isset( $block['blockName'] ) && false !== strpos( $block['blockName'], 'smartforms/' ) ) {
 				$form_fields[] = array(
 					'type'        => str_replace( 'smartforms/', '', sanitize_text_field( $block['blockName'] ) ),
-					'label'       => isset( $block['attrs']['label'] ) ? sanitize_text_field( $block['attrs']['label'] ) : '',
+					'label'       => isset( $block['attrs']['label'] ) && ! empty( $block['attrs']['label'] )
+						? sanitize_text_field( $block['attrs']['label'] )
+						: self::get_default_label( $block['blockName'] ),
 					'placeholder' => isset( $block['attrs']['placeholder'] ) ? sanitize_text_field( $block['attrs']['placeholder'] ) : '',
 					'required'    => isset( $block['attrs']['required'] ) ? (bool) $block['attrs']['required'] : false,
 				);
@@ -114,5 +116,33 @@ class MetaBox {
 		// Store JSON in post meta.
 		update_post_meta( $post_id, 'smartforms_data', $json_data );
 		SmartForms::log_error( '[DEBUG] Form data JSON saved for Form ID: ' . esc_html( $post_id ) );
+	}
+
+	/**
+	 * Returns a default label for a given block if none is set.
+	 *
+	 * @param string $block_name The block name (e.g. "smartforms/text").
+	 * @return string Default label based on the block type.
+	 */
+	private static function get_default_label( $block_name ) {
+		$type = str_replace( 'smartforms/', '', $block_name );
+		switch ( $type ) {
+			case 'text':
+				return 'Text Input';
+			case 'number':
+				return 'Number Input';
+			case 'radio':
+				return 'Radio Input';
+			case 'checkbox':
+				return 'Checkbox Input';
+			case 'select':
+				return 'Select Input';
+			case 'slider':
+				return 'Slider Input';
+			case 'textarea':
+				return 'Textarea Input';
+			default:
+				return 'Input';
+		}
 	}
 }
