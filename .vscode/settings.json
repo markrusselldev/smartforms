@@ -1,5 +1,8 @@
 {
-    "phpcs.executablePath": "${workspaceFolder}/vendor/bin/phpcs",
-    "phpcbf.executablePath": "${workspaceFolder}/vendor/bin/phpcbf",
+    "editor.codeActionsOnSave": {
+        "source.fixAll.phpcs": true
+    },
+    "phpcs.executablePath": "/var/www/html/wp-content/plugins/smartforms/vendor/bin/phpcs",
+    "phpcbf.executablePath": "/var/www/html/wp-content/plugins/smartforms/vendor/bin/phpcbf",
     "phpcs.standard": "WordPress-Core"
 }

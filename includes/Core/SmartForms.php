@@ -73,6 +73,7 @@ class SmartForms {
 	private function __construct() {
 		// Enqueue assets.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 		// Initialize related plugin classes.
 		$this->initialize_classes();
 		// Register page template for SmartForms.
@@ -111,10 +112,7 @@ class SmartForms {
 		if ( class_exists( 'SmartForms\\Core\\API' ) ) {
 			new \SmartForms\Core\API();
 		}
-		// Initialize the CPT settings for SmartForms.
-		if ( class_exists( 'SmartForms\\CPT\\SmartFormsCPTSettings' ) ) {
-			\SmartForms\CPT\SmartFormsCPTSettings::get_instance();
-		}
+
 		// Initialize global Chat UI Settings.
 		if ( class_exists( 'SmartForms\\CPT\\ChatUISettings' ) ) {
 			\SmartForms\CPT\ChatUISettings::get_instance();
@@ -143,6 +141,13 @@ class SmartForms {
 			array(),
 			'5.3.3',
 			true
+		);
+		// Enqueue Font Awesome for both front‑end and admin.
+		wp_enqueue_style(
+			'fontawesome',
+			'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+			array(),
+			'6.4.0'
 		);
 	}
 

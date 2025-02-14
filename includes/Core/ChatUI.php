@@ -2,9 +2,7 @@
 /**
  * Handles the rendering of the SmartForms Chat UI.
  *
- * Provides a static method to render the chat interface for a given form ID.
- * Global style settings are retrieved from a nested options array (stored under
- * the option key "smartforms_chat_ui_styles") and applied to various parts of the UI.
+ * Retrieves form JSON data and the selected theme preset styles, then outputs the chat interface.
  *
  * @package SmartForms
  */
@@ -15,399 +13,150 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Prevent direct access.
 }
 
+use SmartForms\CPT\ChatUISettings;
+
 class ChatUI {
 
 	/**
 	 * Renders the chat UI for a given form ID.
 	 *
-	 * Retrieves form JSON data and global style settings, then outputs the chat UI.
-	 *
 	 * @param int $form_id The ID of the form to render.
 	 * @return string HTML output for the chat UI.
 	 */
 	public static function render( $form_id ) {
-		$form = get_post( $form_id );
-		if ( ! $form || 'smart_form' !== get_post_type( $form_id ) ) {
-			return '<p>' . esc_html__( 'Form not found.', 'smartforms' ) . '</p>';
-		}
+		// For preview purposes, return the demo.
+		return self::render_demo();
+	}
 
-		// Retrieve the stored form JSON data.
-		$form_data = get_post_meta( $form_id, 'smartforms_data', true );
-		$form_json = json_decode( $form_data, true );
-		if ( empty( $form_json ) || empty( $form_json['fields'] ) ) {
-			\SmartForms\Core\SmartForms::log_error(
-				'[DEBUG] No form data available for form ID: ' . esc_html( $form_id ) . '. Raw meta: ' . $form_data
-			);
-			return '<p>' . esc_html__( 'No form fields available.', 'smartforms' ) . '</p>';
-		}
+	/**
+	 * Renders a demo chat interface for preview purposes.
+	 *
+	 * This demo output mimics a full-page chat similar to ChatGPT.
+	 *
+	 * @return string HTML output for the chat UI demo.
+	 */
+	public static function render_demo() {
+		// Retrieve theme preset styles from settings.
+		$theme_styles = ChatUISettings::get_instance()->get_selected_theme_styles();
 
-		// Retrieve per-form styling.
-		$width = get_post_meta( $form_id, '_smartforms_width', true );
-		$width = ! empty( $width ) ? $width : '400px';
+		// Outer container layout properties.
+		$bg_color        = isset( $theme_styles['smartforms_chat_container_background_color'] ) ? $theme_styles['smartforms_chat_container_background_color'] : '#ffffff';
+		$border_color    = isset( $theme_styles['smartforms_chat_container_border_color'] ) ? $theme_styles['smartforms_chat_container_border_color'] : '#cccccc';
+		$border_style    = isset( $theme_styles['smartforms_chat_container_border_style'] ) ? $theme_styles['smartforms_chat_container_border_style'] : 'solid';
+		$border_width    = isset( $theme_styles['smartforms_chat_container_border_width'] ) ? absint( $theme_styles['smartforms_chat_container_border_width'] ) : 1;
+		$border_radius   = isset( $theme_styles['smartforms_chat_container_border_radius'] ) ? absint( $theme_styles['smartforms_chat_container_border_radius'] ) : 10;
+		$box_shadow      = isset( $theme_styles['smartforms_chat_container_box_shadow'] ) ? $theme_styles['smartforms_chat_container_box_shadow'] : 'none';
+		$padding         = isset( $theme_styles['smartforms_chat_container_padding'] ) ? $theme_styles['smartforms_chat_container_padding'] : '10px';
+		$max_width       = isset( $theme_styles['smartforms_chat_container_max_width'] ) ? $theme_styles['smartforms_chat_container_max_width'] : '800px';
+		$flex_direction  = isset( $theme_styles['smartforms_chat_container_flex_direction'] ) ? $theme_styles['smartforms_chat_container_flex_direction'] : 'column';
+		$justify_content = isset( $theme_styles['smartforms_chat_container_justify_content'] ) ? $theme_styles['smartforms_chat_container_justify_content'] : 'center';
+		$align_items     = isset( $theme_styles['smartforms_chat_container_align_items'] ) ? $theme_styles['smartforms_chat_container_align_items'] : 'center';
 
-		/*
-		 * Define the default global styles.
-		 * This nested structure includes settings for:
-		 *   - Chat container
-		 *   - Chat dialog
-		 *   - Form
-		 *   - Fields (each field type can have its own defaults)
-		 *   - Button
-		 */
-		$default_styles = array(
-			'chat_container' => array(
-				'background_color' => '#ffffff',
-				'border'           => array(
-					'color'  => '#cccccc',
-					'style'  => 'solid',
-					'width'  => 1,      // pixels
-					'radius' => 10,     // pixels
-				),
-				'box_shadow'       => 'none',
-				'padding'          => '10px',
-				'margin'           => '10px',
-				'layout'           => array(
-					'type'            => 'flex',
-					'flex_direction'  => 'column',
-					'justify_content' => 'center',
-					'align_items'     => 'center',
-				),
-				'theme'            => 'bootstrap-default',
-			),
-			'chat_dialog'    => array(
-				'background_color' => '#f8f9fa',
-				'text_color'       => '#333333',
-				'font_family'      => 'Helvetica, Arial, sans-serif',
-				'font_size'        => '14px',
-				'padding'          => '8px',
-				'border'           => array(
-					'color'  => '#dddddd',
-					'style'  => 'solid',
-					'width'  => 1,
-					'radius' => 5,
-				),
-			),
-			'form'           => array(
-				'background_color' => '#ffffff',
-				'font_family'      => 'Helvetica, Arial, sans-serif',
-				'font_size'        => '14px',
-				'text_color'       => '#333333',
-				'padding'          => '15px',
-			),
-			'fields'         => array(
-				'checkbox' => array(
-					'background_color' => '#ffffff',
-					'border'           => array(
-						'color'  => '#cccccc',
-						'style'  => 'solid',
-						'width'  => 1,
-						'radius' => 3,
-					),
-					'padding'    => '5px',
-					'margin'     => '5px',
-					'font_size'  => 'inherit',
-					'text_color' => '#000000',
-				),
-				'progress' => array(
-					'background_color' => '#eeeeee',
-					'text_color'       => '#000000',
-					'padding'          => '5px',
-				),
-				'slider'   => array(
-					'background_color' => '#ffffff',
-					'border'           => array(
-						'color'  => '#cccccc',
-						'style'  => 'solid',
-						'width'  => 1,
-						'radius' => 5,
-					),
-					'padding'    => '5px',
-					'margin'     => '5px',
-					'text_color' => '#000000',
-				),
-				'group'    => array(
-					'background_color' => '#ffffff',
-					'border'           => array(
-						'color'  => '#cccccc',
-						'style'  => 'solid',
-						'width'  => 1,
-						'radius' => 5,
-					),
-					'padding'    => '10px',
-					'margin'     => '5px',
-					'text_color' => '#000000',
-				),
-				'radio'    => array(
-					'background_color' => '#ffffff',
-					'border'           => array(
-						'color'  => '#cccccc',
-						'style'  => 'solid',
-						'width'  => 1,
-						'radius' => 5,
-					),
-					'padding'    => '5px',
-					'margin'     => '5px',
-					'text_color' => '#000000',
-				),
-				'text'     => array(
-					'background_color' => '#ffffff',
-					'border'           => array(
-						'color'  => '#cccccc',
-						'style'  => 'solid',
-						'width'  => 1,
-						'radius' => 3,
-					),
-					'padding'    => '5px',
-					'margin'     => '5px',
-					'text_color' => '#000000',
-				),
-				'number'   => array(
-					'background_color' => '#ffffff',
-					'border'           => array(
-						'color'  => '#cccccc',
-						'style'  => 'solid',
-						'width'  => 1,
-						'radius' => 3,
-					),
-					'padding'    => '5px',
-					'margin'     => '5px',
-					'text_color' => '#000000',
-				),
-				'select'   => array(
-					'background_color' => '#ffffff',
-					'border'           => array(
-						'color'  => '#cccccc',
-						'style'  => 'solid',
-						'width'  => 1,
-						'radius' => 3,
-					),
-					'padding'    => '5px',
-					'margin'     => '5px',
-					'text_color' => '#000000',
-				),
-				'textarea' => array(
-					'background_color' => '#ffffff',
-					'border'           => array(
-						'color'  => '#cccccc',
-						'style'  => 'solid',
-						'width'  => 1,
-						'radius' => 3,
-					),
-					'padding'    => '5px',
-					'margin'     => '5px',
-					'text_color' => '#000000',
-				),
-			),
-			'button'         => array(
-				'background_color' => '#007bff',
-				'text_color'       => '#ffffff',
-				'border'           => array(
-					'color'  => '#007bff',
-					'style'  => 'solid',
-					'width'  => 1,
-					'radius' => 4,
-				),
-				'hover'            => array(
-					'background_color' => '#0056b3',
-					'text_color'       => '#ffffff',
-				),
-			),
+		$container_style = sprintf(
+			'display: flex; flex-direction: %s; justify-content: %s; align-items: %s; max-width: %s; margin: 20px auto; background-color: %s; border: %dpx %s %s; border-radius: %dpx; box-shadow: %s; padding: %s;',
+			esc_attr( $flex_direction ),
+			esc_attr( $justify_content ),
+			esc_attr( $align_items ),
+			esc_attr( $max_width ),
+			esc_attr( $bg_color ),
+			$border_width,
+			esc_attr( $border_style ),
+			esc_attr( $border_color ),
+			$border_radius,
+			esc_attr( $box_shadow ),
+			esc_attr( $padding )
 		);
 
-		// Retrieve global styles from the option.
-		$global_styles = get_option( 'smartforms_chat_ui_styles', $default_styles );
-		$chat_cont     = isset( $global_styles['chat_container'] ) ? $global_styles['chat_container'] : $default_styles['chat_container'];
+		// Header styling.
+		$header_text_color  = isset( $theme_styles['smartforms_chat_header_text_color'] ) ? $theme_styles['smartforms_chat_header_text_color'] : '#000000';
+		$header_font_family = isset( $theme_styles['smartforms_chat_header_font_family'] ) ? $theme_styles['smartforms_chat_header_font_family'] : 'sans-serif';
+		$header_font_size   = isset( $theme_styles['smartforms_chat_header_font_size'] ) ? $theme_styles['smartforms_chat_header_font_size'] : '18px';
+		$header_style       = sprintf(
+			'width: 100%%; padding: 10px; border-bottom: 1px solid %s; color: %s; font-family: %s; font-size: %s;',
+			esc_attr( $border_color ),
+			esc_attr( $header_text_color ),
+			esc_attr( $header_font_family ),
+			esc_attr( $header_font_size )
+		);
 
-		// Extract chat container style values.
-		$bg_color   = ! empty( $chat_cont['background_color'] ) ? $chat_cont['background_color'] : '#ffffff';
-		$border     = isset( $chat_cont['border'] ) ? $chat_cont['border'] : array();
-		$b_color    = isset( $border['color'] ) ? $border['color'] : '#cccccc';
-		$b_style    = isset( $border['style'] ) ? $border['style'] : 'solid';
-		$b_width    = isset( $border['width'] ) ? absint( $border['width'] ) : 1;
-		$b_radius   = isset( $border['radius'] ) ? absint( $border['radius'] ) : 10;
-		$box_shadow = ! empty( $chat_cont['box_shadow'] ) ? $chat_cont['box_shadow'] : 'none';
-		$padding    = ! empty( $chat_cont['padding'] ) ? $chat_cont['padding'] : '10px';
-		$margin     = ! empty( $chat_cont['margin'] ) ? $chat_cont['margin'] : '10px';
+		// Input container styles.
+		$input_bg              = isset( $theme_styles['smartforms_chat_input_container_background_color'] ) ? $theme_styles['smartforms_chat_input_container_background_color'] : $bg_color;
+		$input_container_style = sprintf(
+			'background-color: %s; border: %dpx %s %s; border-radius: %dpx; box-shadow: %s; padding: 5px;',
+			esc_attr( $input_bg ),
+			isset( $theme_styles['smartforms_chat_input_container_border_width'] ) ? absint( $theme_styles['smartforms_chat_input_container_border_width'] ) : 1,
+			isset( $theme_styles['smartforms_chat_input_container_border_style'] ) ? esc_attr( $theme_styles['smartforms_chat_input_container_border_style'] ) : 'solid',
+			isset( $theme_styles['smartforms_chat_input_container_border_color'] ) ? esc_attr( $theme_styles['smartforms_chat_input_container_border_color'] ) : $border_color,
+			isset( $theme_styles['smartforms_chat_input_container_border_radius'] ) ? absint( $theme_styles['smartforms_chat_input_container_border_radius'] ) : 5,
+			isset( $theme_styles['smartforms_chat_input_container_box_shadow'] ) ? esc_attr( $theme_styles['smartforms_chat_input_container_box_shadow'] ) : '0 2px 5px rgba(0,0,0,0.1)'
+		);
 
-		// Build the inline style string for the chat container.
-		$inline_style = sprintf(
-			'width: %s; background-color: %s; border: %dpx %s %s; border-radius: %dpx; box-shadow: %s; padding: %s; margin: %s;',
-			esc_attr( $width ),
-			esc_attr( $bg_color ),
-			$b_width,
-			esc_attr( $b_style ),
-			esc_attr( $b_color ),
-			$b_radius,
-			esc_attr( $box_shadow ),
-			esc_attr( $padding ),
-			esc_attr( $margin )
+		// Submit button styles.
+		$submit_size          = isset( $theme_styles['smartforms_chat_submit_button_size'] ) ? $theme_styles['smartforms_chat_submit_button_size'] : '36px';
+		$submit_bg            = isset( $theme_styles['smartforms_chat_submit_button_background_color'] ) ? $theme_styles['smartforms_chat_submit_button_background_color'] : '#007bff';
+		$submit_text          = isset( $theme_styles['smartforms_chat_submit_button_text_color'] ) ? $theme_styles['smartforms_chat_submit_button_text_color'] : '#ffffff';
+		$submit_border        = isset( $theme_styles['smartforms_chat_submit_button_border_color'] ) ? $theme_styles['smartforms_chat_submit_button_border_color'] : '#007bff';
+		$submit_border_style  = isset( $theme_styles['smartforms_chat_submit_button_border_style'] ) ? $theme_styles['smartforms_chat_submit_button_border_style'] : 'solid';
+		$submit_border_width  = isset( $theme_styles['smartforms_chat_submit_button_border_width'] ) ? absint( $theme_styles['smartforms_chat_submit_button_border_width'] ) : 1;
+		$submit_border_radius = isset( $theme_styles['smartforms_chat_submit_button_border_radius'] ) ? $theme_styles['smartforms_chat_submit_button_border_radius'] : '50%';
+		$submit_icon          = isset( $theme_styles['smartforms_chat_submit_button_icon'] ) ? $theme_styles['smartforms_chat_submit_button_icon'] : 'fas fa-arrow-up';
+		$submit_font_size     = $submit_size;
+		$submit_line_height   = $submit_size;
+		// Use the new JSON key for icon size if provided, otherwise default to 80% of the button size.
+		if ( isset( $theme_styles['smartforms_chat_submit_icon_size'] ) && ! empty( $theme_styles['smartforms_chat_submit_icon_size'] ) ) {
+			$submit_icon_size = $theme_styles['smartforms_chat_submit_icon_size'];
+		} else {
+			$submit_size_numeric = intval( preg_replace( '/\D/', '', $submit_size ) );
+			$submit_icon_size    = ( $submit_size_numeric * 0.8 ) . 'px';
+		}
+
+		$submit_button_style = sprintf(
+			'background-color: %s; color: %s; border: %dpx %s %s; border-radius: %s; width: %s; height: %s; font-size: %s; line-height: %s; display: flex; align-items: center; justify-content: center;',
+			esc_attr( $submit_bg ),
+			esc_attr( $submit_text ),
+			$submit_border_width,
+			esc_attr( $submit_border_style ),
+			esc_attr( $submit_border ),
+			esc_attr( $submit_border_radius ),
+			esc_attr( $submit_size ),
+			esc_attr( $submit_size ),
+			esc_attr( $submit_font_size ),
+			esc_attr( $submit_line_height ),
+			esc_attr( $submit_icon_size ),
 		);
 
 		ob_start();
 		?>
-<div id="smartforms-chat-container" class="smartforms-chat-container" style="<?php echo esc_attr( $inline_style ); ?>">
-	<div class="smartforms-chat-header">
-		<h2 class="smartforms-chat-title"><?php echo esc_html( get_the_title( $form_id ) ); ?></h2>
-	</div>
-	<div class="smartforms-chat-dialog" id="smartforms-chat-dialog">
-		<div class="smartforms-chat-content" id="smartforms-chat-ui" data-form-id="<?php echo esc_attr( $form_id ); ?>">
-			<!-- Chat messages and form fields load here dynamically -->
+		<div id="smartforms-chat-container" class="smartforms-chat-container" style="<?php echo esc_attr( $container_style ); ?>">
+			<div class="smartforms-chat-header" style="<?php echo $header_style; ?>">
+				<h2 class="smartforms-chat-title"><?php esc_html_e( 'Chat Preview', 'smartforms' ); ?></h2>
+			</div>
+			<div class="smartforms-chat-dialog" id="smartforms-chat-dialog" style="width: 100%; flex: 1; height: 400px; overflow-y: auto; padding: 10px;">
+				<div class="smartforms-chat-message bot" style="margin-bottom: 10px;">
+					<p style="color: <?php echo esc_attr( $theme_styles['smartforms_chat_dialog_text_color'] ); ?>;">Hello! How can I help you today?</p>
+				</div>
+				<div class="smartforms-chat-message user" style="margin-bottom: 10px; text-align: right;">
+					<p style="color: <?php echo esc_attr( $theme_styles['smartforms_chat_dialog_text_color'] ); ?>;">I need some information.</p>
+				</div>
+			</div>
+			<div class="smartforms-chat-input-container" style="width: 100%; padding: 10px; border-top: 1px solid <?php echo esc_attr( $border_color ); ?>;">
+				<div class="smartforms-chat-input-box" style="<?php echo esc_attr( $input_container_style ); ?>; display: flex; flex-direction: column; gap: 5px;">
+					<textarea class="form-control" rows="4" style="border: none; width: 100%; resize: none; background-color: transparent;" placeholder="<?php esc_attr_e( 'Type your message here...', 'smartforms' ); ?>"></textarea>
+					<!-- Submit button row: below the textarea, aligned to the right -->
+					<div style="display: flex; justify-content: flex-end;">
+						<button type="button" class="btn" style="<?php echo esc_attr( $submit_button_style ); ?>">
+						<i class="<?php echo esc_attr( $submit_icon ); ?>" style="font-size: <?php echo esc_attr( $submit_icon_size ); ?>; line-height: <?php echo esc_attr( $submit_icon_size ); ?>;"></i>
+						</button>
+					</div>
+				</div>
+			</div>
 		</div>
-		<div class="smartforms-chat-form" style="<?php echo esc_attr( self::build_form_inline_style( $global_styles, $default_styles ) ); ?>">
-			<!-- Form container styling applied here -->
-		</div>
-	</div>
-	<div class="smartforms-chat-footer">
-		<button type="button" id="prev-btn" class="btn btn-secondary" style="display: none;"><?php esc_html_e( 'Back', 'smartforms' ); ?></button>
-		<button type="button" id="next-btn" class="btn btn-primary"><?php esc_html_e( 'Next', 'smartforms' ); ?></button>
-	</div>
-</div>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-	const chat_ui = document.getElementById("smartforms-chat-ui");
-	const form_id = chat_ui.getAttribute("data-form-id");
-	let current_step = 0;
-	let steps = [];
-
-	fetch("/wp-json/smartforms/v1/form/" + form_id)
-		.then(function(response) {
-			return response.json();
-		})
-		.then(function(form_data) {
-			if (! form_data.fields) {
-				chat_ui.innerHTML = "<p class='text-danger'>Error: No form fields available.</p>";
-				return;
-			}
-			steps = form_data.fields.map(function(field, index) {
-				const step = document.createElement("div");
-				step.classList.add("smartforms-chat-step", "mb-3", "d-none");
-				step.id = "step-" + index;
-				let input_el;
-				switch (field.type) {
-					case "radio":
-						input_el = document.createElement("div");
-						if (Array.isArray(field.options)) {
-							field.options.forEach(function(option) {
-								input_el.innerHTML += 
-									'<div class="form-check">' +
-										'<input class="form-check-input" type="radio" name="step-' + index + '" value="' + option + '">' +
-										'<label class="form-check-label">' + option + '</label>' +
-									'</div>';
-							});
-						} else {
-							console.warn("Field \"" + field.label + "\" is missing options. Skipping.");
-						}
-						break;
-					case "select":
-						input_el = document.createElement("select");
-						input_el.classList.add("form-select");
-						if (Array.isArray(field.options)) {
-							field.options.forEach(function(option) {
-								const opt = document.createElement("option");
-								opt.value = option;
-								opt.textContent = option;
-								input_el.appendChild(opt);
-							});
-						} else {
-							console.warn("Field \"" + field.label + "\" is missing options. Skipping.");
-						}
-						break;
-					case "slider":
-						input_el = document.createElement("input");
-						input_el.type = "range";
-						input_el.classList.add("form-range");
-						input_el.min = field.min || 0;
-						input_el.max = field.max || 100;
-						input_el.step = field.step || 1;
-						break;
-					default:
-						input_el = document.createElement("input");
-						input_el.type = "text";
-						input_el.classList.add("form-control");
-						input_el.placeholder = field.placeholder || "";
-						break;
-				}
-				const label_el = document.createElement("label");
-				label_el.textContent = field.label;
-				label_el.classList.add("form-label");
-				step.appendChild(label_el);
-				step.appendChild(input_el);
-				chat_ui.appendChild(step);
-				return step;
-			});
-			if (steps.length > 0) {
-				steps[0].classList.remove("d-none");
-			}
-			function update_buttons() {
-				const prev_btn = document.getElementById("prev-btn");
-				const next_btn = document.getElementById("next-btn");
-				prev_btn.style.display = current_step > 0 ? "inline-block" : "none";
-				next_btn.innerText = current_step === steps.length - 1 ? "Submit" : "Next";
-			}
-			update_buttons();
-		})
-		.catch(function(error) {
-			console.error("Error loading form data:", error);
-			chat_ui.innerHTML = "<p class='text-danger'>Error loading form.</p>";
+		<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			// Additional JavaScript for interactive preview behavior (if needed)
 		});
-	
-	document.getElementById("next-btn").addEventListener("click", function() {
-		if (current_step < steps.length - 1) {
-			steps[current_step].classList.add("d-none");
-			current_step++;
-			steps[current_step].classList.remove("d-none");
-			update_buttons();
-		} else {
-			alert("Form submitted! (Simulated)");
-		}
-	});
-	document.getElementById("prev-btn").addEventListener("click", function() {
-		if (current_step > 0) {
-			steps[current_step].classList.add("d-none");
-			current_step--;
-			steps[current_step].classList.remove("d-none");
-			update_buttons();
-		}
-	});
-});
-</script>
-<?php
+		</script>
+		<?php
 		return ob_get_clean();
-	}
-
-	/**
-	 * Builds the inline style string for the form container.
-	 *
-	 * @param array $global_styles  The global styles array.
-	 * @param array $default_styles The default styles array.
-	 * @return string Inline style for the form container.
-	 */
-	private static function build_form_inline_style( $global_styles, $default_styles ) {
-		$form_styles = isset( $global_styles['form'] )
-			? $global_styles['form']
-			: $default_styles['form'];
-		$bg_color    = ! empty( $form_styles['background_color'] )
-			? $form_styles['background_color']
-			: '#ffffff';
-		$font_family = ! empty( $form_styles['font_family'] )
-			? $form_styles['font_family']
-			: 'Helvetica, Arial, sans-serif';
-		$font_size   = ! empty( $form_styles['font_size'] )
-			? $form_styles['font_size']
-			: '14px';
-		$text_color  = ! empty( $form_styles['text_color'] )
-			? $form_styles['text_color']
-			: '#333333';
-		$padding     = ! empty( $form_styles['padding'] )
-			? $form_styles['padding']
-			: '15px';
-		return sprintf(
-			'background-color: %s; font-family: %s; font-size: %s; color: %s; padding: %s;',
-			esc_attr( $bg_color ),
-			esc_attr( $font_family ),
-			esc_attr( $font_size ),
-			esc_attr( $text_color ),
-			esc_attr( $padding )
-		);
 	}
 }

@@ -1,0 +1,66 @@
+{
+	"label": "Light (Bootstrap Default)",
+	"styles": {
+	  "smartforms_chat_container_background_color": "#ffffff",
+	  "smartforms_chat_container_border_color": "#cccccc",
+	  "smartforms_chat_container_border_style": "solid",
+	  "smartforms_chat_container_border_width": 1,
+	  "smartforms_chat_container_border_radius": 10,
+	  "smartforms_chat_container_box_shadow": "none",
+	  "smartforms_chat_container_padding": "10px",
+	  "smartforms_chat_container_margin": "10px",
+	  "smartforms_chat_container_max_width": "800px",
+	  "smartforms_chat_container_flex_direction": "column",
+	  "smartforms_chat_container_justify_content": "center",
+	  "smartforms_chat_container_align_items": "center",
+  
+	  "smartforms_chat_header_background_color": "#f8f9fa",
+	  "smartforms_chat_header_text_color": "#333333",
+	  "smartforms_chat_header_font_family": "Helvetica, Arial, sans-serif",
+	  "smartforms_chat_header_font_size": "18px",
+	  "smartforms_chat_header_padding": "10px",
+  
+	  "smartforms_chat_dialog_background_color": "#ffffff",
+	  "smartforms_chat_dialog_text_color": "#333333",
+	  "smartforms_chat_dialog_font_family": "Helvetica, Arial, sans-serif",
+	  "smartforms_chat_dialog_font_size": "14px",
+	  "smartforms_chat_dialog_padding": "8px",
+	  "smartforms_chat_dialog_border_color": "#dddddd",
+	  "smartforms_chat_dialog_border_style": "solid",
+	  "smartforms_chat_dialog_border_width": 1,
+	  "smartforms_chat_dialog_border_radius": 5,
+  
+	  "smartforms_form_background_color": "#ffffff",
+	  "smartforms_form_font_family": "Helvetica, Arial, sans-serif",
+	  "smartforms_form_font_size": "14px",
+	  "smartforms_form_text_color": "#333333",
+	  "smartforms_form_padding": "15px",
+  
+	  "smartforms_button_background_color": "#007bff",
+	  "smartforms_button_text_color": "#ffffff",
+	  "smartforms_button_border_color": "#007bff",
+	  "smartforms_button_border_style": "solid",
+	  "smartforms_button_border_width": 1,
+	  "smartforms_button_border_radius": 4,
+	  "smartforms_button_hover_background_color": "#0056b3",
+	  "smartforms_button_hover_text_color": "#ffffff",
+  
+	  "smartforms_chat_input_container_background_color": "#f8f8f8",
+	  "smartforms_chat_input_container_border_color": "#cccccc",
+	  "smartforms_chat_input_container_border_style": "solid",
+	  "smartforms_chat_input_container_border_width": 1,
+	  "smartforms_chat_input_container_border_radius": 5,
+	  "smartforms_chat_input_container_box_shadow": "0 2px 5px rgba(0,0,0,0.1)",
+  
+	  "smartforms_chat_submit_button_background_color": "#007bff",
+	  "smartforms_chat_submit_button_text_color": "#ffffff",
+	  "smartforms_chat_submit_button_border_color": "#007bff",
+	  "smartforms_chat_submit_button_border_style": "solid",
+	  "smartforms_chat_submit_button_border_width": 1,
+	  "smartforms_chat_submit_button_border_radius": "50%",
+	  "smartforms_chat_submit_button_size": "32px",
+	  "smartforms_chat_submit_icon_size": "24px",
+	  "smartforms_chat_submit_button_icon": "fas fa-arrow-up"
+	}
+  }
+  
