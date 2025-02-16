@@ -91,13 +91,22 @@ class MetaBox {
 
 		foreach ( $blocks as $block ) {
 			if ( isset( $block['blockName'] ) && false !== strpos( $block['blockName'], 'smartforms/' ) ) {
+				// Determine the block type (e.g., "text", "number", etc.)
+				$type = str_replace( 'smartforms/', '', sanitize_text_field( $block['blockName'] ) );
 				$form_fields[] = array(
-					'type'        => str_replace( 'smartforms/', '', sanitize_text_field( $block['blockName'] ) ),
+					'type'        => $type,
 					'label'       => isset( $block['attrs']['label'] ) && ! empty( $block['attrs']['label'] )
 						? sanitize_text_field( $block['attrs']['label'] )
 						: self::get_default_label( $block['blockName'] ),
 					'placeholder' => isset( $block['attrs']['placeholder'] ) ? sanitize_text_field( $block['attrs']['placeholder'] ) : '',
 					'required'    => isset( $block['attrs']['required'] ) ? (bool) $block['attrs']['required'] : false,
+					// For text blocks, if helpText is not provided or is empty, default to a specific message.
+					// For other block types, default to an empty string.
+					'helpText'    => ( 'text' === $type )
+						? ( isset( $block['attrs']['helpText'] ) && trim( $block['attrs']['helpText'] ) !== ''
+							? sanitize_text_field( $block['attrs']['helpText'] )
+							: 'Only letters, numbers, punctuation, symbols & spaces allowed.' )
+						: ( isset( $block['attrs']['helpText'] ) ? sanitize_text_field( $block['attrs']['helpText'] ) : '' )
 				);
 			}
 		}

@@ -3,7 +3,7 @@
   "name": "smartforms/text",
   "title": "Text Input",
   "category": "smartforms",
-  "icon": "editor-text",
+  "icon": "editor-textcolor",
   "description": "A text input field for SmartForms.",
   "supports": {
     "html": false,
@@ -36,6 +36,14 @@
     "placeholder": {
       "type": "string",
       "default": "Enter text input..."
+    },
+    "defaultValue": {
+      "type": "string",
+      "default": ""
+    },
+    "helpText": {
+      "type": "string",
+      "default": "Only letters, numbers, punctuation, symbols & spaces allowed."
     }
   },
   "editorScript": "file:./index.js",

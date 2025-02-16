@@ -92,23 +92,21 @@ class SmartForms {
 	 * @return void
 	 */
 	private function initialize_classes() {
-		// Initialize the Block Editor Loader (singleton).
 		\SmartForms\Core\BlockEditorLoader::get_instance();
-		// Initialize the SmartForms Handler (singleton).
 		\SmartForms\Core\SmartFormsHandler::get_instance();
-		// Initialize the Admin Menu class (instantiated once).
+		// Initialize the Admin Menu class.
 		if ( class_exists( 'SmartForms\\Admin\\AdminMenu' ) ) {
 			new \SmartForms\Admin\AdminMenu();
 		}
-		// Initialize the Custom Post Type class (instantiated once).
+		// Initialize the Custom Post Type class.
 		if ( class_exists( 'SmartForms\\CPT\\FormCPT' ) ) {
 			new \SmartForms\CPT\FormCPT();
 		}
-		// Initialize the MetaBox class (singleton).
+		// Initialize the MetaBox class.
 		if ( class_exists( 'SmartForms\\Admin\\MetaBox' ) ) {
 			\SmartForms\Admin\MetaBox::get_instance();
 		}
-		// Initialize the API endpoints (instantiated once).
+		// Initialize the API endpoints.
 		if ( class_exists( 'SmartForms\\Core\\API' ) ) {
 			new \SmartForms\Core\API();
 		}
@@ -120,7 +118,7 @@ class SmartForms {
 	}
 
 	/**
-	 * Enqueue Bootstrap styles and scripts.
+	 * Enqueue Bootstrap styles, Font Awesome, and Chat UI scripts.
 	 *
 	 * This method ensures that Bootstrap is available for frontend rendering.
 	 *
@@ -142,12 +140,32 @@ class SmartForms {
 			'5.3.3',
 			true
 		);
-		// Enqueue Font Awesome for both front‑end and admin.
+		// Enqueue Font Awesome.
 		wp_enqueue_style(
 			'fontawesome',
 			'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
 			array(),
 			'6.4.0'
+		);
+		
+		// Enqueue our Chat UI script.
+		// Adjusted the base file to point to the plugin root via dirname(__FILE__, 3) so that the path is correct.
+		wp_enqueue_script(
+			'smartforms-chatui',
+			plugins_url( 'assets/js/smartforms-chat.js', dirname( __FILE__, 3 ) . '/smartforms.php' ),
+			array( 'wp-element' ),
+			'1.0.0',
+			true
+		);
+		// Localize the script with AJAX URL, nonce, and any other parameters.
+		wp_localize_script(
+			'smartforms-chatui',
+			'smartformsData',
+			array(
+				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+				'nonce'   => wp_create_nonce( 'smartform_submit' ),
+				// Optionally, add additional parameters like the form ID here.
+			)
 		);
 	}
 

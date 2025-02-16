@@ -5,7 +5,6 @@
  * Retrieves form JSON data (saved as post meta) and the selected theme preset styles,
  * then outputs the chat interface. The interface steps through each form question –
  * displaying only the current question (as a bot message) in the chat dialog area.
- *
  * Once all questions are answered, a dummy AI response is appended and the input area
  * reverts to a standard chat textarea.
  *
@@ -29,19 +28,20 @@ class ChatUI {
 	 * @return string HTML output for the chat UI.
 	 */
 	public static function render( $form_id ) {
-		return self::render_demo( $form_id );
+		// Renaming our method from "demo" to "chat_ui" for production.
+		return self::render_chat_ui( $form_id );
 	}
 
 	/**
-	 * Renders a demo chat interface for preview purposes.
+	 * Renders the production-ready chat interface.
 	 *
 	 * If a valid form ID is provided and saved JSON exists, that JSON (decoded as an
 	 * associative array) is used for the multi-step questions. Otherwise, dummy data is used.
 	 *
 	 * @param int $form_id Optional form ID to load saved questions.
-	 * @return string HTML output for the chat UI demo.
+	 * @return string HTML output for the chat UI.
 	 */
-	public static function render_demo( $form_id = 0 ) {
+	public static function render_chat_ui( $form_id = 0 ) {
 		// Retrieve theme preset styles.
 		$theme_styles = ChatUISettings::get_instance()->get_selected_theme_styles();
 
@@ -53,51 +53,21 @@ class ChatUI {
 		}
 
 		// Fallback to dummy data if no saved data exists.
+		// Note: We've updated the dummy data to include a default helpText.
 		if ( empty( $form_data ) || ! isset( $form_data['fields'] ) ) {
 			$form_data = array(
 				'fields' => array(
 					array(
-						'type'        => 'text',
-						'label'       => 'Name Input',
-						'placeholder' => 'Enter your name',
-						'required'    => false,
+						'type'             => 'text',
+						'label'            => 'Name Input',
+						'placeholder'      => 'Enter your name',
+						'required'         => false,
+						'defaultValue'     => '',
+						'id'               => 'text-' . uniqid(),
+						'helpText'         => 'Only letters, numbers, punctuation, symbols & spaces allowed.',
+						'validationMessage'=> ''
 					),
-					array(
-						'type'        => 'number',
-						'label'       => '',
-						'placeholder' => '',
-						'required'    => false,
-					),
-					array(
-						'type'        => 'radio',
-						'label'       => '',
-						'placeholder' => '',
-						'required'    => false,
-					),
-					array(
-						'type'        => 'checkbox',
-						'label'       => '',
-						'placeholder' => '',
-						'required'    => false,
-					),
-					array(
-						'type'        => 'select',
-						'label'       => '',
-						'placeholder' => '',
-						'required'    => false,
-					),
-					array(
-						'type'        => 'slider',
-						'label'       => '',
-						'placeholder' => '',
-						'required'    => false,
-					),
-					array(
-						'type'        => 'textarea',
-						'label'       => '',
-						'placeholder' => '',
-						'required'    => false,
-					),
+					// Additional dummy fields can be added here.
 				),
 			);
 		}
@@ -154,7 +124,7 @@ class ChatUI {
 			isset( $theme_styles['smartforms_chat_input_container_box_shadow'] ) ? esc_attr( $theme_styles['smartforms_chat_input_container_box_shadow'] ) : '0 2px 5px rgba(0,0,0,0.1)'
 		);
 
-		// Submit button styles (unchanged markup).
+		// Submit button styles.
 		$submit_size          = isset( $theme_styles['smartforms_chat_submit_button_size'] ) ? $theme_styles['smartforms_chat_submit_button_size'] : '36px';
 		$submit_bg            = isset( $theme_styles['smartforms_chat_submit_button_background_color'] ) ? $theme_styles['smartforms_chat_submit_button_background_color'] : '#007bff';
 		$submit_text          = isset( $theme_styles['smartforms_chat_submit_button_text_color'] ) ? $theme_styles['smartforms_chat_submit_button_text_color'] : '#ffffff';
@@ -183,29 +153,24 @@ class ChatUI {
 			esc_attr( $submit_size ),
 			esc_attr( $submit_size ),
 			esc_attr( $submit_font_size ),
-			esc_attr( $submit_line_height ),
-			esc_attr( $submit_icon_size )
+			esc_attr( $submit_line_height )
 		);
 		
+		// Start output buffering.
 		ob_start();
 		?>
 		<div id="smartforms-chat-container" class="smartforms-chat-container" style="<?php echo esc_attr( $container_style ); ?>">
 			<div class="smartforms-chat-header" style="<?php echo $header_style; ?>">
-				<h2 class="smartforms-chat-title"><?php esc_html_e( 'Chat Preview', 'smartforms' ); ?></h2>
+				<h2 class="smartforms-chat-title"><?php esc_html_e( 'Chat Interface', 'smartforms' ); ?></h2>
 			</div>
-			<!-- Chat dialog area (initially contains dummy messages, will be replaced by JS) -->
+			<!-- Chat dialog area -->
 			<div class="smartforms-chat-dialog" id="smartforms-chat-dialog" style="width: 100%; flex: 1; height: 400px; overflow-y: auto; padding: 10px;">
-				<div class="smartforms-chat-message bot" style="margin-bottom: 10px;">
-					<p style="color: <?php echo esc_attr( $theme_styles['smartforms_chat_dialog_text_color'] ); ?>;">Hello! How can I help you today?</p>
-				</div>
-				<div class="smartforms-chat-message user" style="margin-bottom: 10px; text-align: right;">
-					<p style="color: <?php echo esc_attr( $theme_styles['smartforms_chat_dialog_text_color'] ); ?>;">I need some information.</p>
-				</div>
+				<!-- Initially empty; JavaScript will populate questions -->
 			</div>
 			<div class="smartforms-chat-input-container" style="width: 100%; padding: 10px; border-top: 1px solid <?php echo esc_attr( $border_color ); ?>;">
 				<div class="smartforms-chat-input-box" style="<?php echo esc_attr( $input_container_style ); ?>; display: flex; flex-direction: column; gap: 5px;">
-					<!-- Initially display the normal chat textarea -->
-					<textarea class="form-control" rows="4" style="border: none; width: 100%; resize: none; background-color: transparent;" placeholder="<?php esc_attr_e( 'Type your message here...', 'smartforms' ); ?>"></textarea>
+					<!-- The initial input control will be replaced by JavaScript based on the current question -->
+					<textarea class="form-control" rows="4" style="border: none; width: 100%; resize: none; background-color: transparent;" placeholder="<?php esc_attr_e( 'Type your answer here...', 'smartforms' ); ?>"></textarea>
 					<!-- Submit button row: DO NOT modify this structure -->
 					<div style="display: flex; justify-content: flex-end;">
 						<button type="button" class="btn" style="<?php echo esc_attr( $submit_button_style ); ?>">
@@ -216,139 +181,11 @@ class ChatUI {
 			</div>
 		</div>
 		<script>
-		document.addEventListener("DOMContentLoaded", () => {
-			// Expose form data for debugging (optional).
-			const formData = <?php echo wp_json_encode( $form_data ); ?>;
-			window.formData = formData;
-			
-			if (!formData || !formData.fields || !formData.fields.length) {
-				return;
-			}
-			
-			let currentStep = 0;
-			const formResponses = {};
-			
-			const chatDialog = document.getElementById("smartforms-chat-dialog");
-			const inputBox = document.querySelector(".smartforms-chat-input-box");
-			const submitButton = document.querySelector(".smartforms-chat-input-box button");
-			const botTextColor = "<?php echo esc_js( isset( $theme_styles['smartforms_chat_dialog_text_color'] ) ? $theme_styles['smartforms_chat_dialog_text_color'] : '#000000' ); ?>";
-			
-			// Get the computed height of the default textarea.
-			const defaultTextarea = document.querySelector(".smartforms-chat-input-box textarea");
-			const defaultHeight = defaultTextarea ? window.getComputedStyle(defaultTextarea).height : "100px";
-			
-			/**
-			 * Creates an input control based on the field type.
-			 * Unknown types default to a textarea.
-			 * @param {Object} field - The field configuration.
-			 * @returns {HTMLElement} The created input element.
-			 */
-			const createInputControl = (field) => {
-				let control;
-				switch (field.type) {
-					case "select":
-						control = document.createElement("select");
-						control.className = "form-control";
-						if (field.options && Array.isArray(field.options)) {
-							field.options.forEach(opt => {
-								const option = document.createElement("option");
-								option.value = opt.value;
-								option.textContent = opt.label;
-								control.appendChild(option);
-							});
-						}
-						break;
-					case "slider":
-						control = document.createElement("input");
-						control.type = "range";
-						control.className = "form-control";
-						control.min = field.min || 0;
-						control.max = field.max || 100;
-						control.value = field.value || Math.floor(((field.min || 0) + (field.max || 100)) / 2);
-						break;
-					case "number":
-						control = document.createElement("input");
-						control.type = "number";
-						control.className = "form-control";
-						control.placeholder = field.placeholder || "";
-						break;
-					default:
-						control = document.createElement("textarea");
-						control.className = "form-control";
-						control.rows = 4;
-						control.placeholder = field.placeholder || "Type your answer here...";
-				}
-				// Force the control to have the same height as the default textarea.
-				control.style.height = defaultHeight;
-				control.style.minHeight = defaultHeight;
-				return control;
-			};
-			
-			/**
-			 * Replaces the dynamic input control (first child of the input box) without touching the submit button row.
-			 * @param {HTMLElement} newControl - The new input element.
-			 */
-			const replaceInputControl = (newControl) => {
-				if (inputBox.firstElementChild) {
-					inputBox.firstElementChild.remove();
-				}
-				inputBox.insertBefore(newControl, inputBox.firstElementChild);
-			};
-			
-			/**
-			 * Displays the current question in the chat dialog, clearing previous content.
-			 */
-			const showCurrentQuestion = () => {
-				const currentField = formData.fields[currentStep];
-				chatDialog.innerHTML = "";
-				const botMessage = document.createElement("div");
-				botMessage.classList.add("smartforms-chat-message", "bot");
-				botMessage.style.marginBottom = "10px";
-				const p = document.createElement("p");
-				p.style.color = botTextColor;
-				p.textContent = currentField.label;
-				botMessage.appendChild(p);
-				chatDialog.appendChild(botMessage);
-				chatDialog.scrollTop = chatDialog.scrollHeight;
-				const newControl = createInputControl(currentField);
-				replaceInputControl(newControl);
-			};
-			
-			// Start with the first question.
-			showCurrentQuestion();
-			
-			submitButton.addEventListener("click", (e) => {
-				e.preventDefault();
-				const inputControl = inputBox.firstElementChild;
-				if (!inputControl) return;
-				const answer = inputControl.value;
-				formResponses[currentStep] = answer;
-				currentStep++;
-				if (currentStep < formData.fields.length) {
-					showCurrentQuestion();
-				} else {
-					chatDialog.innerHTML = "";
-					const botMessage = document.createElement("div");
-					botMessage.classList.add("smartforms-chat-message", "bot");
-					botMessage.style.marginBottom = "10px";
-					const p = document.createElement("p");
-					p.style.color = botTextColor;
-					p.textContent = "This is a dummy AI response after form submission.";
-					botMessage.appendChild(p);
-					chatDialog.appendChild(botMessage);
-					chatDialog.scrollTop = chatDialog.scrollHeight;
-					const textarea = document.createElement("textarea");
-					textarea.className = "form-control";
-					textarea.rows = 4;
-					textarea.style.border = "none";
-					textarea.style.width = "100%";
-					textarea.style.resize = "none";
-					textarea.style.backgroundColor = "transparent";
-					textarea.placeholder = "Type your message here...";
-					replaceInputControl(textarea);
-				}
+			// When the document is ready, expose form data and the current form ID globally.
+			document.addEventListener("DOMContentLoaded", () => {
+				window.formData = <?php echo wp_json_encode( $form_data ); ?>;
+				window.smartformsFormId = <?php echo get_the_ID(); ?>;
 			});
-		});
 		</script>
 		<?php
 		return ob_get_clean();
