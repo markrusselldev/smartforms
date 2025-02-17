@@ -113,13 +113,12 @@ class ChatUI {
 		);
 
 		// Input container styles.
-		$input_bg              = isset( $theme_styles['smartforms_chat_input_container_background_color'] ) ? $theme_styles['smartforms_chat_input_container_background_color'] : $bg_color;
 		$input_container_style = sprintf(
 			'background-color: %s; border: %dpx %s %s; border-radius: %dpx; box-shadow: %s; padding: 5px;',
-			esc_attr( $input_bg ),
+			esc_attr( $theme_styles['smartforms_chat_input_container_background_color'] ) ? esc_attr( $theme_styles['smartforms_chat_input_container_background_color'] ) : esc_attr( $bg_color ),
 			isset( $theme_styles['smartforms_chat_input_container_border_width'] ) ? absint( $theme_styles['smartforms_chat_input_container_border_width'] ) : 1,
 			isset( $theme_styles['smartforms_chat_input_container_border_style'] ) ? esc_attr( $theme_styles['smartforms_chat_input_container_border_style'] ) : 'solid',
-			isset( $theme_styles['smartforms_chat_input_container_border_color'] ) ? esc_attr( $theme_styles['smartforms_chat_input_container_border_color'] ) : $border_color,
+			isset( $theme_styles['smartforms_chat_input_container_border_color'] ) ? esc_attr( $theme_styles['smartforms_chat_input_container_border_color'] ) : esc_attr( $border_color ),
 			isset( $theme_styles['smartforms_chat_input_container_border_radius'] ) ? absint( $theme_styles['smartforms_chat_input_container_border_radius'] ) : 5,
 			isset( $theme_styles['smartforms_chat_input_container_box_shadow'] ) ? esc_attr( $theme_styles['smartforms_chat_input_container_box_shadow'] ) : '0 2px 5px rgba(0,0,0,0.1)'
 		);
@@ -155,7 +154,7 @@ class ChatUI {
 			esc_attr( $submit_font_size ),
 			esc_attr( $submit_line_height )
 		);
-		
+
 		// Start output buffering.
 		ob_start();
 		?>
@@ -165,23 +164,25 @@ class ChatUI {
 			</div>
 			<!-- Chat dialog area -->
 			<div class="smartforms-chat-dialog" id="smartforms-chat-dialog" style="width: 100%; flex: 1; height: 400px; overflow-y: auto; padding: 10px;">
-				<!-- Initially empty; JavaScript will populate questions -->
 			</div>
-			<div class="smartforms-chat-input-container" style="width: 100%; padding: 10px; border-top: 1px solid <?php echo esc_attr( $border_color ); ?>;">
-				<div class="smartforms-chat-input-box" style="<?php echo esc_attr( $input_container_style ); ?>; display: flex; flex-direction: column; gap: 5px;">
-					<!-- The initial input control will be replaced by JavaScript based on the current question -->
-					<textarea class="form-control" rows="4" style="border: none; width: 100%; resize: none; background-color: transparent;" placeholder="<?php esc_attr_e( 'Type your answer here...', 'smartforms' ); ?>"></textarea>
-					<!-- Submit button row: DO NOT modify this structure -->
-					<div style="display: flex; justify-content: flex-end;">
-						<button type="button" class="btn" style="<?php echo esc_attr( $submit_button_style ); ?>">
-							<i class="<?php echo esc_attr( $submit_icon ); ?>" style="font-size: <?php echo esc_attr( $submit_icon_size ); ?>; line-height: <?php echo esc_attr( $submit_icon_size ); ?>;"></i>
-						</button>
+			<!-- Wrap the input area in a form for JustValidate. Explicitly set the form's width to 100% -->
+			<form id="smartforms-chat-form" style="width: 100%;">
+				<div class="smartforms-chat-input-container" style="width: 100%; padding: 10px; border-top: 1px solid <?php echo esc_attr( $border_color ); ?>;">
+					<div class="smartforms-chat-input-box" style="<?php echo esc_attr( $input_container_style ); ?>; display: flex; flex-direction: column; gap: 5px;">
+						<!-- The initial input control will be replaced by JavaScript based on the current question -->
+						<textarea id="smartforms-current-input" class="form-control" rows="4" style="border: none; width: 100%; resize: none; background-color: transparent;" placeholder="<?php esc_attr_e( 'Type your answer here...', 'smartforms' ); ?>"></textarea>
+						<!-- Submit button row: DO NOT modify this structure -->
+						<div style="display: flex; justify-content: flex-end;">
+							<button type="button" class="btn" style="<?php echo esc_attr( $submit_button_style ); ?>">
+								<i class="<?php echo esc_attr( $submit_icon ); ?>" style="font-size: <?php echo esc_attr( $submit_icon_size ); ?>; line-height: <?php echo esc_attr( $submit_icon_size ); ?>;"></i>
+							</button>
+						</div>
 					</div>
 				</div>
-			</div>
+			</form>
 		</div>
 		<script>
-			// When the document is ready, expose form data and the current form ID globally.
+			// Expose form data and the current form ID globally.
 			document.addEventListener("DOMContentLoaded", () => {
 				window.formData = <?php echo wp_json_encode( $form_data ); ?>;
 				window.smartformsFormId = <?php echo get_the_ID(); ?>;

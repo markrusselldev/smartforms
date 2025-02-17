@@ -1,7 +1,7 @@
 /**
  * Edit component for the SmartForms Text Input block.
  *
- * Renders an actual text input field in the editor along with InspectorControls
+ * Renders a preview of the text input field in the editor along with InspectorControls
  * for adjusting the field's settings.
  *
  * @package SmartForms
@@ -10,9 +10,17 @@
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
+import { useEffect } from '@wordpress/element';
 
-const Edit = ({ attributes, setAttributes }) => {
+const Edit = ({ attributes, setAttributes, clientId }) => {
 	const blockProps = useBlockProps();
+
+	// Generate a unique input ID for this block instance if not already set.
+	useEffect(() => {
+		if ( ! attributes.inputId ) {
+			setAttributes({ inputId: 'smartforms-text-' + clientId });
+		}
+	}, []);
 
 	return (
 		<div {...blockProps}>
@@ -43,9 +51,15 @@ const Edit = ({ attributes, setAttributes }) => {
 			</InspectorControls>
 			<label>{ attributes.label }</label>
 			<input
+				id={ attributes.inputId }
 				type="text"
 				placeholder={ attributes.placeholder }
 				required={ attributes.required }
+				// This pattern requires at least one letter or digit.
+				pattern="^(?=.*[A-Za-z0-9]).+$"
+				// Data attributes for potential front-end initialization.
+				data-validate="true"
+				data-validation-message={ attributes.helpText }
 				className="smartforms-text-input"
 			/>
 			{ attributes.helpText && (

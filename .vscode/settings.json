@@ -1,6 +1,6 @@
 {
     "editor.codeActionsOnSave": {
-        "source.fixAll.phpcs": true
+        "source.fixAll.phpcs": "explicit"
     },
     "phpcs.executablePath": "/var/www/html/wp-content/plugins/smartforms/vendor/bin/phpcs",
     "phpcbf.executablePath": "/var/www/html/wp-content/plugins/smartforms/vendor/bin/phpcbf",

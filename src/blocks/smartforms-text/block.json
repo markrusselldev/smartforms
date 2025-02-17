@@ -44,6 +44,10 @@
 		"helpText": {
 			"type": "string",
 			"default": "Only letters, numbers, punctuation, symbols & spaces allowed."
+		},
+		"inputId": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"editorScript": "file:./index.js",
