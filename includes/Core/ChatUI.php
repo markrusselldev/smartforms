@@ -58,14 +58,14 @@ class ChatUI {
 			$form_data = array(
 				'fields' => array(
 					array(
-						'type'             => 'text',
-						'label'            => 'Name Input',
-						'placeholder'      => 'Enter your name',
-						'required'         => false,
-						'defaultValue'     => '',
-						'id'               => 'text-' . uniqid(),
-						'helpText'         => 'Only letters, numbers, punctuation, symbols & spaces allowed.',
-						'validationMessage'=> ''
+						'type'              => 'text',
+						'label'             => 'Name Input',
+						'placeholder'       => 'Enter your name',
+						'required'          => false,
+						'defaultValue'      => '',
+						'id'                => 'text-' . uniqid(),
+						'helpText'          => 'Only letters, numbers, punctuation, symbols & spaces allowed.',
+						'validationMessage' => '',
 					),
 					// Additional dummy fields can be added here.
 				),
@@ -140,7 +140,7 @@ class ChatUI {
 			$submit_size_numeric = intval( preg_replace( '/\D/', '', $submit_size ) );
 			$submit_icon_size    = ( $submit_size_numeric * 0.8 ) . 'px';
 		}
-		
+
 		$submit_button_style = sprintf(
 			'background-color: %s; color: %s; border: %dpx %s %s; border-radius: %s; width: %s; height: %s; font-size: %s; line-height: %s; display: flex; align-items: center; justify-content: center;',
 			esc_attr( $submit_bg ),

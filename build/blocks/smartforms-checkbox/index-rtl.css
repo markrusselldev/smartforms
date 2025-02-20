@@ -1,1 +1,1 @@
-.wp-block-smartforms-checkbox{border:1px solid #ddd;padding:10px}
+.wp-block-smartforms-checkbox{background-color:#fff;border:1px solid #ddd;border-radius:4px;padding:12px}.wp-block-smartforms-checkbox>label{display:block;font-weight:600;margin-bottom:8px}.wp-block-smartforms-checkbox .sf-checkbox-group{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}.wp-block-smartforms-checkbox .sf-checkbox-option{align-items:center;display:inline-flex;min-width:100px}.wp-block-smartforms-checkbox .sf-checkbox-option input[type=checkbox]{margin-left:5px}

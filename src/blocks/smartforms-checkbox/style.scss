@@ -1,6 +1,36 @@
-.wp-block-smartforms-checkbox input {
+/* Front-End Styles for SmartForms Checkbox Block */
+
+/* Outer container matching original design */
+.wp-block-smartforms-checkbox .sf-checkbox-container {
   width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+/* Flex layout for checkbox group */
+.wp-block-smartforms-checkbox .sf-checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Each checkbox option inline */
+.wp-block-smartforms-checkbox .sf-checkbox-option {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  margin-right: 10px;
+}
+
+/* Checkbox input styling */
+.wp-block-smartforms-checkbox .sf-checkbox-container input[type="checkbox"] {
+  width: auto;
+  padding: 0;
+  border: none;
+  margin-right: 5px;
+  -webkit-appearance: checkbox;
+  appearance: checkbox;
 }

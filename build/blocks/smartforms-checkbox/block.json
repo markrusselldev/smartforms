@@ -3,7 +3,6 @@
   "name": "smartforms/checkbox",
   "title": "Checkbox",
   "category": "smartforms",
-  "icon": "yes",
   "description": "A checkbox field for selecting options.",
   "supports": {
     "html": false,
@@ -24,7 +23,7 @@
   "attributes": {
     "label": {
       "type": "string",
-      "default": "Checkbox"
+      "default": "Checkbox Input"
     },
     "required": {
       "type": "boolean",
@@ -36,9 +35,19 @@
     "options": {
       "type": "array",
       "default": [
-        "Option 1",
-        "Option 2"
+        {
+          "label": "Option 1",
+          "value": "option-1"
+        },
+        {
+          "label": "Option 2",
+          "value": "option-2"
+        }
       ]
+    },
+    "groupId": {
+      "type": "string",
+      "default": ""
     }
   },
   "editorScript": "file:./index.js",

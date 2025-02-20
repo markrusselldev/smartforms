@@ -93,7 +93,7 @@ class MetaBox {
 			if ( isset( $block['blockName'] ) && false !== strpos( $block['blockName'], 'smartforms/' ) ) {
 				// Determine the block type (e.g., "text", "number", etc.)
 				$type = str_replace( 'smartforms/', '', sanitize_text_field( $block['blockName'] ) );
-				$form_fields[] = array(
+				$form_field = array(
 					'type'        => $type,
 					'label'       => isset( $block['attrs']['label'] ) && ! empty( $block['attrs']['label'] )
 						? sanitize_text_field( $block['attrs']['label'] )
@@ -108,6 +108,25 @@ class MetaBox {
 							: 'Only letters, numbers, punctuation, symbols & spaces allowed.' )
 						: ( isset( $block['attrs']['helpText'] ) ? sanitize_text_field( $block['attrs']['helpText'] ) : '' )
 				);
+
+				// If this is a checkbox block, include the options array explicitly.
+				if ( 'checkbox' === $type && isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) ) {
+					$options = array();
+					foreach ( $block['attrs']['options'] as $option ) {
+						if ( isset( $option['label'], $option['value'] ) ) {
+							$options[] = array(
+								'label' => sanitize_text_field( $option['label'] ),
+								'value' => sanitize_text_field( $option['value'] ),
+							);
+						} else {
+							SmartForms::log_error( "Checkbox option missing label or value for post $post_id." );
+						}
+					}
+					$form_field['options'] = $options;
+					SmartForms::log_error( "Checkbox block processed with " . count( $options ) . " options for post $post_id." );
+				}
+
+				$form_fields[] = $form_field;
 			}
 		}
 
@@ -124,7 +143,7 @@ class MetaBox {
 
 		// Store JSON in post meta.
 		update_post_meta( $post_id, 'smartforms_data', $json_data );
-		SmartForms::log_error( '[DEBUG] Form data JSON saved for Form ID: ' . esc_html( $post_id ) );
+		SmartForms::log_error( "[DEBUG] Form data JSON saved for Form ID: $post_id" );
 	}
 
 	/**
@@ -155,3 +174,5 @@ class MetaBox {
 		}
 	}
 }
+
+MetaBox::get_instance();

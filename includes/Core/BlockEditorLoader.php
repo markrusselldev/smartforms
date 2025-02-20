@@ -62,7 +62,7 @@ class BlockEditorLoader {
 			'smartforms-text',
 			'smartforms-number',
 			'smartforms-radio',
-			'smartforms-checkbox',
+			/*'smartforms-checkbox',*/
 			'smartforms-select',
 			'smartforms-slider',
 			'smartforms-textarea',
