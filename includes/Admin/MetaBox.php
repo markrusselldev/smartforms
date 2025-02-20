@@ -110,20 +110,30 @@ class MetaBox {
 				);
 
 				// If this is a checkbox block, include the options array explicitly.
-				if ( 'checkbox' === $type && isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) ) {
-					$options = array();
-					foreach ( $block['attrs']['options'] as $option ) {
-						if ( isset( $option['label'], $option['value'] ) ) {
-							$options[] = array(
-								'label' => sanitize_text_field( $option['label'] ),
-								'value' => sanitize_text_field( $option['value'] ),
-							);
-						} else {
-							SmartForms::log_error( "Checkbox option missing label or value for post $post_id." );
+				if ( 'checkbox' === $type ) {
+					if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
+						$options = array();
+						foreach ( $block['attrs']['options'] as $option ) {
+							if ( isset( $option['label'], $option['value'] ) ) {
+								$options[] = array(
+									'label' => sanitize_text_field( $option['label'] ),
+									'value' => sanitize_text_field( $option['value'] ),
+								);
+							} else {
+								SmartForms::log_error( "Checkbox option missing label or value for post $post_id." );
+							}
 						}
+						$form_field['options'] = $options;
+						SmartForms::log_error( "Checkbox block processed with " . count( $options ) . " options for post $post_id." );
+					} else {
+						// If no options are provided, log an error.
+						SmartForms::log_error( "Checkbox block missing options for post $post_id." );
+						// Optionally, you can assign a fallback default:
+						$form_field['options'] = array(
+							array( 'label' => 'Option 1', 'value' => 'option-1' ),
+							array( 'label' => 'Option 2', 'value' => 'option-2' )
+						);
 					}
-					$form_field['options'] = $options;
-					SmartForms::log_error( "Checkbox block processed with " . count( $options ) . " options for post $post_id." );
 				}
 
 				$form_fields[] = $form_field;

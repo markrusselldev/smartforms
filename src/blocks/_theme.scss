@@ -1,0 +1,31 @@
+/**
+ * _theme.scss
+ *
+ * Shared design tokens for SmartForms.
+ * Defines common variables for colors, spacing, typography, etc.
+ * Both editor and front-end styles import this file.
+ *
+ * @package SmartForms
+ */
+
+// Sass variables
+$primary-color: #007bff;
+$border-color: #ddd;
+$background-color: #fff;
+$padding-base: 12px;
+$border-radius-base: 4px;
+$gap-size: 10px;
+$font-family-base: 'Manrope', sans-serif;
+$font-size-base: 16px;
+
+// CSS custom properties (for runtime flexibility)
+:root {
+  --smartforms-primary-color: #007bff;
+  --smartforms-border-color: #ddd;
+  --smartforms-background-color: #fff;
+  --smartforms-padding-base: 12px;
+  --smartforms-border-radius-base: 4px;
+  --smartforms-gap-size: 10px;
+  --smartforms-font-family: 'Manrope', sans-serif;
+  --smartforms-font-size: 16px;
+}

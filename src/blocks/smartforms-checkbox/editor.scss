@@ -1,36 +1,41 @@
-/* Editor styles for SmartForms Checkbox block */
+@use '../_theme.scss' as theme;
 
-/* Outer container styling matching other blocks */
+/**
+ * Editor styles for SmartForms Checkbox block.
+ *
+ * These styles use the shared design tokens from _theme.scss for consistency.
+ *
+ * @package SmartForms
+ */
+
 .wp-block-smartforms-checkbox {
-  border: 1px solid #ddd;
-  padding: 12px;
-  border-radius: 4px;
-  background-color: #fff;
+  border: 1px solid theme.$border-color;
+  padding: theme.$padding-base;
+  border-radius: theme.$border-radius-base;
+  background-color: theme.$background-color;
 }
 
-/* Styling for the block’s label */
 .wp-block-smartforms-checkbox > label {
   font-weight: 600;
   margin-bottom: 8px;
   display: block;
+  font-family: theme.$font-family-base;
+  font-size: theme.$font-size-base;
 }
 
-/* Arrange checkbox options as a horizontal, wrapping grid */
 .wp-block-smartforms-checkbox .sf-checkbox-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
+  gap: theme.$gap-size;
+  margin-top: theme.$gap-size;
 }
 
-/* Each checkbox option styled for inline-flex layout */
 .wp-block-smartforms-checkbox .sf-checkbox-option {
   display: inline-flex;
   align-items: center;
   min-width: 100px;
 }
 
-/* Spacing between checkbox and its label */
 .wp-block-smartforms-checkbox .sf-checkbox-option input[type="checkbox"] {
   margin-right: 5px;
 }
