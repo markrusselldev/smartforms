@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // Expose form data (assumed to be set by ChatUI.php).
+    // Expose form data (set by ChatUI.php).
     const formData = window.formData;
     if (!formData || !formData.fields || !formData.fields.length) {
         return;
@@ -9,12 +9,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const formResponses = {};
     
     const chatDialog = document.getElementById("smartforms-chat-dialog");
+    // Updated: select the submit button from its new container.
+    const submitButton = document.querySelector(".smartforms-chat-submit-row button");
     const inputBox = document.querySelector(".smartforms-chat-input-box");
-    const submitButton = document.querySelector(".smartforms-chat-input-box button");
     const botTextColor = smartformsData.chatDialogTextColor || '#000000';
     
-    // Get the computed height of the input container to maintain overall area.
-    const containerHeight = window.getComputedStyle(inputBox).height;
+    // Get the computed height of the input box (fixed height) if needed.
+    const defaultInputHeight = window.getComputedStyle(inputBox).height;
     
     /**
      * Creates an input control based on the field type.
@@ -30,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (field.type === "text") {
             const container = document.createElement("div");
             container.className = "smartforms-input-container";
-            container.style.height = containerHeight;
+            container.style.height = defaultInputHeight;
             container.style.display = "flex";
             container.style.flexDirection = "column";
             container.style.justifyContent = "center";
@@ -41,22 +42,18 @@ document.addEventListener("DOMContentLoaded", () => {
             input.type = "text";
             input.className = "form-control";
             input.placeholder = field.placeholder || "Type your answer here...";
-            input.style.height = "auto";
-            input.style.minHeight = "auto";
             inputWrapper.appendChild(input);
             container.appendChild(inputWrapper);
             control = container;
         } else if (field.type === "checkbox") {
-            // Create a container that uses Bootstrap's utility classes for horizontal wrapping.
-            // This container will have no inline styling so that Bootstrap and theme styles apply.
             control = document.createElement("div");
-            control.className = "d-flex flex-wrap gap-2";
+            // Remove inline styling so that stylesheet rules apply.
+            control.className = "sf-checkbox-group sf-checkbox-group-" + (field.layout || "horizontal");
             
             if (field.options && Array.isArray(field.options)) {
                 field.options.forEach(opt => {
                     const optionWrapper = document.createElement("div");
-                    // Use Bootstrap's form-check for individual checkbox styling.
-                    optionWrapper.className = "form-check";
+                    optionWrapper.className = "sf-checkbox-option";
                     
                     const checkbox = document.createElement("input");
                     checkbox.type = "checkbox";
@@ -121,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
     /**
      * Displays the current question in the chat dialog.
      * Clears previous content, shows the question label as a bot message,
-     * creates the input control for the current field, and inserts help text below it.
+     * creates the input control for the current field, and inserts help text.
      */
     const showCurrentQuestion = () => {
         const currentField = formData.fields[currentStep];
@@ -142,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const newControl = createInputControl(currentField);
         replaceInputControl(newControl);
         
-        // Insert help text, if provided.
+        // Insert help text if provided.
         if (currentField.helpText && currentField.helpText.trim().length > 0) {
             const helpTextElement = document.createElement("p");
             helpTextElement.className = "smartforms-help-text";
@@ -150,16 +147,19 @@ document.addEventListener("DOMContentLoaded", () => {
             helpTextElement.style.fontSize = "12px";
             helpTextElement.style.marginTop = "4px";
             helpTextElement.textContent = currentField.helpText;
-            if (currentField.type === "text") {
-                newControl.appendChild(helpTextElement);
-            } else {
-                inputBox.insertBefore(helpTextElement, newControl.nextSibling);
-            }
+            // Append help text after the control.
+            newControl.parentNode.insertBefore(helpTextElement, newControl.nextSibling);
         }
     };
     
     // Start with the first question.
     showCurrentQuestion();
+    
+    // Ensure the submit button is found.
+    if (!submitButton) {
+        console.error("Submit button not found in the chat form.");
+        return;
+    }
     
     submitButton.addEventListener("click", (e) => {
         e.preventDefault();
@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 .filter(cb => cb.checked)
                 .map(cb => cb.value);
         } else if (currentField.type === "text") {
-            const inputControl = inputBox.querySelector(".smartforms-input-container input");
+            const inputControl = inputBox.querySelector("input");
             if (!inputControl) return;
             answer = inputControl.value;
         } else {
@@ -205,6 +205,7 @@ document.addEventListener("DOMContentLoaded", () => {
             existingError.remove();
         }
         
+        // Save the answer.
         formResponses[currentField.id || currentStep] = answer;
         
         if (currentStep < formData.fields.length - 1) {
@@ -240,6 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 chatDialog.appendChild(botMessage);
                 chatDialog.scrollTop = chatDialog.scrollHeight;
                 
+                // Replace the input control with a textarea for chat submission.
                 const textarea = document.createElement("textarea");
                 textarea.className = "form-control";
                 textarea.rows = 4;

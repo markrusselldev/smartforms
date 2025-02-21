@@ -3,40 +3,46 @@
 /**
  * Front-end styles for SmartForms Checkbox block.
  *
- * These styles use the shared design tokens to match the editor appearance.
+ * These styles use shared design tokens from _theme.scss for consistency.
  *
  * @package SmartForms
  */
 
-.wp-block-smartforms-checkbox .sf-checkbox-container {
-  background: theme.$background-color;
+.wp-block-smartforms-checkbox {
   border: 1px solid theme.$border-color;
-  border-radius: theme.$border-radius-base;
-  box-sizing: border-box;
   padding: theme.$padding-base;
-  width: 100%;
+  border-radius: theme.$border-radius-base;
+  background-color: theme.$background-color;
 }
 
-.wp-block-smartforms-checkbox .sf-checkbox-group {
+.wp-block-smartforms-checkbox > label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
+  font-family: theme.$font-family-base;
+  font-size: theme.$font-size-base;
+}
+
+/* Horizontal layout (default) */
+.sf-checkbox-group-horizontal {
   display: flex;
   flex-wrap: wrap;
   gap: theme.$gap-size;
   margin-top: theme.$gap-size;
 }
 
-.wp-block-smartforms-checkbox .sf-checkbox-option {
-  align-items: center;
-  display: inline-flex;
-  flex: 0 0 auto;
-  margin-right: theme.$gap-size;
+/* Vertical layout */
+.sf-checkbox-group-vertical {
+  display: block;
+  margin-top: theme.$gap-size;
 }
 
-.wp-block-smartforms-checkbox .sf-checkbox-container input[type="checkbox"],
-.wp-block-smartforms-checkbox .sf-checkbox-group input[type="checkbox"] {
-  -webkit-appearance: checkbox;
-  -moz-appearance: checkbox;
-  appearance: checkbox;
+.sf-checkbox-option {
+  display: inline-flex;
+  align-items: center;
+  min-width: 100px;
+}
+
+.sf-checkbox-option input[type="checkbox"] {
   margin-right: 5px;
-  padding: 0;
-  width: auto;
 }

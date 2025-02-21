@@ -3,7 +3,7 @@
 /**
  * Editor styles for SmartForms Checkbox block.
  *
- * These styles use the shared design tokens from _theme.scss for consistency.
+ * These styles use shared design tokens from _theme.scss for consistency.
  *
  * @package SmartForms
  */
@@ -23,19 +23,26 @@
   font-size: theme.$font-size-base;
 }
 
-.wp-block-smartforms-checkbox .sf-checkbox-group {
+/* Horizontal layout (default) */
+.sf-checkbox-group-horizontal {
   display: flex;
   flex-wrap: wrap;
   gap: theme.$gap-size;
   margin-top: theme.$gap-size;
 }
 
-.wp-block-smartforms-checkbox .sf-checkbox-option {
+/* Vertical layout */
+.sf-checkbox-group-vertical {
+  display: block;
+  margin-top: theme.$gap-size;
+}
+
+.sf-checkbox-option {
   display: inline-flex;
   align-items: center;
   min-width: 100px;
 }
 
-.wp-block-smartforms-checkbox .sf-checkbox-option input[type="checkbox"] {
+.sf-checkbox-option input[type="checkbox"] {
   margin-right: 5px;
 }

@@ -100,8 +100,6 @@ class MetaBox {
 						: self::get_default_label( $block['blockName'] ),
 					'placeholder' => isset( $block['attrs']['placeholder'] ) ? sanitize_text_field( $block['attrs']['placeholder'] ) : '',
 					'required'    => isset( $block['attrs']['required'] ) ? (bool) $block['attrs']['required'] : false,
-					// For text blocks, if helpText is not provided or is empty, default to a specific message.
-					// For other block types, default to an empty string.
 					'helpText'    => ( 'text' === $type )
 						? ( isset( $block['attrs']['helpText'] ) && trim( $block['attrs']['helpText'] ) !== ''
 							? sanitize_text_field( $block['attrs']['helpText'] )
@@ -109,7 +107,7 @@ class MetaBox {
 						: ( isset( $block['attrs']['helpText'] ) ? sanitize_text_field( $block['attrs']['helpText'] ) : '' )
 				);
 
-				// If this is a checkbox block, include the options array explicitly.
+				// If this is a checkbox block, include options and layout.
 				if ( 'checkbox' === $type ) {
 					if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
 						$options = array();
@@ -126,13 +124,22 @@ class MetaBox {
 						$form_field['options'] = $options;
 						SmartForms::log_error( "Checkbox block processed with " . count( $options ) . " options for post $post_id." );
 					} else {
-						// If no options are provided, log an error.
 						SmartForms::log_error( "Checkbox block missing options for post $post_id." );
-						// Optionally, you can assign a fallback default:
 						$form_field['options'] = array(
 							array( 'label' => 'Option 1', 'value' => 'option-1' ),
 							array( 'label' => 'Option 2', 'value' => 'option-2' )
 						);
+					}
+					// Extract the layout attribute.
+					if ( isset( $block['attrs']['layout'] ) && ! empty( $block['attrs']['layout'] ) ) {
+						$form_field['layout'] = sanitize_text_field( $block['attrs']['layout'] );
+					} else {
+						// As a fallback, attempt to extract it from the block's innerHTML.
+						if ( isset( $block['innerHTML'] ) && preg_match( '/data-layout="([^"]+)"/', $block['innerHTML'], $matches ) ) {
+							$form_field['layout'] = sanitize_text_field( $matches[1] );
+						} else {
+							$form_field['layout'] = 'horizontal';
+						}
 					}
 				}
 

@@ -48,6 +48,13 @@
     "groupId": {
       "type": "string",
       "default": ""
+    },
+    "layout": {
+      "type": "string",
+      "default": "horizontal",
+      "source": "attribute",
+      "selector": "div.sf-checkbox-group",
+      "attribute": "data-layout"
     }
   },
   "editorScript": "file:./index.js",

@@ -28,7 +28,7 @@ class ChatUI {
 	 * @return string HTML output for the chat UI.
 	 */
 	public static function render( $form_id ) {
-		// Renaming our method from "demo" to "chat_ui" for production.
+		// For production use, call the main chat UI renderer.
 		return self::render_chat_ui( $form_id );
 	}
 
@@ -52,8 +52,7 @@ class ChatUI {
 			$form_data  = $saved_json ? json_decode( $saved_json, true ) : array();
 		}
 
-		// Fallback to dummy data if no saved data exists.
-		// Note: We've updated the dummy data to include a default helpText.
+		// Fallback dummy data if no saved data exists.
 		if ( empty( $form_data ) || ! isset( $form_data['fields'] ) ) {
 			$form_data = array(
 				'fields' => array(
@@ -72,7 +71,7 @@ class ChatUI {
 			);
 		}
 
-		// Container layout properties.
+		// Define container styling.
 		$bg_color        = isset( $theme_styles['smartforms_chat_container_background_color'] ) ? $theme_styles['smartforms_chat_container_background_color'] : '#ffffff';
 		$border_color    = isset( $theme_styles['smartforms_chat_container_border_color'] ) ? $theme_styles['smartforms_chat_container_border_color'] : '#cccccc';
 		$border_style    = isset( $theme_styles['smartforms_chat_container_border_style'] ) ? $theme_styles['smartforms_chat_container_border_style'] : 'solid';
@@ -112,9 +111,9 @@ class ChatUI {
 			esc_attr( $header_font_size )
 		);
 
-		// Input container styles.
+		// Input container styles (applied to the container, not the input box).
 		$input_container_style = sprintf(
-			'background-color: %s; border: %dpx %s %s; border-radius: %dpx; box-shadow: %s; padding: 5px;',
+			'background-color: %s; border: %dpx %s %s; border-radius: %dpx; box-shadow: %s;',
 			esc_attr( $theme_styles['smartforms_chat_input_container_background_color'] ) ? esc_attr( $theme_styles['smartforms_chat_input_container_background_color'] ) : esc_attr( $bg_color ),
 			isset( $theme_styles['smartforms_chat_input_container_border_width'] ) ? absint( $theme_styles['smartforms_chat_input_container_border_width'] ) : 1,
 			isset( $theme_styles['smartforms_chat_input_container_border_style'] ) ? esc_attr( $theme_styles['smartforms_chat_input_container_border_style'] ) : 'solid',
@@ -122,6 +121,9 @@ class ChatUI {
 			isset( $theme_styles['smartforms_chat_input_container_border_radius'] ) ? absint( $theme_styles['smartforms_chat_input_container_border_radius'] ) : 5,
 			isset( $theme_styles['smartforms_chat_input_container_box_shadow'] ) ? esc_attr( $theme_styles['smartforms_chat_input_container_box_shadow'] ) : '0 2px 5px rgba(0,0,0,0.1)'
 		);
+
+		// Input box styles: fixed default height (can grow if needed).
+		$input_box_style = 'height: 100px; min-height: 100px; resize: vertical;';
 
 		// Submit button styles.
 		$submit_size          = isset( $theme_styles['smartforms_chat_submit_button_size'] ) ? $theme_styles['smartforms_chat_submit_button_size'] : '36px';
@@ -155,7 +157,7 @@ class ChatUI {
 			esc_attr( $submit_line_height )
 		);
 
-		// Start output buffering.
+		// Build the HTML output.
 		ob_start();
 		?>
 		<div id="smartforms-chat-container" class="smartforms-chat-container" style="<?php echo esc_attr( $container_style ); ?>">
@@ -165,18 +167,18 @@ class ChatUI {
 			<!-- Chat dialog area -->
 			<div class="smartforms-chat-dialog" id="smartforms-chat-dialog" style="width: 100%; flex: 1; height: 400px; overflow-y: auto; padding: 10px;">
 			</div>
-			<!-- Wrap the input area in a form for JustValidate. Explicitly set the form's width to 100% -->
+			<!-- Input area: Both the input control and submit button row -->
 			<form id="smartforms-chat-form" style="width: 100%;">
-				<div class="smartforms-chat-input-container" style="width: 100%; padding: 10px; border-top: 1px solid <?php echo esc_attr( $border_color ); ?>;">
-					<div class="smartforms-chat-input-box" style="<?php echo esc_attr( $input_container_style ); ?>; display: flex; flex-direction: column; gap: 5px;">
-						<!-- The initial input control will be replaced by JavaScript based on the current question -->
-						<textarea id="smartforms-current-input" class="form-control" rows="4" style="border: none; width: 100%; resize: none; background-color: transparent;" placeholder="<?php esc_attr_e( 'Type your answer here...', 'smartforms' ); ?>"></textarea>
-						<!-- Submit button row: DO NOT modify this structure -->
-						<div style="display: flex; justify-content: flex-end;">
-							<button type="button" class="btn" style="<?php echo esc_attr( $submit_button_style ); ?>">
-								<i class="<?php echo esc_attr( $submit_icon ); ?>" style="font-size: <?php echo esc_attr( $submit_icon_size ); ?>; line-height: <?php echo esc_attr( $submit_icon_size ); ?>;"></i>
-							</button>
-						</div>
+				<div class="smartforms-chat-input-container" style="<?php echo esc_attr( $input_container_style ); ?>; padding: 10px; border-top: 1px solid <?php echo esc_attr( $border_color ); ?>;">
+					<!-- Input control area: fixed height textarea inside the container -->
+					<div class="smartforms-chat-input-box" style="<?php echo esc_attr( $input_box_style ); ?>">
+						<textarea id="smartforms-current-input" class="form-control" rows="4" style="border: none; width: 100%; background-color: transparent;" placeholder="<?php esc_attr_e( 'Type your answer here...', 'smartforms' ); ?>"></textarea>
+					</div>
+					<!-- Submit button row -->
+					<div class="smartforms-chat-submit-row" style="display: flex; justify-content: flex-end; margin-top: 5px;">
+						<button type="button" class="btn" style="<?php echo esc_attr( $submit_button_style ); ?>">
+							<i class="<?php echo esc_attr( $submit_icon ); ?>" style="font-size: <?php echo esc_attr( $submit_icon_size ); ?>; line-height: <?php echo esc_attr( $submit_icon_size ); ?>;"></i>
+						</button>
 					</div>
 				</div>
 			</form>

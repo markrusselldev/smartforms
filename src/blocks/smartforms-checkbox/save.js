@@ -9,12 +9,18 @@
 import { useBlockProps } from '@wordpress/block-editor';
 
 const Save = ({ attributes }) => {
+	// Include the layout value as a data attribute on the group container.
 	const blockProps = useBlockProps.save();
+
 	return (
 		<div { ...blockProps }>
 			<label>{ attributes.label }</label>
 			<div className="sf-checkbox-container">
-				<div className="sf-checkbox-group">
+				{/* The group container now includes a data-layout attribute to store the layout value */}
+				<div
+					className={ `sf-checkbox-group sf-checkbox-group-${ attributes.layout || 'horizontal' }` }
+					data-layout={ attributes.layout || 'horizontal' }
+				>
 					{ attributes.options &&
 						attributes.options.map( ( option, index ) => (
 							<div key={ index } className="sf-checkbox-option">
@@ -24,9 +30,7 @@ const Save = ({ attributes }) => {
 									name={ attributes.groupId }
 									required={ attributes.required }
 								/>
-								<label htmlFor={ `${ attributes.groupId }-${ index }` }>
-									{ option.label }
-								</label>
+								<label htmlFor={ `${ attributes.groupId }-${ index }` }>{ option.label }</label>
 							</div>
 						) )
 					}
