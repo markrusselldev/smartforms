@@ -1,46 +1,38 @@
-@use '../_theme.scss' as theme;
-
 /**
- * Editor styles for SmartForms Checkbox block.
+ * Editor styles for the SmartForms Checkbox block.
  *
- * These styles use shared design tokens from _theme.scss for consistency.
+ * This file provides a grid layout for the checkbox options that adjusts
+ * based on the block’s "layout" attribute. When the layout is set to "horizontal",
+ * the options display in multiple columns; when set to "vertical", they appear in a single column.
  *
  * @package SmartForms
  */
 
-.wp-block-smartforms-checkbox {
-  border: 1px solid theme.$border-color;
-  padding: theme.$padding-base;
-  border-radius: theme.$border-radius-base;
-  background-color: theme.$background-color;
+ .wp-block-smartforms-checkbox {
+  /* Editor block container styling */
+  padding: 10px;
 }
 
-.wp-block-smartforms-checkbox > label {
-  font-weight: 600;
-  margin-bottom: 8px;
-  display: block;
-  font-family: theme.$font-family-base;
-  font-size: theme.$font-size-base;
+/* Base styling for the checkbox group container */
+.sf-checkbox-group {
+  display: grid;
+  grid-gap: 10px;
 }
 
-/* Horizontal layout (default) */
+/* Horizontal layout: display options in multiple columns */
 .sf-checkbox-group-horizontal {
-  display: flex;
-  flex-wrap: wrap;
-  gap: theme.$gap-size;
-  margin-top: theme.$gap-size;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }
 
-/* Vertical layout */
+/* Vertical layout: display options in a single column */
 .sf-checkbox-group-vertical {
-  display: block;
-  margin-top: theme.$gap-size;
+  grid-template-columns: 1fr;
 }
 
+/* Additional styling for individual checkbox options */
 .sf-checkbox-option {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  min-width: 100px;
 }
 
 .sf-checkbox-option input[type="checkbox"] {
