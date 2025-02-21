@@ -5,6 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"build": "wp-scripts build",
+		"build:chatui": "wp-scripts build --config wp-scripts.chatui.config.js",
 		"start": "wp-scripts start",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},

@@ -129,19 +129,26 @@ class SmartForms {
 		wp_enqueue_script(
 			'just-validate',
 			'https://cdn.jsdelivr.net/npm/just-validate@2.2.0/dist/just-validate.production.min.js',
-			array(), // no dependency on jQuery
+			array(),
 			'2.2.0',
 			true
 		);
-		// Enqueue our Chat UI script, now dependent on wp-element and JustValidate.
+		// Enqueue our Chat UI script.
 		wp_enqueue_script(
 			'smartforms-chatui',
-			plugins_url( 'assets/js/smartforms-chat.js', dirname( __FILE__, 3 ) . '/smartforms.php' ),
+			plugins_url( 'build/js/smartforms-chat.js', dirname( __FILE__, 3 ) . '/smartforms.php' ),
 			array( 'wp-element', 'just-validate' ),
 			'1.0.0',
 			true
 		);
-		// Localize the script with AJAX URL, nonce, etc.
+		// Enqueue the generated Chat UI CSS file.
+		wp_enqueue_style(
+			'smartforms-chat',
+			plugins_url( 'build/css/smartforms-chat.css', dirname( __FILE__, 3 ) . '/smartforms.php' ),
+			array( 'bootstrap-css', 'fontawesome' ),
+			'1.0.0'
+		);
+		// Localize the Chat UI script.
 		wp_localize_script(
 			'smartforms-chatui',
 			'smartformsData',
