@@ -29,12 +29,19 @@ document.addEventListener("DOMContentLoaded", () => {
             control.className = "form-control smartforms-text-input";
             control.placeholder = field.placeholder || "Type your answer here...";
         } else if (field.type === "checkbox") {
+            // Preserve the outer container with proper class and data attribute for layout JSON mapping.
             control = document.createElement("div");
             control.className = "sf-checkbox-group sf-checkbox-group-" + (field.layout || "horizontal");
+            control.setAttribute("data-layout", field.layout || "horizontal");
             if (field.options && Array.isArray(field.options)) {
                 field.options.forEach(opt => {
                     const optionWrapper = document.createElement("div");
-                    optionWrapper.className = "sf-checkbox-option";
+                    // Apply Bootstrap's form-check class; add form-check-inline if layout is horizontal.
+                    let inlineClass = "";
+                    if (field.layout === "horizontal") {
+                        inlineClass = " form-check-inline";
+                    }
+                    optionWrapper.className = "sf-checkbox-option form-check" + inlineClass;
                     
                     const checkbox = document.createElement("input");
                     checkbox.type = "checkbox";

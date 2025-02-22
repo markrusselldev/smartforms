@@ -1,9 +1,8 @@
 /**
  * Edit component for the SmartForms Checkbox block.
  *
- * Renders a checkbox field with multiple options in the editor,
- * along with InspectorControls to add, remove, and modify options,
- * and a setting to choose horizontal or vertical layout.
+ * Renders a checkbox field group for the editor with InspectorControls to add, remove, and modify options,
+ * along with a setting to choose horizontal or vertical layout.
  *
  * @package SmartForms
  */
@@ -19,25 +18,20 @@ const DEFAULT_OPTIONS = [
 ];
 
 const Edit = ({ attributes, setAttributes, clientId }) => {
-	// Ensure the block's outer container gets the proper class.
-	const blockProps = useBlockProps({ className: 'wp-block-smartforms-checkbox' });
+	const blockProps = useBlockProps();
 
-	// Ensure a unique groupId is set and a layout is defined.
+	// Ensure the block's settings are initialized.
 	useEffect(() => {
 		if ( ! attributes.groupId ) {
 			setAttributes({ groupId: 'sf-checkbox-' + clientId });
 		}
-		if ( typeof attributes.layout === 'undefined' || ! attributes.layout ) {
+		if ( ! attributes.layout ) {
 			setAttributes({ layout: 'horizontal' });
 		}
-	}, [ attributes.groupId, attributes.layout, clientId, setAttributes ]);
-
-	// Set default options if none exist.
-	useEffect(() => {
-		if ( ! attributes.options || ! Array.isArray( attributes.options ) || attributes.options.length === 0 ) {
+		if ( ! attributes.options || !Array.isArray( attributes.options ) || attributes.options.length === 0 ) {
 			setAttributes({ options: DEFAULT_OPTIONS });
 		}
-	}, [ attributes.options, setAttributes ]);
+	}, [ attributes, clientId, setAttributes ]);
 
 	/**
 	 * Updates an option's label and derived value.
@@ -99,42 +93,52 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 						] }
 						onChange={ ( value ) => setAttributes({ layout: value }) }
 					/>
-					<PanelBody title={ __( 'Checkbox Options', 'smartforms' ) } initialOpen={ true }>
-						{ attributes.options &&
-							attributes.options.map( ( option, index ) => (
-								<Fragment key={ index }>
-									<TextControl
-										label={ `${ __( 'Option', 'smartforms' ) } ${ index + 1 }` }
-										value={ option.label }
-										onChange={ ( value ) => updateOption( index, value ) }
-									/>
-									<Button isSecondary onClick={ () => removeOption( index ) } isSmall>
-										{ __( 'Remove Option', 'smartforms' ) }
-									</Button>
-								</Fragment>
-							) )
-						}
-						<Button isPrimary onClick={ addOption }>
-							{ __( 'Add Option', 'smartforms' ) }
-						</Button>
-					</PanelBody>
+				</PanelBody>
+				<PanelBody title={ __( 'Checkbox Options', 'smartforms' ) } initialOpen={ true }>
+					{ attributes.options &&
+						attributes.options.map( ( option, index ) => (
+							<Fragment key={ index }>
+								<TextControl
+									label={ `${ __( 'Option', 'smartforms' ) } ${ index + 1 }` }
+									value={ option.label }
+									onChange={ ( value ) => updateOption( index, value ) }
+								/>
+								<Button isSecondary onClick={ () => removeOption( index ) } isSmall>
+									{ __( 'Remove Option', 'smartforms' ) }
+								</Button>
+							</Fragment>
+						) )
+					}
+					<Button isPrimary onClick={ addOption }>
+						{ __( 'Add Option', 'smartforms' ) }
+					</Button>
 				</PanelBody>
 			</InspectorControls>
 			<label>{ attributes.label }</label>
-			{/* The group container gets a modifier class based on layout */}
-			<div className={ `sf-checkbox-group sf-checkbox-group-${ attributes.layout }` }>
+			{/* Outer container preserved for JSON mapping */}
+			<div
+				className={ `sf-checkbox-group sf-checkbox-group-${ attributes.layout || 'horizontal' }` }
+				data-layout={ attributes.layout || 'horizontal' }
+			>
 				{ attributes.options &&
-					attributes.options.map( ( option, index ) => (
-						<div key={ index } className="sf-checkbox-option">
-							<input
-								type="checkbox"
-								id={ `${ attributes.groupId }-${ index }` }
-								name={ attributes.groupId }
-								required={ attributes.required }
-							/>
-							<label htmlFor={ `${ attributes.groupId }-${ index }` }>{ option.label }</label>
-						</div>
-					) )
+					attributes.options.map( ( option, index ) => {
+						// Apply Bootstrap classes: always "form-check" and "form-check-inline" if horizontal.
+						const inlineClass = attributes.layout === 'horizontal' ? ' form-check-inline' : '';
+						return (
+							<div key={ index } className={ `sf-checkbox-option form-check${ inlineClass }` }>
+								<input
+									className="form-check-input"
+									type="checkbox"
+									id={ `${ attributes.groupId }-${ index }` }
+									name={ attributes.groupId }
+									required={ attributes.required }
+								/>
+								<label className="form-check-label" htmlFor={ `${ attributes.groupId }-${ index }` }>
+									{ option.label }
+								</label>
+							</div>
+						);
+					})
 				}
 			</div>
 		</div>
