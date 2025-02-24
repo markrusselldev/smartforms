@@ -95,35 +95,3 @@
 	font-size: 12px;
 	margin-top: 4px;
 }
-
-/* Begin: SmartForms Checkbox Grid Styles */
-/**
- * These styles handle the layout for checkbox groups in the chat UI.
- * The layout setting is applied via a class:
- *   - .sf-checkbox-group-horizontal: for a multi-column grid layout.
- *   - .sf-checkbox-group-vertical: for a single-column layout.
- * This grid display ensures the checkbox options are neatly arranged without
- * affecting the rest of the chat UI styling.
- */
-.sf-checkbox-group {
-	display: grid;
-	grid-gap: 10px;
-}
- 
-.sf-checkbox-group-horizontal {
-	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-}
- 
-.sf-checkbox-group-vertical {
-	grid-template-columns: 1fr;
-}
- 
-.sf-checkbox-option {
-	display: flex;
-	align-items: center;
-}
- 
-.sf-checkbox-option input[type="checkbox"] {
-	margin-right: 5px;
-}
-/* End: SmartForms Checkbox Grid Styles */
