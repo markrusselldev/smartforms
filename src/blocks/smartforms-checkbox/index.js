@@ -63,6 +63,10 @@ registerBlockType('smartforms/checkbox', {
     groupId: {
       type: 'string',
       default: ''
+    },
+    layout: {
+      type: 'string',
+      default: 'horizontal'
     }
   },
   edit: Edit,

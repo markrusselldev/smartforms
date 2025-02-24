@@ -4,9 +4,8 @@
 	"description": "SmartForms is a WordPress plugin that enables users to create chatbot-style questionnaires with GPT-powered recommendations. This plugin leverages modern WordPress standards and AI technology to provide an intuitive and powerful tool for form creation.",
 	"main": "index.js",
 	"scripts": {
-		"build": "wp-scripts build",
-		"build:chatui": "wp-scripts build --config wp-scripts.chatui.config.js",
-		"start": "wp-scripts start",
+		"build": "wp-scripts build && wp-scripts build --config wp-scripts.chatui.config.js",
+		"start": "concurrently \"wp-scripts start\" \"wp-scripts start --config wp-scripts.chatui.config.js\"",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"repository": {
@@ -30,7 +29,8 @@
 	"devDependencies": {
 		"@wordpress/scripts": "^30.10.0",
 		"ajv": "^8.17.1",
-		"ajv-keywords": "^5.1.0"
+		"ajv-keywords": "^5.1.0",
+		"concurrently": "^9.1.2"
 	},
 	"dependencies": {
 		"@wordpress/block-editor": "^14.12.0",

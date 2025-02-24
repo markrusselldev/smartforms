@@ -54,9 +54,23 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 
 	/**
 	 * Adds a new checkbox option.
+	 *
+	 * Automatically assigns a sequential label "Option N" based on the current highest option number.
 	 */
 	const addOption = () => {
-		const newOptions = [ ...attributes.options, { label: 'New Option', value: 'new-option' } ];
+		let maxNumber = 0;
+		attributes.options.forEach( ( option ) => {
+			const match = option.label.match( /^Option (\d+)$/ );
+			if ( match ) {
+				const num = parseInt( match[1], 10 );
+				if ( num > maxNumber ) {
+					maxNumber = num;
+				}
+			}
+		} );
+		const newLabel = `Option ${ maxNumber + 1 }`;
+		const newValue = newLabel.toLowerCase().replace( /\s+/g, '-' );
+		const newOptions = [ ...attributes.options, { label: newLabel, value: newValue } ];
 		setAttributes({ options: newOptions });
 	};
 

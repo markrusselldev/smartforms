@@ -1,9 +1,7 @@
 /**
  * Editor styles for the SmartForms Checkbox block.
  *
- * This file provides a grid layout for the checkbox options that adjusts
- * based on the block’s "layout" attribute. When the layout is set to "horizontal",
- * the options display in multiple columns; when set to "vertical", they appear in a single column.
+ * Provides a consistent, evenly spaced grid layout for the checkbox options regardless of flow direction.
  *
  * @package SmartForms
  */
@@ -13,20 +11,12 @@
   padding: 10px;
 }
 
-/* Base styling for the checkbox group container */
-.sf-checkbox-group {
+/* Unified grid styling for both horizontal and vertical layouts */
+.sf-checkbox-group-horizontal,
+.sf-checkbox-group-vertical {
   display: grid;
   grid-gap: 10px;
-}
-
-/* Horizontal layout: display options in multiple columns */
-.sf-checkbox-group-horizontal {
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-}
-
-/* Vertical layout: display options in a single column */
-.sf-checkbox-group-vertical {
-  grid-template-columns: 1fr;
 }
 
 /* Additional styling for individual checkbox options */
