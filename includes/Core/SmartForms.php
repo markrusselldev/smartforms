@@ -76,7 +76,9 @@ class SmartForms {
 	 * @return void
 	 */
 	private function initialize_classes() {
-		\SmartForms\Core\BlockEditorLoader::get_instance();
+		if ( is_admin() ) {
+			\SmartForms\Core\BlockEditorLoader::get_instance();
+		}
 		\SmartForms\Core\SmartFormsHandler::get_instance();
 		if ( class_exists( 'SmartForms\\Admin\\AdminMenu' ) ) {
 			new \SmartForms\Admin\AdminMenu();

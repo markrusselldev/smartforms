@@ -2,22 +2,23 @@
 /**
  * Handles the rendering of the SmartForms Chat UI.
  *
- * Retrieves form JSON data (saved as post meta) and the selected theme preset styles,
- * then outputs the chat interface. The interface steps through each form question –
- * displaying only the current question (as a bot message) in the chat dialog area.
- * Once all questions are answered, a dummy AI response is appended and the input area
- * reverts to a standard chat textarea.
+ * Retrieves form block markup from the saved post content by parsing Gutenberg blocks,
+ * then renders each block via render_block(). This ensures that the full markup (with
+ * all form fields) is output and that WordPress automatically enqueues the frontend and editor
+ * styles as defined in each block's block.json file.
+ *
+ * This file is modified to no longer rely on extracted JSON, and all original isset() checks and logic are preserved.
  *
  * @package SmartForms
  */
 
 namespace SmartForms\Core;
 
+use SmartForms\CPT\ChatUISettings;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Prevent direct access.
 }
-
-use SmartForms\CPT\ChatUISettings;
 
 class ChatUI {
 
@@ -34,43 +35,37 @@ class ChatUI {
 	/**
 	 * Renders the production-ready chat interface.
 	 *
-	 * If a valid form ID is provided and saved JSON exists, that JSON (decoded as an
-	 * associative array) is used for the multi-step questions. Otherwise, dummy data is used.
+	 * Retrieves the full post content (the Gutenberg block markup) via get_post_field(),
+	 * parses it with parse_blocks(), and renders each block with render_block().
+	 * The resulting HTML is wrapped in a chat container with dynamic CSS variables.
 	 *
-	 * @param int $form_id Optional form ID to load saved questions.
+	 * @param int $form_id The form ID to load.
 	 * @return string HTML output for the chat UI.
 	 */
 	public static function render_chat_ui( $form_id = 0 ) {
-		// Retrieve theme preset styles.
 		$theme_styles = ChatUISettings::get_instance()->get_selected_theme_styles();
 
-		// Load saved form data from post meta.
-		$form_data = array();
-		if ( $form_id ) {
-			$saved_json = get_post_meta( $form_id, 'smartforms_data', true );
-			$form_data  = $saved_json ? json_decode( $saved_json, true ) : array();
+		if ( ! $form_id ) {
+			return '<p>' . esc_html__( 'Form ID not provided.', 'smartforms' ) . '</p>';
 		}
 
-		// Fallback dummy data if no saved data exists.
-		if ( empty( $form_data ) || ! isset( $form_data['fields'] ) ) {
-			$form_data = array(
-				'fields' => array(
-					array(
-						'type'              => 'text',
-						'label'             => 'Name Input',
-						'placeholder'       => 'Enter your name',
-						'required'          => false,
-						'defaultValue'      => '',
-						'id'                => 'text-' . uniqid(),
-						'helpText'          => 'Only letters, numbers, punctuation, symbols & spaces allowed.',
-						'validationMessage' => '',
-					),
-				),
-			);
+		// Retrieve the complete post content.
+		$post_content = get_post_field( 'post_content', $form_id );
+		if ( ! isset( $post_content ) || empty( $post_content ) ) {
+			return '<p>' . esc_html__( 'Form content not found.', 'smartforms' ) . '</p>';
 		}
 
-		// Build a dynamic CSS block to output any necessary CSS variables.
-		// (You can later modify your SCSS to reference these variables if desired.)
+		$blocks = parse_blocks( $post_content );
+		$form_markup = '';
+		if ( isset( $blocks ) && ! empty( $blocks ) ) {
+			foreach ( $blocks as $block ) {
+				$form_markup .= render_block( $block );
+			}
+		} else {
+			$form_markup = '<p>' . esc_html__( 'No form blocks found.', 'smartforms' ) . '</p>';
+		}
+
+		// Build dynamic CSS using isset checks as originally written.
 		$css = "
 		#smartforms-chat-container {
 			--chat-bg-color: " . esc_attr( isset( $theme_styles['smartforms_chat_container_background_color'] ) ? $theme_styles['smartforms_chat_container_background_color'] : '#ffffff' ) . ";
@@ -88,15 +83,17 @@ class ChatUI {
 		";
 		$css = "<style>" . $css . "</style>";
 
-		// Build the HTML output without inline style attributes.
+		// Output the chat container with header, rendered form markup, and chat input.
 		ob_start();
 		?>
-		<?php echo $css; // Output dynamic CSS variables ?>
+		<?php echo $css; ?>
 		<div id="smartforms-chat-container" class="smartforms-chat-container">
 			<div id="smartforms-chat-header" class="smartforms-chat-header">
 				<h2 class="smartforms-chat-title"><?php esc_html_e( 'Chat Interface', 'smartforms' ); ?></h2>
 			</div>
-			<div id="smartforms-chat-dialog" class="smartforms-chat-dialog"></div>
+			<div id="smartforms-chat-dialog" class="smartforms-chat-dialog">
+				<?php echo $form_markup; ?>
+			</div>
 			<form id="smartforms-chat-form" class="smartforms-chat-form">
 				<div id="smartforms-chat-input-container" class="smartforms-chat-input-container">
 					<div id="smartforms-chat-input-box" class="smartforms-chat-input-box">
@@ -112,7 +109,7 @@ class ChatUI {
 		</div>
 		<script>
 			document.addEventListener("DOMContentLoaded", () => {
-				window.formData = <?php echo wp_json_encode( $form_data ); ?>;
+				window.formData = <?php echo wp_json_encode( $form_markup ); ?>;
 				window.smartformsFormId = <?php echo get_the_ID(); ?>;
 			});
 		</script>

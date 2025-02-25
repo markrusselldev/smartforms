@@ -24,6 +24,13 @@ class BlockEditorLoader {
 	private static $instance = null;
 
 	/**
+	 * Flag to ensure blocks are registered only once.
+	 *
+	 * @var bool
+	 */
+	private static $registered = false;
+
+	/**
 	 * Get or create the singleton instance.
 	 *
 	 * @return BlockEditorLoader The singleton instance.
@@ -54,9 +61,11 @@ class BlockEditorLoader {
 	 * @return void
 	 */
 	public function register_blocks() {
-		if ( did_action( 'init' ) > 1 ) {
+		// Prevent duplicate registration.
+		if ( did_action( 'init' ) > 1 || self::$registered ) {
 			return;
 		}
+		self::$registered = true;
 
 		$blocks = array(
 			'smartforms-text',
