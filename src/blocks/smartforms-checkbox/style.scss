@@ -1,44 +1,40 @@
 /**
- * Frontend styles for the SmartForms Checkbox block.
+ * Frontend and shared styles for the SmartForms Checkbox block.
  *
- * Provides a consistent, evenly spaced grid layout for checkbox options.
- * In horizontal mode, options fill row-first using CSS Grid.
- * In vertical mode, we force a grid with exactly 3 rows and a fixed height so that extra items wrap into new columns.
+ * These styles provide a consistent, evenly spaced grid layout for checkbox options.
+ * In horizontal mode, options fill rows from left-to-right.
+ * In vertical mode, options fill columns with exactly 3 rows so that additional items wrap.
  *
  * @package SmartForms
  */
 
  .wp-block-smartforms-checkbox {
-  /* Frontend block container styling */
+  /* Block container styling */
   padding: 10px;
 }
 
 .sf-checkbox-group-horizontal {
-  display: grid !important;
-  grid-gap: 10px !important;
-  grid-auto-flow: row !important;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+  display: grid;
+  grid-gap: 10px;
+  /* Fill rows left-to-right */
+  grid-auto-flow: row;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }
 
 .sf-checkbox-group-vertical {
-  display: grid !important;
-  grid-gap: 10px !important;
-  grid-auto-flow: column !important;
-  grid-template-rows: repeat(3, auto) !important;
-  height: 140px !important; /* Fixed height to force wrapping into additional columns */
-  width: 100% !important;
-  box-sizing: border-box !important;
+  display: grid;
+  grid-gap: 10px;
+  /* Fill columns with exactly 3 rows so that additional items wrap */
+  grid-auto-flow: column;
+  grid-template-rows: repeat(3, auto);
 }
 
+/* Styling for individual checkbox options */
 .sf-checkbox-option {
-  display: flex !important;
-  align-items: center !important;
+  display: flex;
+  align-items: center;
 }
 
 .sf-checkbox-option input[type="checkbox"] {
-  margin-right: 5px !important;
-}
-
-.sf-checkbox-group-vertical {
-  border: 2px dashed red !important;
+  margin-right: 5px;
 }

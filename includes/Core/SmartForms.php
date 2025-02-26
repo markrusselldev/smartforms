@@ -76,18 +76,19 @@ class SmartForms {
 	 * @return void
 	 */
 	private function initialize_classes() {
-		if ( is_admin() ) {
+		// Only load block registration and editor assets in the admin.
+		if ( is_admin() && class_exists( 'SmartForms\\Core\\BlockEditorLoader' ) ) {
 			\SmartForms\Core\BlockEditorLoader::get_instance();
 		}
-		\SmartForms\Core\SmartFormsHandler::get_instance();
+		// Always load the frontend asset enqueuer.
+		if ( class_exists( 'SmartForms\\Core\\BlockFrontendAssets' ) ) {
+			\SmartForms\Core\BlockFrontendAssets::get_instance();
+		}
 		if ( class_exists( 'SmartForms\\Admin\\AdminMenu' ) ) {
 			new \SmartForms\Admin\AdminMenu();
 		}
 		if ( class_exists( 'SmartForms\\CPT\\FormCPT' ) ) {
 			new \SmartForms\CPT\FormCPT();
-		}
-		if ( class_exists( 'SmartForms\\Admin\\MetaBox' ) ) {
-			\SmartForms\Admin\MetaBox::get_instance();
 		}
 		if ( class_exists( 'SmartForms\\Core\\API' ) ) {
 			new \SmartForms\Core\API();

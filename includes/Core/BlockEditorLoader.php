@@ -12,7 +12,8 @@ use WP_Error;
 /**
  * Block Editor Loader Class.
  *
- * Dynamically registers Gutenberg blocks inside the SmartForms editor.
+ * Dynamically registers Gutenberg blocks inside the SmartForms editor
+ * and enqueues editor assets.
  */
 class BlockEditorLoader {
 
@@ -45,7 +46,7 @@ class BlockEditorLoader {
 	/**
 	 * Constructor.
 	 *
-	 * Hooks into WordPress actions and filters to load blocks inside the SmartForms editor.
+	 * Hooks into WordPress actions and filters to load blocks and editor assets.
 	 */
 	private function __construct() {
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_assets' ) );
@@ -79,7 +80,7 @@ class BlockEditorLoader {
 			'smartforms-progress',
 		);
 
-		// Use __DIR__ to build the path: current __DIR__ is "smartforms/includes/Core".
+		// Use __DIR__ to build the path (current __DIR__ is "smartforms/includes/Core").
 		$build_dir = __DIR__ . '/../../build/blocks/';
 
 		foreach ( $blocks as $block ) {
@@ -92,7 +93,7 @@ class BlockEditorLoader {
 				/**
 				 * Handles block registration errors.
 				 *
-				 * @var WP_Error $result Ensures Intelephense recognizes this as WP_Error.
+				 * @var WP_Error $result
 				 */
 				if ( is_wp_error( $result ) ) {
 					\SmartForms\Core\SmartForms::log_error(
@@ -115,8 +116,6 @@ class BlockEditorLoader {
 	/**
 	 * Enqueue block editor scripts and styles for SmartForms blocks.
 	 *
-	 * Ensures that each block's JavaScript and CSS files are properly enqueued.
-	 *
 	 * @return void
 	 */
 	public function enqueue_block_assets() {
@@ -133,9 +132,7 @@ class BlockEditorLoader {
 			return;
 		}
 
-		// Define the plugin root path: from __DIR__ (smartforms/includes/Core) go up two levels to the plugin root.
-		$plugin_root = __DIR__ . '/../../smartforms.php';
-
+		// Enqueue editor assets.
 		foreach ( $block_folders as $folder ) {
 			if ( '.' === $folder || '..' === $folder ) {
 				continue;
@@ -148,7 +145,7 @@ class BlockEditorLoader {
 			if ( file_exists( $script_path ) ) {
 				wp_enqueue_script(
 					'smartforms-' . $folder . '-editor-script',
-					plugins_url( 'build/blocks/' . $folder . '/index.js', $plugin_root ),
+					plugins_url( 'build/blocks/' . $folder . '/index.js', SMARTFORMS_PLUGIN_FILE ),
 					array( 'wp-blocks', 'wp-element', 'wp-editor' ),
 					filemtime( $script_path ),
 					true
@@ -159,7 +156,7 @@ class BlockEditorLoader {
 			if ( file_exists( $style_path ) ) {
 				wp_enqueue_style(
 					'smartforms-' . $folder . '-editor-style',
-					plugins_url( 'build/blocks/' . $folder . '/index.css', $plugin_root ),
+					plugins_url( 'build/blocks/' . $folder . '/index.css', SMARTFORMS_PLUGIN_FILE ),
 					array(),
 					filemtime( $style_path )
 				);
@@ -169,8 +166,6 @@ class BlockEditorLoader {
 
 	/**
 	 * Add the SmartForms block category for the SmartForms post type.
-	 *
-	 * Ensures the SmartForms category appears in the block editor.
 	 *
 	 * @param array $categories Existing block categories.
 	 * @return array Modified block categories.
