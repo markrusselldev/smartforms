@@ -1,41 +1,51 @@
 /**
  * Editor styles for the SmartForms Checkbox block.
  *
- * Provides a consistent, evenly spaced grid layout for the checkbox options.
- * In horizontal mode, options fill row-first.
- * In vertical mode, options fill columns with a fixed number of rows (3 rows),
- * so that additional items wrap into a new column.
+ * We remove WP admin defaults that interfere with Bootstrap’s native
+ * checkbox styling. This lets Bootstrap’s default (square, properly sized,
+ * dark border with a white checkmark on blue when checked) appear.
  *
  * @package SmartForms
  */
 
  .wp-block-smartforms-checkbox {
-  /* Editor block container styling */
+  border: 1px solid #ddd;
   padding: 10px;
 }
 
+/* Use a grid layout for our checkbox group */
 .sf-checkbox-group-horizontal {
   display: grid;
-  grid-gap: 10px;
-  /* Fill rows left-to-right */
+  gap: 10px;
   grid-auto-flow: row;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }
-
 .sf-checkbox-group-vertical {
   display: grid;
-  grid-gap: 10px;
-  /* Fill columns with exactly 3 rows so that additional items wrap */
+  gap: 10px;
   grid-auto-flow: column;
   grid-template-rows: repeat(3, auto);
 }
 
-/* Additional styling for individual checkbox options */
-.sf-checkbox-option {
+/* Remove WP defaults from checkbox inputs that interfere with Bootstrap */
+/* Instead of forcing a native appearance, let Bootstrap’s CSS do its job */
+.wp-block-smartforms-checkbox input.form-check-input {
+  margin: 0;
+  padding: 0;
+  /* Do not override background, border, size, or appearance */
+}
+
+/* Ensure each checkbox option aligns properly */
+.sf-checkbox-option.form-check {
   display: flex;
   align-items: center;
 }
 
-.sf-checkbox-option input[type="checkbox"] {
-  margin-right: 5px;
+/* Use Bootstrap’s default label styling and add a bit of left margin for spacing */
+.sf-checkbox-option.form-check label.form-check-label {
+  margin: 0;
+  font-size: 1rem;  // Bootstrap default font size
+  line-height: 1.25;
+  vertical-align: middle;
+  margin-left: 5px;
 }
