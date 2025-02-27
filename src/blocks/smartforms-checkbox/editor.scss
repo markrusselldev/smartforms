@@ -52,3 +52,24 @@ body.wp-admin
   input.form-check-input:checked {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23fff' d='M6.173 11.414L3.293 8.536a1 1 0 0 1 1.414-1.414l1.466 1.466 4.95-4.95a1 1 0 1 1 1.414 1.414L6.173 11.414z'/%3E%3C/svg%3E");
 }
+
+/* Editor-specific override for grid spacing */
+body.wp-admin {
+  .sf-checkbox-group-horizontal,
+  .sf-checkbox-group-vertical {
+    margin-left: -22px;       /* Remove extra left margin */
+    justify-items: start; /* Force items to align at the start */
+  }
+}
+
+/* Force vertical layout to match frontend in block editor */
+.sf-checkbox-group-vertical {
+  display: grid;
+  /* Use the same explicit gaps as horizontal mode */
+  row-gap: 10px;
+  column-gap: 13px;
+  grid-auto-flow: column;
+  /* Exactly 3 rows so that additional items wrap */
+  grid-template-rows: repeat(3, max-content);
+  justify-content: start;
+}

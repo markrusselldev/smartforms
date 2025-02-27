@@ -5,6 +5,9 @@
  * In horizontal mode, options fill rows from left-to-right.
  * In vertical mode, options fill columns with exactly 3 rows so that additional items wrap.
  *
+ * The grid is made as compact as possible by using a minimum cell size of 120px
+ * and letting cells grow only to the natural width/height of their content.
+ *
  * @package SmartForms
  */
 
@@ -15,18 +18,29 @@
 
 .sf-checkbox-group-horizontal {
   display: grid;
-  grid-gap: 10px;
-  /* Fill rows left-to-right */
+  /* Use explicit row and column gaps for consistent spacing */
+  row-gap: 10px;
+  column-gap: 0;
   grid-auto-flow: row;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  /* Each column is at least 120px wide and grows only to fit its content */
+  grid-template-columns: repeat(auto-fit, minmax(120px, max-content));
+  justify-content: start;
+  
+  /* Prevent text wrapping in labels for a compact layout */
+  .sf-checkbox-option label {
+    white-space: nowrap;
+  }
 }
 
 .sf-checkbox-group-vertical {
   display: grid;
-  grid-gap: 10px;
-  /* Fill columns with exactly 3 rows so that additional items wrap */
+  /* Use the same explicit gaps as horizontal mode */
+  row-gap: 10px;
+  column-gap: 35px;
   grid-auto-flow: column;
-  grid-template-rows: repeat(3, auto);
+  /* Exactly 3 rows so that additional items wrap */
+  grid-template-rows: repeat(3, max-content);
+  justify-content: start;
 }
 
 /* Styling for individual checkbox options */
