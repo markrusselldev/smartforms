@@ -5,34 +5,24 @@
  * checkbox styling. This lets Bootstrap’s default (square, properly sized,
  * dark border with a white checkmark on blue when checked) appear.
  *
+ * Note: Layout styles are handled in style.scss.
+ *
  * @package SmartForms
  */
 
- .wp-block-smartforms-checkbox {
+/* Container styling for the block */
+.wp-block-smartforms-checkbox {
   border: 1px solid #ddd;
   padding: 10px;
 }
 
-/* Use a grid layout for our checkbox group */
-.sf-checkbox-group-horizontal {
-  display: grid;
-  gap: 10px;
-  grid-auto-flow: row;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-}
-.sf-checkbox-group-vertical {
-  display: grid;
-  gap: 10px;
-  grid-auto-flow: column;
-  grid-template-rows: repeat(3, auto);
-}
-
-/* Remove WP defaults from checkbox inputs that interfere with Bootstrap */
-/* Instead of forcing a native appearance, let Bootstrap’s CSS do its job */
+/* Remove WP admin defaults from checkbox inputs */
 .wp-block-smartforms-checkbox input.form-check-input {
   margin: 0;
   padding: 0;
-  /* Do not override background, border, size, or appearance */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
 /* Ensure each checkbox option aligns properly */
@@ -41,11 +31,24 @@
   align-items: center;
 }
 
-/* Use Bootstrap’s default label styling and add a bit of left margin for spacing */
+/* Use Bootstrap’s default label spacing */
 .sf-checkbox-option.form-check label.form-check-label {
-  margin: 0;
-  font-size: 1rem;  // Bootstrap default font size
+  margin: 0 0 0 5px;
+  font-size: 1rem; // Bootstrap default font size
   line-height: 1.25;
   vertical-align: middle;
-  margin-left: 5px;
+}
+
+/* Remove any pseudo-elements that might add an extra checkmark */
+.wp-block-smartforms-checkbox input.form-check-input:checked::before,
+.wp-block-smartforms-checkbox input.form-check-input:checked::after {
+  display: none !important;
+}
+
+/* Override checked state with specificity to remove WP defaults */
+body.wp-admin 
+  .wp-block-smartforms-checkbox 
+  .sf-checkbox-option.form-check 
+  input.form-check-input:checked {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23fff' d='M6.173 11.414L3.293 8.536a1 1 0 0 1 1.414-1.414l1.466 1.466 4.95-4.95a1 1 0 1 1 1.414 1.414L6.173 11.414z'/%3E%3C/svg%3E");
 }
