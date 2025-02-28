@@ -51,10 +51,10 @@ class BlockFrontendAssets {
 	 */
 	public function enqueue_frontend_assets() {
 		// Build the filesystem path to the blocks directory.
-		$build_dir = plugin_dir_path( SMARTFORMS_PLUGIN_FILE ) . 'build/blocks/';
+		$build_dir = plugin_dir_path( \SMARTFORMS_PLUGIN_FILE ) . 'build/blocks/';
 
 		// Get the plugin root URL.
-		$plugin_root_url = plugin_dir_url( SMARTFORMS_PLUGIN_FILE );
+		$plugin_root_url = plugin_dir_url( \SMARTFORMS_PLUGIN_FILE );
 
 		if ( ! is_dir( $build_dir ) ) {
 			\SmartForms\Core\SmartForms::log_error( '[ERROR] SmartForms build directory not found for frontend assets: ' . esc_url( $build_dir ) );

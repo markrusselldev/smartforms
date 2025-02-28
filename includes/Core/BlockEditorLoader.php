@@ -145,7 +145,7 @@ class BlockEditorLoader {
 			if ( file_exists( $script_path ) ) {
 				wp_enqueue_script(
 					'smartforms-' . $folder . '-editor-script',
-					plugins_url( 'build/blocks/' . $folder . '/index.js', SMARTFORMS_PLUGIN_FILE ),
+					plugins_url( 'build/blocks/' . $folder . '/index.js', \SMARTFORMS_PLUGIN_FILE ),
 					array( 'wp-blocks', 'wp-element', 'wp-editor' ),
 					filemtime( $script_path ),
 					true
@@ -156,7 +156,7 @@ class BlockEditorLoader {
 			if ( file_exists( $style_path ) ) {
 				wp_enqueue_style(
 					'smartforms-' . $folder . '-editor-style',
-					plugins_url( 'build/blocks/' . $folder . '/index.css', SMARTFORMS_PLUGIN_FILE ),
+					plugins_url( 'build/blocks/' . $folder . '/index.css', \SMARTFORMS_PLUGIN_FILE ),
 					array(),
 					filemtime( $style_path )
 				);
