@@ -15,8 +15,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Set the url of our plugin.
 if ( ! defined( 'SMARTFORMS_PLUGIN_URL' ) ) {
 	define( 'SMARTFORMS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+}
+
+// Set the file path of our plugin.
+if ( ! defined( 'SMARTFORMS_PLUGIN_FILE' ) ) {
+	define( 'SMARTFORMS_PLUGIN_FILE', __FILE__ );
 }
 
 // Include Composer autoloader.
