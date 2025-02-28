@@ -19,6 +19,7 @@ const DEFAULT_OPTIONS = [
 
 const Edit = ({ attributes, setAttributes, clientId }) => {
 	const blockProps = useBlockProps();
+	const { label, helpText } = attributes;
 
 	// Ensure the block's settings are initialized.
 	useEffect(() => {
@@ -88,7 +89,6 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 		<div { ...blockProps }>
 			<InspectorControls>
 				<PanelBody title={ __( 'Checkbox Settings', 'smartforms' ) }>
-					{/* Other settings remain unchanged */}
 					<ToggleControl
 						label={ __( 'Required', 'smartforms' ) }
 						checked={ attributes.required }
@@ -102,6 +102,12 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 							{ label: __( 'Vertical', 'smartforms' ), value: 'vertical' }
 						] }
 						onChange={ ( value ) => setAttributes({ layout: value }) }
+					/>
+					<TextControl
+						label={ __( 'Help Text', 'smartforms' ) }
+						value={ helpText }
+						onChange={ ( value ) => setAttributes({ helpText: value }) }
+						placeholder={ __( 'Enter your help text here', 'smartforms' ) }
 					/>
 				</PanelBody>
 				<PanelBody title={ __( 'Checkbox Options', 'smartforms' ) } initialOpen={ true }>

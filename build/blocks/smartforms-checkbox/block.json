@@ -24,7 +24,7 @@
   "attributes": {
     "label": {
       "type": "string",
-      "default": "Type your question here..."
+      "default": "Enter your question here"
     },
     "required": {
       "type": "boolean",
@@ -56,6 +56,10 @@
       "source": "attribute",
       "selector": "div.sf-checkbox-group",
       "attribute": "data-layout"
+    },
+    "helpText": {
+      "type": "string",
+      "default": "Enter your help text here"
     }
   },
   "editorScript": "file:./index.js",
