@@ -76,8 +76,16 @@ class SmartForms {
 	 * @return void
 	 */
 	private function initialize_classes() {
-		\SmartForms\Core\BlockEditorLoader::get_instance();
-		\SmartForms\Core\SmartFormsHandler::get_instance();
+		// Only load block registration and editor assets in the admin.
+		if ( is_admin() && class_exists( 'SmartForms\\Core\\BlockEditorLoader' ) ) {
+			\SmartForms\Core\BlockEditorLoader::get_instance();
+		}
+		if ( class_exists( 'SmartForms\\Core\\BlockFrontendAssets' ) ) {
+			\SmartForms\Core\BlockFrontendAssets::get_instance();
+		}
+		if ( class_exists( 'SmartForms\\Core\\SmartFormsHandler' ) ) {
+			\SmartForms\Core\SmartFormsHandler::get_instance();
+		}
 		if ( class_exists( 'SmartForms\\Admin\\AdminMenu' ) ) {
 			new \SmartForms\Admin\AdminMenu();
 		}

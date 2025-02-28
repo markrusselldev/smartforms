@@ -4,6 +4,7 @@
   "title": "Checkbox",
   "category": "smartforms",
   "description": "A checkbox field for selecting options.",
+  "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><polyline points=\"6,12 10,16 18,8\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/></svg>",
   "supports": {
     "html": false,
     "color": {
@@ -23,7 +24,7 @@
   "attributes": {
     "label": {
       "type": "string",
-      "default": "Checkbox Input"
+      "default": "Type your question here..."
     },
     "required": {
       "type": "boolean",
@@ -59,5 +60,6 @@
   },
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
-  "style": "file:./style-index.css"
+  "style": "file:./style-index.css",
+  "save": "file:./save.js"
 }
