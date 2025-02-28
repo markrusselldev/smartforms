@@ -73,3 +73,9 @@ body.wp-admin {
   grid-template-rows: repeat(3, max-content);
   justify-content: start;
 }
+
+/* Main Label */
+.sf-checkbox-main-label {
+  display: block;
+  margin-bottom: 10px; 
+}

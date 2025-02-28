@@ -24,7 +24,7 @@
   "attributes": {
     "label": {
       "type": "string",
-      "default": "Checkbox Input"
+      "default": "Type your question here..."
     },
     "required": {
       "type": "boolean",

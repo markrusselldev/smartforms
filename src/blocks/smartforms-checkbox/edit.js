@@ -2,14 +2,14 @@
  * Edit component for the SmartForms Checkbox block.
  *
  * Renders a checkbox field group for the editor with InspectorControls to add, remove, and modify options,
- * along with a setting to choose horizontal or vertical layout.
+ * and implements inline editing (via RichText) for the main label.
  *
  * @package SmartForms
  */
 
 import { __ } from '@wordpress/i18n';
-import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
-import { PanelBody, TextControl, ToggleControl, Button, SelectControl } from '@wordpress/components';
+import { useBlockProps, InspectorControls, RichText } from '@wordpress/block-editor';
+import { PanelBody, ToggleControl, Button, SelectControl, TextControl } from '@wordpress/components';
 import { Fragment, useEffect } from '@wordpress/element';
 
 const DEFAULT_OPTIONS = [
@@ -88,11 +88,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 		<div { ...blockProps }>
 			<InspectorControls>
 				<PanelBody title={ __( 'Checkbox Settings', 'smartforms' ) }>
-					<TextControl
-						label={ __( 'Group Label', 'smartforms' ) }
-						value={ attributes.label }
-						onChange={ ( value ) => setAttributes({ label: value }) }
-					/>
+					{/* Other settings remain unchanged */}
 					<ToggleControl
 						label={ __( 'Required', 'smartforms' ) }
 						checked={ attributes.required }
@@ -128,7 +124,14 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 					</Button>
 				</PanelBody>
 			</InspectorControls>
-			<label>{ attributes.label }</label>
+			{/* Inline editable main label using RichText */}
+			<RichText
+				tagName="label"
+				className="sf-checkbox-main-label"
+				value={ attributes.label }
+				onChange={ ( value ) => setAttributes({ label: value }) }
+				placeholder={ __( 'Type your question here...', 'smartforms' ) }
+			/>
 			{/* Outer container preserved for JSON mapping */}
 			<div
 				className={ `sf-checkbox-group sf-checkbox-group-${ attributes.layout || 'horizontal' }` }
