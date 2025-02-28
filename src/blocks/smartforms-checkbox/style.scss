@@ -1,22 +1,46 @@
 /**
- * Frontend styles for the SmartForms Checkbox block.
+ * Frontend and shared styles for the SmartForms Checkbox block.
  *
- * Provides a consistent, evenly spaced grid layout for checkbox options regardless of the selected layout.
+ * These styles provide a consistent, evenly spaced grid layout for checkbox options.
+ * In horizontal mode, options fill rows from left-to-right.
+ * In vertical mode, options fill columns with exactly 3 rows so that additional items wrap.
+ *
+ * The grid is made as compact as possible by using a minimum cell size of 120px
+ * and letting cells grow only to the natural width/height of their content.
  *
  * @package SmartForms
  */
 
  .wp-block-smartforms-checkbox {
-  /* Frontend block container styling */
+  /* Block container styling */
   padding: 10px;
 }
 
-/* Unified grid styling for both horizontal and vertical layouts */
-.sf-checkbox-group-horizontal,
+.sf-checkbox-group-horizontal {
+  display: grid;
+  /* Use explicit row and column gaps for consistent spacing */
+  row-gap: 10px;
+  column-gap: 0;
+  grid-auto-flow: row;
+  /* Each column is at least 120px wide and grows only to fit its content */
+  grid-template-columns: repeat(auto-fit, minmax(120px, max-content));
+  justify-content: start;
+  
+  /* Prevent text wrapping in labels for a compact layout */
+  .sf-checkbox-option label {
+    white-space: nowrap;
+  }
+}
+
 .sf-checkbox-group-vertical {
   display: grid;
-  grid-gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  /* Use the same explicit gaps as horizontal mode */
+  row-gap: 10px;
+  column-gap: 35px;
+  grid-auto-flow: column;
+  /* Exactly 3 rows so that additional items wrap */
+  grid-template-rows: repeat(3, max-content);
+  justify-content: start;
 }
 
 /* Styling for individual checkbox options */

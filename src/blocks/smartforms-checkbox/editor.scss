@@ -1,30 +1,81 @@
 /**
  * Editor styles for the SmartForms Checkbox block.
  *
- * Provides a consistent, evenly spaced grid layout for the checkbox options regardless of flow direction.
+ * We remove WP admin defaults that interfere with Bootstrap’s native
+ * checkbox styling. This lets Bootstrap’s default (square, properly sized,
+ * dark border with a white checkmark on blue when checked) appear.
+ *
+ * Note: Layout styles are handled in style.scss.
  *
  * @package SmartForms
  */
 
- .wp-block-smartforms-checkbox {
-  /* Editor block container styling */
+/* Container styling for the block */
+.wp-block-smartforms-checkbox {
+  border: 1px solid #ddd;
   padding: 10px;
 }
 
-/* Unified grid styling for both horizontal and vertical layouts */
-.sf-checkbox-group-horizontal,
-.sf-checkbox-group-vertical {
-  display: grid;
-  grid-gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+/* Remove WP admin defaults from checkbox inputs */
+.wp-block-smartforms-checkbox input.form-check-input {
+  margin: 0;
+  padding: 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
-/* Additional styling for individual checkbox options */
-.sf-checkbox-option {
+/* Ensure each checkbox option aligns properly */
+.sf-checkbox-option.form-check {
   display: flex;
   align-items: center;
 }
 
-.sf-checkbox-option input[type="checkbox"] {
-  margin-right: 5px;
+/* Use Bootstrap’s default label spacing */
+.sf-checkbox-option.form-check label.form-check-label {
+  margin: 0 0 0 5px;
+  font-size: 1rem; // Bootstrap default font size
+  line-height: 1.25;
+  vertical-align: middle;
+}
+
+/* Remove any pseudo-elements that might add an extra checkmark */
+.wp-block-smartforms-checkbox input.form-check-input:checked::before,
+.wp-block-smartforms-checkbox input.form-check-input:checked::after {
+  display: none !important;
+}
+
+/* Override checked state with specificity to remove WP defaults */
+body.wp-admin 
+  .wp-block-smartforms-checkbox 
+  .sf-checkbox-option.form-check 
+  input.form-check-input:checked {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23fff' d='M6.173 11.414L3.293 8.536a1 1 0 0 1 1.414-1.414l1.466 1.466 4.95-4.95a1 1 0 1 1 1.414 1.414L6.173 11.414z'/%3E%3C/svg%3E");
+}
+
+/* Editor-specific override for grid spacing */
+body.wp-admin {
+  .sf-checkbox-group-horizontal,
+  .sf-checkbox-group-vertical {
+    margin-left: -22px;       /* Remove extra left margin */
+    justify-items: start; /* Force items to align at the start */
+  }
+}
+
+/* Force vertical layout to match frontend in block editor */
+.sf-checkbox-group-vertical {
+  display: grid;
+  /* Use the same explicit gaps as horizontal mode */
+  row-gap: 10px;
+  column-gap: 13px;
+  grid-auto-flow: column;
+  /* Exactly 3 rows so that additional items wrap */
+  grid-template-rows: repeat(3, max-content);
+  justify-content: start;
+}
+
+/* Main Label */
+.sf-checkbox-main-label {
+  display: block;
+  margin-bottom: 10px; 
 }
