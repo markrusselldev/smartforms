@@ -24,7 +24,7 @@
   "attributes": {
     "label": {
       "type": "string",
-      "default": "Enter your question here"
+      "default": "Select your options:"
     },
     "required": {
       "type": "boolean",
@@ -59,7 +59,11 @@
     },
     "helpText": {
       "type": "string",
-      "default": "Enter your help text here"
+      "default": "Choose one or more options"
+    },
+    "requiredMessage": {
+      "type": "string",
+      "default": "This field is required."
     }
   },
   "editorScript": "file:./index.js",

@@ -19,7 +19,7 @@ const DEFAULT_OPTIONS = [
 
 const Edit = ({ attributes, setAttributes, clientId }) => {
 	const blockProps = useBlockProps();
-	const { label, helpText } = attributes;
+	const { label, helpText, requiredMessage, required } = attributes;
 
 	// Ensure the block's settings are initialized.
 	useEffect(() => {
@@ -89,11 +89,6 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 		<div { ...blockProps }>
 			<InspectorControls>
 				<PanelBody title={ __( 'Checkbox Settings', 'smartforms' ) }>
-					<ToggleControl
-						label={ __( 'Required', 'smartforms' ) }
-						checked={ attributes.required }
-						onChange={ ( value ) => setAttributes({ required: value }) }
-					/>
 					<SelectControl
 						label={ __( 'Layout', 'smartforms' ) }
 						value={ attributes.layout }
@@ -103,11 +98,29 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 						] }
 						onChange={ ( value ) => setAttributes({ layout: value }) }
 					/>
+					<ToggleControl
+						label={ __( 'Required', 'smartforms' ) }
+						checked={ required }
+						onChange={ ( value ) => setAttributes({ required: value }) }
+					/>
+					{ required && (
+						<TextControl
+							label={ __( 'Required Message', 'smartforms' ) }
+							value={ requiredMessage }
+							onChange={ ( value ) => setAttributes({ requiredMessage: value }) }
+							onBlur={ () => {
+								if ( requiredMessage.trim() === '' ) {
+									setAttributes({ requiredMessage: 'This field is required.' });
+								}
+							} }
+							placeholder={ __( 'This field is required.', 'smartforms' ) }
+						/>
+					) }
 					<TextControl
 						label={ __( 'Help Text', 'smartforms' ) }
 						value={ helpText }
 						onChange={ ( value ) => setAttributes({ helpText: value }) }
-						placeholder={ __( 'Enter your help text here', 'smartforms' ) }
+						placeholder={ __( 'Enter your help text', 'smartforms' ) }
 					/>
 				</PanelBody>
 				<PanelBody title={ __( 'Checkbox Options', 'smartforms' ) } initialOpen={ true }>
@@ -134,7 +147,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 			<RichText
 				tagName="label"
 				className="sf-checkbox-main-label"
-				value={ attributes.label }
+				value={ label }
 				onChange={ ( value ) => setAttributes({ label: value }) }
 				placeholder={ __( 'Type your question here...', 'smartforms' ) }
 			/>
@@ -154,7 +167,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 									type="checkbox"
 									id={ `${ attributes.groupId }-${ index }` }
 									name={ attributes.groupId }
-									required={ attributes.required }
+									required={ required }
 								/>
 								<label className="form-check-label" htmlFor={ `${ attributes.groupId }-${ index }` }>
 									{ option.label }
