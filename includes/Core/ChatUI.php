@@ -63,10 +63,10 @@ class ChatUI {
 			);
 		}
 
-		// Assume that the current field is the first one for demo purposes.
+		// Assume the current field is the first one for default help text.
 		$current_field = isset( $form_data['fields'][0] ) ? $form_data['fields'][0] : array();
 
-		// Build dynamic CSS based on theme settings.
+		// Build dynamic CSS.
 		$css = "
 		#smartforms-chat-container {
 			--chat-bg-color: " . esc_attr( isset( $theme_styles['smartforms_chat_container_background_color'] ) ? $theme_styles['smartforms_chat_container_background_color'] : '#ffffff' ) . ";
@@ -84,11 +84,18 @@ class ChatUI {
 		";
 		$css = "<style>" . $css . "</style>";
 
+		// Conditionally add classes based on context.
+		$wrapper_class = 'smartforms-chat-wrapper';
+		if ( is_admin() ) {
+			$wrapper_class .= ' admin-display';
+		} elseif ( is_admin_bar_showing() ) {
+			$wrapper_class .= ' admin-bar-present';
+		}
+
 		ob_start();
 		?>
 		<?php echo $css; ?>
-		<!-- Wrap the chat container so it stays contained within the viewport -->
-		<div class="smartforms-chat-wrapper">
+		<div class="<?php echo esc_attr( $wrapper_class ); ?>">
 			<div id="smartforms-chat-container" class="smartforms-chat-container">
 				<div id="smartforms-chat-header" class="smartforms-chat-header">
 					<h2 class="smartforms-chat-title"><?php esc_html_e( 'Chat Interface', 'smartforms' ); ?></h2>
