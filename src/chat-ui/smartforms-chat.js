@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatDialog = document.getElementById("smartforms-chat-dialog");
     const submitButton = document.getElementById("smartforms-chat-submit-button");
     const inputBox = document.getElementById("smartforms-chat-input-box");
-
+  
     /**
      * Creates an input control based on the field type.
      *
@@ -100,28 +100,51 @@ document.addEventListener("DOMContentLoaded", () => {
             inputBox.firstElementChild.remove();
         }
         inputBox.insertBefore(newControl, inputBox.firstElementChild);
-        // No auto-resize JS is attached here; the container will enforce max height via CSS.
     };
     
     /**
-     * Displays the current question in the chat dialog.
+     * Appends a bot message bubble to the chat dialog.
+     *
+     * @param {string} message - The bot's message text.
      */
-    const showCurrentQuestion = () => {
-        const currentField = formData.fields[currentStep];
-        chatDialog.innerHTML = "";
-        
+    const appendBotMessage = (message) => {
         const botMessage = document.createElement("div");
         botMessage.classList.add("smartforms-chat-message", "bot");
         const p = document.createElement("p");
-        p.textContent = currentField.label;
+        p.textContent = message;
         botMessage.appendChild(p);
         chatDialog.appendChild(botMessage);
         chatDialog.scrollTop = chatDialog.scrollHeight;
-        
+    };
+
+    /**
+     * Appends a user message bubble to the chat dialog.
+     *
+     * @param {string} message - The user's message text.
+     */
+    const appendUserMessage = (message) => {
+        const userMessage = document.createElement("div");
+        userMessage.classList.add("smartforms-chat-message", "user");
+        const p = document.createElement("p");
+        p.textContent = message;
+        userMessage.appendChild(p);
+        chatDialog.appendChild(userMessage);
+        chatDialog.scrollTop = chatDialog.scrollHeight;
+    };
+    
+    /**
+     * Displays the current question as a bot message and loads its input control.
+     */
+    const showCurrentQuestion = () => {
+        const currentField = formData.fields[currentStep];
+        // Append bot message with the question text.
+        appendBotMessage(currentField.label);
+        // Create and set the input control.
         const newControl = createInputControl(currentField);
         replaceInputControl(newControl);
     };
     
+    // Start the conversation by showing the first question.
     showCurrentQuestion();
     
     if (!submitButton) {
@@ -138,6 +161,8 @@ document.addEventListener("DOMContentLoaded", () => {
             answer = Array.from(checkboxes)
                 .filter(cb => cb.checked)
                 .map(cb => cb.value);
+            // For checkbox, convert answer array to a comma-separated string for display.
+            answer = answer.join(", ");
         } else if (currentField.type === "text") {
             const inputControl = inputBox.querySelector("input");
             if (!inputControl) return;
@@ -148,8 +173,9 @@ document.addEventListener("DOMContentLoaded", () => {
             answer = inputControl.value;
         }
         
+        // Validate required fields.
         if (currentField.required) {
-            if ((currentField.type === "checkbox" && (!Array.isArray(answer) || answer.length === 0)) ||
+            if ((currentField.type === "checkbox" && (!answer || answer.trim().length === 0)) ||
                 (typeof answer === "string" && answer.trim().length === 0)) {
                 const helpContainer = document.getElementById("smartforms-chat-help-container");
                 helpContainer.textContent = currentField.requiredMessage || `${currentField.label} is required.`;
@@ -158,6 +184,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
         
+        // Append the user's message to the chat dialog.
+        appendUserMessage(answer);
+        
+        // Reset the help container to show default help text.
         const helpContainer = document.getElementById("smartforms-chat-help-container");
         helpContainer.textContent = currentField.helpText || "Enter your help text";
         helpContainer.classList.remove("smartforms-error-message");
@@ -168,6 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
             currentStep++;
             showCurrentQuestion();
         } else {
+            // All fields answered; process the form submission.
             const data = new URLSearchParams();
             data.append("action", "process_smartform");
             data.append("smartform_nonce", smartformsData.nonce);
