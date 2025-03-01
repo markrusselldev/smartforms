@@ -2,27 +2,22 @@
  * File: assets/scss/smartforms-chat.scss
  *
  * This file centralizes all styling for the SmartForms Chat UI.
- * It replaces the inline styles previously defined in PHP/JS.
  * Form controls continue to use Bootstrap defaults, while these custom rules
  * style the chat container and layout.
  */
 
-/* Wrapper to contain the chat UI within the viewport */
+/* Wrapper that limits the entire chat UI to a fixed height relative to the viewport */
 .smartforms-chat-wrapper {
-	max-height: calc(100vh - 100px); // Leaves some space for other elements (e.g., header)
-	overflow-y: auto;
+	height: calc(100vh - 100px);  // Adjust offset as needed
+	overflow: hidden;            // Prevent the whole wrapper from scrolling
   }
   
-  .smartforms-chat-form {
-	width: 100%;
-  }
-  
+  /* Chat container fills the wrapper and uses flex layout */
   .smartforms-chat-container {
+	height: 100%;
 	width: 100% !important;
 	display: flex;
 	flex-direction: column;
-	justify-content: flex-start; // Changed to flex-start so messages appear at top
-	align-items: center;
 	max-width: 800px;
 	margin: 20px auto;
 	background-color: #ffffff;
@@ -31,8 +26,10 @@
 	box-shadow: none;
 	padding: 10px;
   }
-	
+  
+  /* Chat header remains fixed */
   .smartforms-chat-header {
+	flex: 0 0 auto;
 	width: 100%;
 	padding: 10px;
 	border-bottom: 1px solid #cccccc;
@@ -40,17 +37,20 @@
 	font-family: sans-serif;
 	font-size: 1.125rem; /* 18px */
   }
-	
+  
+  /* Chat dialog takes up remaining space and scrolls */
   .smartforms-chat-dialog {
+	flex: 1 1 auto;
 	width: 100%;
-	height: 400px; /* Fixed height for the chat area */
 	overflow-y: auto;
 	padding: 10px;
 	display: flex;
 	flex-direction: column;
   }
-	
+  
+  /* Input container fixed at bottom */
   .smartforms-chat-input-container {
+	flex: 0 0 auto;
 	width: 100%;
 	background-color: #ffffff;
 	border: 1px solid #cccccc;
@@ -59,7 +59,8 @@
 	padding: 10px;
 	border-top: 1px solid #cccccc;
   }
-	
+  
+  /* Input box: container for the input control, with a max-height */
   .smartforms-chat-input-box {
 	width: 100%;
 	min-height: 100px;
@@ -67,7 +68,8 @@
 	max-height: 150px;
 	overflow-y: auto;
   }
-	
+  
+  /* Input control itself */
   .smartforms-chat-input {
 	width: 100%;
 	border: none;
@@ -75,8 +77,10 @@
 	resize: none;
 	box-sizing: border-box;
   }
-	
+  
+  /* Submit row remains fixed */
   .smartforms-chat-submit-row {
+	flex: 0 0 auto;
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
@@ -141,7 +145,7 @@
   }
   
   .smartforms-chat-message.user {
-	background-color: #f1f1f1; /* light grey background */
+	background-color: #f1f1f1; /* Light grey background */
 	color: #000;
 	align-self: flex-end;
   }

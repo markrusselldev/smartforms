@@ -66,7 +66,7 @@ class ChatUI {
 		// Assume that the current field is the first one for demo purposes.
 		$current_field = isset( $form_data['fields'][0] ) ? $form_data['fields'][0] : array();
 
-		// Build dynamic CSS.
+		// Build dynamic CSS based on theme settings.
 		$css = "
 		#smartforms-chat-container {
 			--chat-bg-color: " . esc_attr( isset( $theme_styles['smartforms_chat_container_background_color'] ) ? $theme_styles['smartforms_chat_container_background_color'] : '#ffffff' ) . ";
@@ -84,39 +84,38 @@ class ChatUI {
 		";
 		$css = "<style>" . $css . "</style>";
 
-		// Output the chat interface markup.
 		ob_start();
 		?>
 		<?php echo $css; ?>
-		<div id="smartforms-chat-container" class="smartforms-chat-container">
-			<div id="smartforms-chat-header" class="smartforms-chat-header">
-				<h2 class="smartforms-chat-title"><?php esc_html_e( 'Chat Interface', 'smartforms' ); ?></h2>
-			</div>
-			<div id="smartforms-chat-dialog" class="smartforms-chat-dialog"></div>
-			<form id="smartforms-chat-form" class="smartforms-chat-form">
-				<div id="smartforms-chat-input-container" class="smartforms-chat-input-container">
-					<div id="smartforms-chat-input-box" class="smartforms-chat-input-box">
-						<textarea id="smartforms-current-input" class="form-control smartforms-chat-input" rows="4" placeholder="<?php esc_attr_e( 'Type your answer here...', 'smartforms' ); ?>"></textarea>
-					</div>
-					<div id="smartforms-chat-submit-row" class="smartforms-chat-submit-row">
-						<!-- Help/Error container placed to the left of the submit button -->
-						<div id="smartforms-chat-help-container" class="smartforms-chat-help-container">
-							<?php
-							// By default, output the help text from the current field.
-							if ( isset( $current_field['helpText'] ) && '' !== $current_field['helpText'] ) {
-								echo esc_html( $current_field['helpText'] );
-							} else {
-								// If blank, output a placeholder (this is only for admin preview).
-								echo esc_html__( 'Enter your help text', 'smartforms' );
-							}
-							?>
-						</div>
-						<button type="button" id="smartforms-chat-submit-button" class="btn smartforms-chat-submit-button">
-							<i class="<?php echo esc_attr( isset( $theme_styles['smartforms_chat_submit_button_icon'] ) ? $theme_styles['smartforms_chat_submit_button_icon'] : 'fas fa-arrow-up' ); ?> smartforms-chat-submit-icon"></i>
-						</button>
-					</div>
+		<!-- Wrap the chat container so it stays contained within the viewport -->
+		<div class="smartforms-chat-wrapper">
+			<div id="smartforms-chat-container" class="smartforms-chat-container">
+				<div id="smartforms-chat-header" class="smartforms-chat-header">
+					<h2 class="smartforms-chat-title"><?php esc_html_e( 'Chat Interface', 'smartforms' ); ?></h2>
 				</div>
-			</form>
+				<div id="smartforms-chat-dialog" class="smartforms-chat-dialog"></div>
+				<form id="smartforms-chat-form" class="smartforms-chat-form">
+					<div id="smartforms-chat-input-container" class="smartforms-chat-input-container">
+						<div id="smartforms-chat-input-box" class="smartforms-chat-input-box">
+							<textarea id="smartforms-current-input" class="form-control smartforms-chat-input" rows="4" placeholder="<?php esc_attr_e( 'Type your answer here...', 'smartforms' ); ?>"></textarea>
+						</div>
+						<div id="smartforms-chat-submit-row" class="smartforms-chat-submit-row">
+							<div id="smartforms-chat-help-container" class="smartforms-chat-help-container">
+								<?php
+								if ( isset( $current_field['helpText'] ) && '' !== $current_field['helpText'] ) {
+									echo esc_html( $current_field['helpText'] );
+								} else {
+									echo esc_html__( 'Enter your help text', 'smartforms' );
+								}
+								?>
+							</div>
+							<button type="button" id="smartforms-chat-submit-button" class="btn smartforms-chat-submit-button">
+								<i class="<?php echo esc_attr( isset( $theme_styles['smartforms_chat_submit_button_icon'] ) ? $theme_styles['smartforms_chat_submit_button_icon'] : 'fas fa-arrow-up' ); ?> smartforms-chat-submit-icon"></i>
+							</button>
+						</div>
+					</div>
+				</form>
+			</div>
 		</div>
 		<script>
 			document.addEventListener("DOMContentLoaded", () => {
