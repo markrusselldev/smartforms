@@ -4,7 +4,9 @@
  *
  * Retrieves form JSON data (saved as post meta) and the selected theme preset styles,
  * then outputs the chat interface. The interface steps through each form question –
- * displaying the conversation as chat bubbles.
+ * displaying only the current question (as a bot message) in the chat dialog area.
+ * Once all questions are answered, a dummy AI response is appended and the input area
+ * reverts to a standard chat textarea.
  *
  * @package SmartForms
  */
@@ -29,7 +31,7 @@ class ChatUI {
 	 * Renders the production-ready chat interface.
 	 *
 	 * If a valid form ID is provided and saved JSON exists, that JSON (decoded as an
-	 * associative array) is used for the conversation. Otherwise, dummy data is used.
+	 * associative array) is used for the multi-step questions. Otherwise, dummy data is used.
 	 *
 	 * @param int $form_id Optional form ID to load saved questions.
 	 * @return string HTML output for the chat UI.
@@ -64,7 +66,7 @@ class ChatUI {
 		// Assume that the current field is the first one for demo purposes.
 		$current_field = isset( $form_data['fields'][0] ) ? $form_data['fields'][0] : array();
 
-		// Build dynamic CSS from theme settings.
+		// Build dynamic CSS.
 		$css = "
 		#smartforms-chat-container {
 			--chat-bg-color: " . esc_attr( isset( $theme_styles['smartforms_chat_container_background_color'] ) ? $theme_styles['smartforms_chat_container_background_color'] : '#ffffff' ) . ";
@@ -82,39 +84,39 @@ class ChatUI {
 		";
 		$css = "<style>" . $css . "</style>";
 
+		// Output the chat interface markup.
 		ob_start();
 		?>
 		<?php echo $css; ?>
-		<!-- Wrap the chat container in a new wrapper to limit overall height -->
-		<div class="smartforms-chat-wrapper">
-			<div id="smartforms-chat-container" class="smartforms-chat-container">
-				<div id="smartforms-chat-header" class="smartforms-chat-header">
-					<h2 class="smartforms-chat-title"><?php esc_html_e( 'Chat Interface', 'smartforms' ); ?></h2>
-				</div>
-				<div id="smartforms-chat-dialog" class="smartforms-chat-dialog"></div>
-				<form id="smartforms-chat-form" class="smartforms-chat-form">
-					<div id="smartforms-chat-input-container" class="smartforms-chat-input-container">
-						<div id="smartforms-chat-input-box" class="smartforms-chat-input-box">
-							<!-- The input control will be injected here by JS -->
-						</div>
-						<div id="smartforms-chat-submit-row" class="smartforms-chat-submit-row">
-							<div id="smartforms-chat-help-container" class="smartforms-chat-help-container">
-								<?php
-								// Display the help text from the current field (default).
-								if ( isset( $current_field['helpText'] ) && '' !== $current_field['helpText'] ) {
-									echo esc_html( $current_field['helpText'] );
-								} else {
-									echo esc_html__( 'Enter your help text', 'smartforms' );
-								}
-								?>
-							</div>
-							<button type="button" id="smartforms-chat-submit-button" class="btn smartforms-chat-submit-button">
-								<i class="<?php echo esc_attr( isset( $theme_styles['smartforms_chat_submit_button_icon'] ) ? $theme_styles['smartforms_chat_submit_button_icon'] : 'fas fa-arrow-up' ); ?> smartforms-chat-submit-icon"></i>
-							</button>
-						</div>
-					</div>
-				</form>
+		<div id="smartforms-chat-container" class="smartforms-chat-container">
+			<div id="smartforms-chat-header" class="smartforms-chat-header">
+				<h2 class="smartforms-chat-title"><?php esc_html_e( 'Chat Interface', 'smartforms' ); ?></h2>
 			</div>
+			<div id="smartforms-chat-dialog" class="smartforms-chat-dialog"></div>
+			<form id="smartforms-chat-form" class="smartforms-chat-form">
+				<div id="smartforms-chat-input-container" class="smartforms-chat-input-container">
+					<div id="smartforms-chat-input-box" class="smartforms-chat-input-box">
+						<textarea id="smartforms-current-input" class="form-control smartforms-chat-input" rows="4" placeholder="<?php esc_attr_e( 'Type your answer here...', 'smartforms' ); ?>"></textarea>
+					</div>
+					<div id="smartforms-chat-submit-row" class="smartforms-chat-submit-row">
+						<!-- Help/Error container placed to the left of the submit button -->
+						<div id="smartforms-chat-help-container" class="smartforms-chat-help-container">
+							<?php
+							// By default, output the help text from the current field.
+							if ( isset( $current_field['helpText'] ) && '' !== $current_field['helpText'] ) {
+								echo esc_html( $current_field['helpText'] );
+							} else {
+								// If blank, output a placeholder (this is only for admin preview).
+								echo esc_html__( 'Enter your help text', 'smartforms' );
+							}
+							?>
+						</div>
+						<button type="button" id="smartforms-chat-submit-button" class="btn smartforms-chat-submit-button">
+							<i class="<?php echo esc_attr( isset( $theme_styles['smartforms_chat_submit_button_icon'] ) ? $theme_styles['smartforms_chat_submit_button_icon'] : 'fas fa-arrow-up' ); ?> smartforms-chat-submit-icon"></i>
+						</button>
+					</div>
+				</div>
+			</form>
 		</div>
 		<script>
 			document.addEventListener("DOMContentLoaded", () => {
@@ -126,5 +128,3 @@ class ChatUI {
 		return ob_get_clean();
 	}
 }
-
-ChatUI::get_instance(); // or your equivalent initialization call.
