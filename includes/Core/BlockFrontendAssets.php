@@ -7,11 +7,9 @@
 
 namespace SmartForms\Core;
 
-/**
- * Block Frontend Assets Class.
- *
- * Enqueues the frontend stylesheet (style-index.css) for each SmartForms block.
- */
+use WP_Error;
+use SmartForms\Core\SmartForms;
+
 class BlockFrontendAssets {
 
 	/**
@@ -51,19 +49,19 @@ class BlockFrontendAssets {
 	 */
 	public function enqueue_frontend_assets() {
 		// Build the filesystem path to the blocks directory.
-		$build_dir = plugin_dir_path( \SMARTFORMS_PLUGIN_FILE ) . 'build/blocks/';
+		$build_dir = plugin_dir_path( SMARTFORMS_PLUGIN_FILE ) . 'build/blocks/';
 
 		// Get the plugin root URL.
-		$plugin_root_url = plugin_dir_url( \SMARTFORMS_PLUGIN_FILE );
+		$plugin_root_url = plugin_dir_url( SMARTFORMS_PLUGIN_FILE );
 
 		if ( ! is_dir( $build_dir ) ) {
-			\SmartForms\Core\SmartForms::log_error( '[ERROR] SmartForms build directory not found for frontend assets: ' . esc_url( $build_dir ) );
+			SmartForms::log_error( '[ERROR] SmartForms build directory not found for frontend assets: ' . esc_url( $build_dir ) );
 			return;
 		}
 
 		$block_folders = scandir( $build_dir );
 		if ( false === $block_folders || empty( $block_folders ) ) {
-			\SmartForms\Core\SmartForms::log_error( '[ERROR] No compiled blocks found inside build/blocks/ directory for frontend assets.' );
+			SmartForms::log_error( '[ERROR] No compiled blocks found inside build/blocks/ directory for frontend assets.' );
 			return;
 		}
 
@@ -79,10 +77,12 @@ class BlockFrontendAssets {
 				wp_enqueue_style(
 					'smartforms-' . $folder . '-frontend-style',
 					plugins_url( 'build/blocks/' . $folder . '/style-index.css', SMARTFORMS_PLUGIN_FILE ),
-					array(),
+					array( 'bootstrap-css' ), // Ensure Bootstrap loads first
 					filemtime( $frontend_style_path )
 				);
 			}
 		}
 	}
 }
+
+BlockFrontendAssets::get_instance();

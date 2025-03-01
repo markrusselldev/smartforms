@@ -33,7 +33,7 @@
 	border-bottom: 1px solid #cccccc;
 	color: #000000;
 	font-family: sans-serif;
-	font-size: 18px;
+	font-size: 1.125rem; /* 18px */
 }
   
 .smartforms-chat-dialog {
@@ -54,21 +54,35 @@
 }
   
 .smartforms-chat-input-box {
-	height: 100px;
 	min-height: 100px;
 	resize: vertical;
+	/* Add max-height and scrolling here so that the container doesn't stretch indefinitely */
+	max-height: 150px;
+	overflow-y: auto;
 }
   
 .smartforms-chat-input {
 	border: none;
 	width: 100%;
 	background-color: transparent;
+	/* Let the container control the height; no need to set max-height here */
+	resize: none;
+	box-sizing: border-box;
 }
   
 .smartforms-chat-submit-row {
 	display: flex;
+	align-items: center;
 	justify-content: flex-end;
 	margin-top: 5px;
+}
+  
+#smartforms-chat-help-container {
+	flex-grow: 1;
+	text-align: left;
+	padding-right: 10px;
+	font-size: 0.75rem; /* 12px */
+	color: #6c757d;
 }
   
 .smartforms-chat-submit-button {
@@ -78,20 +92,28 @@
 	border-radius: 50%;
 	width: 36px;
 	height: 36px;
-	font-size: 36px;
-	line-height: 36px;
+	font-size: 2.25rem; /* 36px */
+	line-height: 2.25rem; /* 36px */
 	display: flex;
 	align-items: center;
 	justify-content: center;
 }
   
 .smartforms-chat-submit-icon {
-	font-size: 28.8px;
-	line-height: 28.8px;
+	font-size: 1.8rem; /* 28.8px */
+	line-height: 1.8rem;
 }
   
 .smartforms-help-text {
 	color: #999;
-	font-size: 12px;
+	font-size: 0.75rem;
 	margin-top: 4px;
+}
+
+/* Validation error styling */
+#smartforms-chat-help-container.smartforms-error-message {
+	color: #dc3545;
+	font-size: 0.875rem; /* 14px */
+	margin-right: 10px;
+	font-family: inherit;
 }

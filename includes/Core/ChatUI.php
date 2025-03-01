@@ -13,10 +13,6 @@
 
 namespace SmartForms\Core;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Prevent direct access.
-}
-
 use SmartForms\CPT\ChatUISettings;
 
 class ChatUI {
@@ -57,11 +53,9 @@ class ChatUI {
 				'fields' => array(
 					array(
 						'type'              => 'text',
-						'label'             => 'Name Input',
-						'placeholder'       => 'Enter your name',
-						'required'          => false,
-						'defaultValue'      => '',
-						'id'                => 'text-' . uniqid(),
+						'label'             => 'Text Input',
+						'placeholder'       => '',
+						'required'          => true,
 						'helpText'          => 'Only letters, numbers, punctuation, symbols & spaces allowed.',
 						'validationMessage' => '',
 					),
@@ -69,8 +63,10 @@ class ChatUI {
 			);
 		}
 
-		// Build a dynamic CSS block to output any necessary CSS variables.
-		// (You can later modify your SCSS to reference these variables if desired.)
+		// Assume that the current field is the first one for demo purposes.
+		$current_field = isset( $form_data['fields'][0] ) ? $form_data['fields'][0] : array();
+
+		// Build dynamic CSS.
 		$css = "
 		#smartforms-chat-container {
 			--chat-bg-color: " . esc_attr( isset( $theme_styles['smartforms_chat_container_background_color'] ) ? $theme_styles['smartforms_chat_container_background_color'] : '#ffffff' ) . ";
@@ -88,10 +84,10 @@ class ChatUI {
 		";
 		$css = "<style>" . $css . "</style>";
 
-		// Build the HTML output without inline style attributes.
+		// Output the chat interface markup.
 		ob_start();
 		?>
-		<?php echo $css; // Output dynamic CSS variables ?>
+		<?php echo $css; ?>
 		<div id="smartforms-chat-container" class="smartforms-chat-container">
 			<div id="smartforms-chat-header" class="smartforms-chat-header">
 				<h2 class="smartforms-chat-title"><?php esc_html_e( 'Chat Interface', 'smartforms' ); ?></h2>
@@ -103,6 +99,18 @@ class ChatUI {
 						<textarea id="smartforms-current-input" class="form-control smartforms-chat-input" rows="4" placeholder="<?php esc_attr_e( 'Type your answer here...', 'smartforms' ); ?>"></textarea>
 					</div>
 					<div id="smartforms-chat-submit-row" class="smartforms-chat-submit-row">
+						<!-- Help/Error container placed to the left of the submit button -->
+						<div id="smartforms-chat-help-container" class="smartforms-chat-help-container">
+							<?php
+							// By default, output the help text from the current field.
+							if ( isset( $current_field['helpText'] ) && '' !== $current_field['helpText'] ) {
+								echo esc_html( $current_field['helpText'] );
+							} else {
+								// If blank, output a placeholder (this is only for admin preview).
+								echo esc_html__( 'Enter your help text', 'smartforms' );
+							}
+							?>
+						</div>
 						<button type="button" id="smartforms-chat-submit-button" class="btn smartforms-chat-submit-button">
 							<i class="<?php echo esc_attr( isset( $theme_styles['smartforms_chat_submit_button_icon'] ) ? $theme_styles['smartforms_chat_submit_button_icon'] : 'fas fa-arrow-up' ); ?> smartforms-chat-submit-icon"></i>
 						</button>

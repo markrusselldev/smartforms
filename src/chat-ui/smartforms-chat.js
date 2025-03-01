@@ -29,14 +29,12 @@ document.addEventListener("DOMContentLoaded", () => {
             control.className = "form-control smartforms-text-input";
             control.placeholder = field.placeholder || "Type your answer here...";
         } else if (field.type === "checkbox") {
-            // Preserve the outer container with proper class and data attribute for layout JSON mapping.
             control = document.createElement("div");
             control.className = "sf-checkbox-group sf-checkbox-group-" + (field.layout || "horizontal");
             control.setAttribute("data-layout", field.layout || "horizontal");
             if (field.options && Array.isArray(field.options)) {
                 field.options.forEach(opt => {
                     const optionWrapper = document.createElement("div");
-                    // Apply Bootstrap's form-check class; add form-check-inline if layout is horizontal.
                     let inlineClass = "";
                     if (field.layout === "horizontal") {
                         inlineClass = " form-check-inline";
@@ -83,8 +81,9 @@ document.addEventListener("DOMContentLoaded", () => {
             control.className = "form-control smartforms-number";
             control.placeholder = field.placeholder || "";
         } else {
+            // For other field types, create a textarea.
             control = document.createElement("textarea");
-            control.className = "form-control smartforms-textarea";
+            control.className = "form-control smartforms-textarea smartforms-chat-input";
             control.rows = 4;
             control.placeholder = field.placeholder || "Type your answer here...";
         }
@@ -101,6 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
             inputBox.firstElementChild.remove();
         }
         inputBox.insertBefore(newControl, inputBox.firstElementChild);
+        // No auto-resize JS is attached here; the container will enforce max height via CSS.
     };
     
     /**
@@ -110,7 +110,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const currentField = formData.fields[currentStep];
         chatDialog.innerHTML = "";
         
-        // Create and append the bot message.
         const botMessage = document.createElement("div");
         botMessage.classList.add("smartforms-chat-message", "bot");
         const p = document.createElement("p");
@@ -119,20 +118,10 @@ document.addEventListener("DOMContentLoaded", () => {
         chatDialog.appendChild(botMessage);
         chatDialog.scrollTop = chatDialog.scrollHeight;
         
-        // Create the input control for the current field.
         const newControl = createInputControl(currentField);
         replaceInputControl(newControl);
-        
-        // Append help text if provided.
-        if (currentField.helpText && currentField.helpText.trim().length > 0) {
-            const helpTextElement = document.createElement("p");
-            helpTextElement.className = "smartforms-help-text";
-            helpTextElement.textContent = currentField.helpText;
-            newControl.parentNode.insertBefore(helpTextElement, newControl.nextSibling);
-        }
     };
     
-    // Start with the first question.
     showCurrentQuestion();
     
     if (!submitButton) {
@@ -159,29 +148,20 @@ document.addEventListener("DOMContentLoaded", () => {
             answer = inputControl.value;
         }
         
-        // Validate required fields.
         if (currentField.required) {
             if ((currentField.type === "checkbox" && (!Array.isArray(answer) || answer.length === 0)) ||
                 (typeof answer === "string" && answer.trim().length === 0)) {
-                const buttonRow = submitButton.parentElement;
-                if (!buttonRow.querySelector(".smartforms-error-message")) {
-                    const errorMessageElement = document.createElement("span");
-                    errorMessageElement.className = "smartforms-error-message";
-                    errorMessageElement.textContent = currentField.validationMessage || `${currentField.label} is required.`;
-                    buttonRow.insertBefore(errorMessageElement, submitButton);
-                }
+                const helpContainer = document.getElementById("smartforms-chat-help-container");
+                helpContainer.textContent = currentField.requiredMessage || `${currentField.label} is required.`;
+                helpContainer.classList.add("smartforms-error-message");
                 return;
             }
         }
         
-        // Remove any existing error message.
-        const buttonRow = submitButton.parentElement;
-        const existingError = buttonRow.querySelector(".smartforms-error-message");
-        if (existingError) {
-            existingError.remove();
-        }
+        const helpContainer = document.getElementById("smartforms-chat-help-container");
+        helpContainer.textContent = currentField.helpText || "Enter your help text";
+        helpContainer.classList.remove("smartforms-error-message");
         
-        // Save the answer.
         formResponses[currentField.id || currentStep] = answer;
         
         if (currentStep < formData.fields.length - 1) {
@@ -217,7 +197,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 chatDialog.appendChild(botMessage);
                 chatDialog.scrollTop = chatDialog.scrollHeight;
                 
-                // Replace the input control with a textarea for chat submission.
                 const textarea = document.createElement("textarea");
                 textarea.className = "form-control smartforms-chat-input";
                 textarea.rows = 4;
