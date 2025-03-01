@@ -107,8 +107,16 @@ class MetaBox {
 						: ( isset( $block['attrs']['helpText'] ) ? sanitize_text_field( $block['attrs']['helpText'] ) : '' )
 				);
 
-				// If this is a checkbox block, include options and layout.
+				// If this is a checkbox block, include options, layout, and requiredMessage.
 				if ( 'checkbox' === $type ) {
+					$required_message = ( isset( $block['attrs']['requiredMessage'] ) && '' !== $block['attrs']['requiredMessage'] )
+						? sanitize_text_field( $block['attrs']['requiredMessage'] )
+						: 'This field is required.';
+					// For helpText, use a default if the attribute is not present or empty.
+					$form_field['helpText'] = ( array_key_exists( 'helpText', $block['attrs'] ) && trim( $block['attrs']['helpText'] ) !== '' )
+						? sanitize_text_field( $block['attrs']['helpText'] )
+						: 'Choose one or more options';
+					
 					if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
 						$options = array();
 						foreach ( $block['attrs']['options'] as $option ) {
@@ -121,26 +129,35 @@ class MetaBox {
 								SmartForms::log_error( "Checkbox option missing label or value for post $post_id." );
 							}
 						}
-						$form_field['options'] = $options;
 						SmartForms::log_error( "Checkbox block processed with " . count( $options ) . " options for post $post_id." );
 					} else {
 						SmartForms::log_error( "Checkbox block missing options for post $post_id." );
-						$form_field['options'] = array(
+						$options = array(
 							array( 'label' => 'Option 1', 'value' => 'option-1' ),
 							array( 'label' => 'Option 2', 'value' => 'option-2' )
 						);
 					}
-					// Extract the layout attribute.
 					if ( isset( $block['attrs']['layout'] ) && ! empty( $block['attrs']['layout'] ) ) {
-						$form_field['layout'] = sanitize_text_field( $block['attrs']['layout'] );
+						$layout = sanitize_text_field( $block['attrs']['layout'] );
 					} else {
-						// As a fallback, attempt to extract it from the block's innerHTML.
 						if ( isset( $block['innerHTML'] ) && preg_match( '/data-layout="([^"]+)"/', $block['innerHTML'], $matches ) ) {
-							$form_field['layout'] = sanitize_text_field( $matches[1] );
+							$layout = sanitize_text_field( $matches[1] );
 						} else {
-							$form_field['layout'] = 'horizontal';
+							$layout = 'horizontal';
 						}
 					}
+					// Reorder keys: requiredMessage before helpText, and layout above options.
+					$temp_help_text = $form_field['helpText'];
+					$form_field = array(
+						'type'            => $form_field['type'],
+						'label'           => $form_field['label'],
+						'placeholder'     => $form_field['placeholder'],
+						'required'        => $form_field['required'],
+						'requiredMessage' => $required_message,
+						'helpText'        => $temp_help_text,
+						'layout'          => $layout,
+						'options'         => $options,
+					);
 				}
 
 				$form_fields[] = $form_field;
