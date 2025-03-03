@@ -32,8 +32,9 @@
       "type": "boolean",
       "default": false
     },
-    "className": {
-      "type": "string"
+    "helpText": {
+      "type": "string",
+      "default": "Choose one or more options"
     },
     "options": {
       "type": "array",
@@ -58,14 +59,6 @@
       "source": "attribute",
       "selector": "div.sf-checkbox-group",
       "attribute": "data-layout"
-    },
-    "helpText": {
-      "type": "string",
-      "default": "Choose one or more options"
-    },
-    "requiredMessage": {
-      "type": "string",
-      "default": "This field is required."
     }
   },
   "editorScript": "file:./index.js",

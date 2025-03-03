@@ -36,10 +36,6 @@
       "type": "string",
       "default": "Select an option"
     },
-    "requiredMessage": {
-      "type": "string",
-      "default": "This field is required."
-    },
     "options": {
       "type": "array",
       "default": [

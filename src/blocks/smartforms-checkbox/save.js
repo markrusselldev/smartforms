@@ -1,34 +1,31 @@
 import { useBlockProps } from '@wordpress/block-editor';
 
-const Save = ({ attributes }) => {
-  const blockProps = useBlockProps.save();
-  return (
-    <div {...blockProps}>
-      <label>{ attributes.label }</label>
-      <div
-        className={`sf-checkbox-group sf-checkbox-group-${ attributes.layout || 'horizontal' }`}
-        data-layout={ attributes.layout || 'horizontal' }
-      >
-        { attributes.options && attributes.options.map((option, index) => (
-          <div
-            key={ index }
-            className={`sf-checkbox-option form-check${ attributes.layout === 'horizontal' ? ' form-check-inline' : '' }`}
-          >
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id={ `${ attributes.groupId }-${ index }` }
-              name={ attributes.groupId }
-              required={ attributes.required }
-            />
-            <label className="form-check-label" htmlFor={ `${ attributes.groupId }-${ index }` }>
-              { option.label }
-            </label>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+const Save = ( { attributes } ) => {
+	const { label, options, required, helpText, groupId, layout } = attributes;
+	return (
+		<div { ...useBlockProps.save() }>
+			<label className="sf-checkbox-main-label">{ label }</label>
+			<div className={ `sf-checkbox-group sf-checkbox-group-${ layout || "horizontal" }` } data-layout={ layout || "horizontal" } role="group" data-group-id={ groupId }>
+				{ options &&
+					options.map( ( option, index ) => (
+						<div key={ index } className={ `sf-checkbox-option form-check${ layout === "horizontal" ? " form-check-inline" : "" }` }>
+							<input
+								className="form-check-input"
+								type="checkbox"
+								id={ `${ groupId }-${ index }` }
+								name={ groupId }
+								required={ required }
+							/>
+							<label className="form-check-label" htmlFor={ `${ groupId }-${ index }` }>
+								{ option.label }
+							</label>
+						</div>
+					) )
+				}
+			</div>
+			<input type="hidden" name={ groupId } required={ required } />
+		</div>
+	);
 };
 
 export default Save;
