@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatDialog = document.getElementById("smartforms-chat-dialog");
     const submitButton = document.getElementById("smartforms-chat-submit-button");
     const inputBox = document.getElementById("smartforms-chat-input-box");
+    const helpContainer = document.getElementById("smartforms-chat-help-container");
   
     /**
      * Creates an input control based on the field type.
@@ -35,17 +36,14 @@ document.addEventListener("DOMContentLoaded", () => {
             if (field.options && Array.isArray(field.options)) {
                 field.options.forEach(opt => {
                     const optionWrapper = document.createElement("div");
-                    let inlineClass = "";
-                    if (field.layout === "horizontal") {
-                        inlineClass = " form-check-inline";
-                    }
+                    const inlineClass = field.layout === "horizontal" ? " form-check-inline" : "";
                     optionWrapper.className = "sf-checkbox-option form-check" + inlineClass;
                     
                     const checkbox = document.createElement("input");
                     checkbox.type = "checkbox";
                     checkbox.className = "form-check-input";
                     checkbox.value = opt.value;
-                    checkbox.id = field.id ? field.id + '-' + opt.value : opt.value;
+                    checkbox.id = field.id ? `${field.id}-${opt.value}` : opt.value;
                     
                     const label = document.createElement("label");
                     label.className = "form-check-label";
@@ -177,7 +175,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (currentField.required) {
             if ((currentField.type === "checkbox" && (!answer || answer.trim().length === 0)) ||
                 (typeof answer === "string" && answer.trim().length === 0)) {
-                const helpContainer = document.getElementById("smartforms-chat-help-container");
                 helpContainer.textContent = currentField.requiredMessage || `${currentField.label} is required.`;
                 helpContainer.classList.add("smartforms-error-message");
                 return;
@@ -188,7 +185,6 @@ document.addEventListener("DOMContentLoaded", () => {
         appendUserMessage(answer);
         
         // Reset the help container to show default help text.
-        const helpContainer = document.getElementById("smartforms-chat-help-container");
         helpContainer.textContent = currentField.helpText || "Enter your help text";
         helpContainer.classList.remove("smartforms-error-message");
         

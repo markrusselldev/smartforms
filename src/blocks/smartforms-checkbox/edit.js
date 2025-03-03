@@ -24,7 +24,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 	// Ensure the block's settings are initialized.
 	useEffect(() => {
 		if ( ! attributes.groupId ) {
-			setAttributes({ groupId: 'sf-checkbox-' + clientId });
+			setAttributes({ groupId: `sf-checkbox-${ clientId }` });
 		}
 		if ( ! attributes.layout ) {
 			setAttributes({ layout: 'horizontal' });
@@ -32,7 +32,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 		if ( ! attributes.options || !Array.isArray( attributes.options ) || attributes.options.length === 0 ) {
 			setAttributes({ options: DEFAULT_OPTIONS });
 		}
-	}, [ attributes, clientId, setAttributes ]);
+	}, [ attributes.groupId, attributes.layout, attributes.options, clientId, setAttributes ]);
 
 	/**
 	 * Updates an option's label and derived value.

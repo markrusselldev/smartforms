@@ -66,23 +66,36 @@ class ChatUI {
 		// Assume the current field is the first one for default help text.
 		$current_field = isset( $form_data['fields'][0] ) ? $form_data['fields'][0] : array();
 
-		// Build dynamic CSS.
-		$css = "
-		#smartforms-chat-container {
-			--chat-bg-color: " . esc_attr( isset( $theme_styles['smartforms_chat_container_background_color'] ) ? $theme_styles['smartforms_chat_container_background_color'] : '#ffffff' ) . ";
-			--chat-border-color: " . esc_attr( isset( $theme_styles['smartforms_chat_container_border_color'] ) ? $theme_styles['smartforms_chat_container_border_color'] : '#cccccc' ) . ";
-			--chat-border-style: " . esc_attr( isset( $theme_styles['smartforms_chat_container_border_style'] ) ? $theme_styles['smartforms_chat_container_border_style'] : 'solid' ) . ";
-			--chat-border-width: " . absint( isset( $theme_styles['smartforms_chat_container_border_width'] ) ? $theme_styles['smartforms_chat_container_border_width'] : 1 ) . "px;
-			--chat-border-radius: " . absint( isset( $theme_styles['smartforms_chat_container_border_radius'] ) ? $theme_styles['smartforms_chat_container_border_radius'] : 10 ) . "px;
-			--chat-box-shadow: " . esc_attr( isset( $theme_styles['smartforms_chat_container_box_shadow'] ) ? $theme_styles['smartforms_chat_container_box_shadow'] : 'none' ) . ";
-			--chat-padding: " . esc_attr( isset( $theme_styles['smartforms_chat_container_padding'] ) ? $theme_styles['smartforms_chat_container_padding'] : '10px' ) . ";
-			--chat-max-width: " . esc_attr( isset( $theme_styles['smartforms_chat_container_max_width'] ) ? $theme_styles['smartforms_chat_container_max_width'] : '800px' ) . ";
-			--chat-flex-direction: " . esc_attr( isset( $theme_styles['smartforms_chat_container_flex_direction'] ) ? $theme_styles['smartforms_chat_container_flex_direction'] : 'column' ) . ";
-			--chat-justify-content: " . esc_attr( isset( $theme_styles['smartforms_chat_container_justify_content'] ) ? $theme_styles['smartforms_chat_container_justify_content'] : 'center' ) . ";
-			--chat-align-items: " . esc_attr( isset( $theme_styles['smartforms_chat_container_align_items'] ) ? $theme_styles['smartforms_chat_container_align_items'] : 'center' ) . ";
-		}
-		";
-		$css = "<style>" . $css . "</style>";
+		// Build dynamic CSS using heredoc for clarity.
+		$chat_bg_color   = esc_attr( $theme_styles['smartforms_chat_container_background_color'] ?? '#ffffff' );
+		$border_color    = esc_attr( $theme_styles['smartforms_chat_container_border_color'] ?? '#cccccc' );
+		$border_style    = esc_attr( $theme_styles['smartforms_chat_container_border_style'] ?? 'solid' );
+		$border_width    = absint( $theme_styles['smartforms_chat_container_border_width'] ?? 1 );
+		$border_radius   = absint( $theme_styles['smartforms_chat_container_border_radius'] ?? 10 );
+		$box_shadow      = esc_attr( $theme_styles['smartforms_chat_container_box_shadow'] ?? 'none' );
+		$padding         = esc_attr( $theme_styles['smartforms_chat_container_padding'] ?? '10px' );
+		$max_width       = esc_attr( $theme_styles['smartforms_chat_container_max_width'] ?? '800px' );
+		$flex_direction  = esc_attr( $theme_styles['smartforms_chat_container_flex_direction'] ?? 'column' );
+		$justify_content = esc_attr( $theme_styles['smartforms_chat_container_justify_content'] ?? 'center' );
+		$align_items     = esc_attr( $theme_styles['smartforms_chat_container_align_items'] ?? 'center' );
+
+		$css = <<<CSS
+<style>
+#smartforms-chat-container {
+	--chat-bg-color: {$chat_bg_color};
+	--chat-border-color: {$border_color};
+	--chat-border-style: {$border_style};
+	--chat-border-width: {$border_width}px;
+	--chat-border-radius: {$border_radius}px;
+	--chat-box-shadow: {$box_shadow};
+	--chat-padding: {$padding};
+	--chat-max-width: {$max_width};
+	--chat-flex-direction: {$flex_direction};
+	--chat-justify-content: {$justify_content};
+	--chat-align-items: {$align_items};
+}
+</style>
+CSS;
 
 		// Conditionally add classes based on context.
 		$wrapper_class = 'smartforms-chat-wrapper';
@@ -117,7 +130,7 @@ class ChatUI {
 								?>
 							</div>
 							<button type="button" id="smartforms-chat-submit-button" class="btn smartforms-chat-submit-button">
-								<i class="<?php echo esc_attr( isset( $theme_styles['smartforms_chat_submit_button_icon'] ) ? $theme_styles['smartforms_chat_submit_button_icon'] : 'fas fa-arrow-up' ); ?> smartforms-chat-submit-icon"></i>
+								<i class="<?php echo esc_attr( $theme_styles['smartforms_chat_submit_button_icon'] ?? 'fas fa-arrow-up' ); ?> smartforms-chat-submit-icon"></i>
 							</button>
 						</div>
 					</div>
