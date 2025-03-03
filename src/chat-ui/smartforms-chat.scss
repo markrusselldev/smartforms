@@ -10,18 +10,18 @@
 .smartforms-chat-wrapper {
 	width: 100%;
 	margin: 0 auto;
-  }
-  
-  /* Contextual adjustments for the wrapper */
-  .smartforms-chat-wrapper.admin-bar-present {
+}
+
+/* Contextual adjustments for the wrapper */
+.smartforms-chat-wrapper.admin-bar-present {
 	/* No extra top margin if WordPress pushes content down already */
-  }
-  .smartforms-chat-wrapper.admin-display {
+}
+.smartforms-chat-wrapper.admin-display {
 	/* Adjustments for admin area if needed; currently none */
-  }
-  
-  /* Chat container */
-  .smartforms-chat-container {
+}
+
+/* Chat container */
+.smartforms-chat-container {
 	width: 100% !important;
 	display: flex;
 	flex-direction: column;
@@ -32,10 +32,10 @@
 	border-radius: 10px;
 	box-shadow: none;
 	padding: 10px;
-  }
-  
-  /* Chat header */
-  .smartforms-chat-header {
+}
+
+/* Chat header */
+.smartforms-chat-header {
 	flex: 0 0 auto;
 	width: 100%;
 	padding: 10px;
@@ -43,10 +43,10 @@
 	color: #000000;
 	font-family: sans-serif;
 	font-size: 1.125rem; /* 18px */
-  }
-  
-  /* Chat dialog: Constrained to a maximum height so it scrolls when content exceeds */
-  .smartforms-chat-dialog {
+}
+
+/* Chat dialog: Constrained to a maximum height so it scrolls when content exceeds */
+.smartforms-chat-dialog {
 	flex: 1 1 auto;
 	width: 100%;
 	max-height: 300px; /* Adjust as needed */
@@ -54,10 +54,10 @@
 	padding: 10px;
 	display: flex;
 	flex-direction: column;
-  }
-  
-  /* Input container */
-  .smartforms-chat-input-container {
+}
+
+/* Input container */
+.smartforms-chat-input-container {
 	flex: 0 0 auto;
 	width: 100%;
 	background-color: #ffffff;
@@ -66,46 +66,46 @@
 	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 	padding: 10px;
 	border-top: 1px solid #cccccc;
-  }
-  
-  /* Input box */
-  .smartforms-chat-input-box {
+}
+
+/* Input box */
+.smartforms-chat-input-box {
 	width: 100%;
 	min-height: 100px;
 	resize: vertical;
 	max-height: 150px;
 	overflow-y: auto;
-  }
-  
-  /* Input control */
-  .smartforms-chat-input {
+}
+
+/* Input control */
+.smartforms-chat-input {
 	width: 100%;
 	border: none;
 	background-color: transparent;
 	resize: none;
 	box-sizing: border-box;
-  }
-  
-  /* Submit row */
-  .smartforms-chat-submit-row {
+}
+
+/* Submit row */
+.smartforms-chat-submit-row {
 	flex: 0 0 auto;
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
 	margin-top: 5px;
-  }
-  
-  /* Help container */
-  #smartforms-chat-help-container {
+}
+
+/* Help container */
+#smartforms-chat-help-container {
 	flex-grow: 1;
 	text-align: left;
 	padding-right: 10px;
 	font-size: 0.75rem; /* 12px */
 	color: #6c757d;
-  }
-  
-  /* Submit button */
-  .smartforms-chat-submit-button {
+}
+
+/* Submit button */
+.smartforms-chat-submit-button {
 	background-color: #007bff;
 	color: #ffffff;
 	border: 1px solid #007bff;
@@ -117,48 +117,66 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-  }
-  
-  /* Submit icon */
-  .smartforms-chat-submit-icon {
+	transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+/* Hover state for submit button: use a slightly darker blue */
+.smartforms-chat-submit-button:hover {
+	background-color: #006799;
+	border-color: #006799;
+}
+
+/* Disabled state for submit button: reduce opacity while retaining background color */
+#smartforms-chat-submit-button.disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+/* Ensure disabled state on hover doesn't change color */
+#smartforms-chat-submit-button.disabled:hover {
+	background-color: #007bff !important;
+	border-color: #007bff !important;
+}
+
+/* Submit icon */
+.smartforms-chat-submit-icon {
 	font-size: 1.8rem; /* 28.8px */
 	line-height: 1.8rem;
-  }
-  
-  /* Additional help text styling */
-  .smartforms-help-text {
+}
+
+/* Additional help text styling */
+.smartforms-help-text {
 	color: #999;
 	font-size: 0.75rem;
 	margin-top: 4px;
-  }
-  
-  /* Validation error styling */
-  #smartforms-chat-help-container.smartforms-error-message {
+}
+
+/* Validation error styling */
+#smartforms-chat-help-container.smartforms-error-message {
 	color: #dc3545;
 	font-size: 0.875rem; /* 14px */
 	font-weight: bold;
 	margin-right: 10px;
 	font-family: inherit;
-  }
-  
-  /* Message bubble styles */
-  .smartforms-chat-message {
+}
+
+/* Message bubble styles */
+.smartforms-chat-message {
 	margin-bottom: 10px;
 	padding: 8px 12px;
 	border-radius: 8px;
 	max-width: 80%;
 	word-wrap: break-word;
-  }
-  
-  .smartforms-chat-message.bot {
+}
+
+.smartforms-chat-message.bot {
 	background-color: #ffffff;
 	color: #000;
 	align-self: flex-start;
-  }
-  
-  .smartforms-chat-message.user {
+}
+
+.smartforms-chat-message.user {
 	background-color: #f1f1f1; /* light grey background */
 	color: #000;
 	align-self: flex-end;
-  }
-  
+}

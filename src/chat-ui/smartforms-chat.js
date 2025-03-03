@@ -1,4 +1,14 @@
-// Import the SCSS file so that webpack can process and extract it.
+/**
+ * File: smartforms-chat.js
+ *
+ * Handles the front-end behavior for the SmartForms Chat UI.
+ * It advances the form through questions, validates required fields,
+ * toggles the submit button's disabled state, and handles AJAX submission.
+ *
+ * The submit button is styled to mimic a ChatGPT‑style circular button,
+ * and its disabled state is controlled via a CSS class.
+ */
+
 import './smartforms-chat.scss';
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -12,61 +22,78 @@ document.addEventListener("DOMContentLoaded", () => {
     const formResponses = {};
     let currentAnswer = null; // Stores the answer for the current field
 
+    // Retrieve key DOM elements.
     const chatDialog = document.getElementById("smartforms-chat-dialog");
     const submitButton = document.getElementById("smartforms-chat-submit-button");
     const inputBox = document.getElementById("smartforms-chat-input-box");
     const helpContainer = document.getElementById("smartforms-chat-help-container");
 
     /**
-     * Updates the disabled state of the submit button.
-     * It will be disabled if the current field is required and no answer is provided.
+     * Updates the visual disabled state of the submit button.
+     * It adds the "disabled" class if the current field is required and no valid answer is provided.
+     *
+     * @param {Object} currentField - The current field configuration.
+     * @param {string|array|null} answer - The current answer value.
      */
     const updateSubmitButtonState = (currentField, answer) => {
-        if (currentField.required) {
-            submitButton.disabled = !answer || (typeof answer === "string" && answer.trim().length === 0) || (Array.isArray(answer) && answer.length === 0);
+        if (
+            currentField.required &&
+            (
+                answer === null ||
+                (typeof answer === "string" && answer.trim().length === 0) ||
+                (Array.isArray(answer) && answer.length === 0)
+            )
+        ) {
+            submitButton.classList.add("disabled");
         } else {
-            submitButton.disabled = false;
+            submitButton.classList.remove("disabled");
         }
     };
 
     /**
      * Processes the answer for the current question.
+     * If validation fails, shows an error message for 3 seconds.
+     * If validation passes, appends the user's message, stores the answer, and advances.
      *
      * @param {string|array} answer - The answer value.
-     * @param {string} [displayText] - The text to display for the user message; defaults to answer.
+     * @param {string} [displayText] - The text to display for the user's message; defaults to answer.
      */
     const processAnswer = (answer, displayText = answer) => {
         const currentField = formData.fields[currentStep];
         
-        // Validate required fields.
-        if (currentField.required) {
-            if ((typeof answer === "string" && answer.trim().length === 0) ||
+        // Validate required field.
+        if (
+            currentField.required &&
+            (
+                (typeof answer === "string" && answer.trim().length === 0) ||
                 (Array.isArray(answer) && answer.length === 0) ||
-                answer === null) {
-                helpContainer.textContent = currentField.requiredMessage || `${currentField.label} is required.`;
-                helpContainer.classList.add("smartforms-error-message");
-                return;
-            }
+                answer === null
+            )
+        ) {
+            helpContainer.textContent = currentField.requiredMessage || `${currentField.label} is required.`;
+            helpContainer.classList.add("smartforms-error-message");
+            setTimeout(() => {
+                helpContainer.textContent = currentField.helpText || "Enter your help text";
+                helpContainer.classList.remove("smartforms-error-message");
+            }, 3000);
+            return;
         }
         
         // Append the user's message.
         appendUserMessage(displayText);
-        
-        // Reset help container to default help text.
+        // Reset help container.
         helpContainer.textContent = currentField.helpText || "Enter your help text";
         helpContainer.classList.remove("smartforms-error-message");
-        
-        // Store the answer.
+        // Store answer.
         formResponses[currentField.id || currentStep] = answer;
-        
-        // Reset currentAnswer for next field.
         currentAnswer = null;
         
+        // Advance to next question or submit form.
         if (currentStep < formData.fields.length - 1) {
             currentStep++;
             showCurrentQuestion();
         } else {
-            // All fields answered; process form submission.
+            // All questions answered; submit form via AJAX.
             const data = new URLSearchParams();
             data.append("action", "process_smartform");
             data.append("smartform_nonce", smartformsData.nonce);
@@ -75,22 +102,19 @@ document.addEventListener("DOMContentLoaded", () => {
             
             fetch(smartformsData.ajaxUrl, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 body: data.toString()
             })
             .then(response => response.json())
             .then(result => {
+                // Clear the chat dialog and display bot response.
                 chatDialog.innerHTML = "";
                 const botMessage = document.createElement("div");
                 botMessage.classList.add("smartforms-chat-message", "bot");
                 if (result.success) {
                     botMessage.innerHTML = `<p>${result.data.message}</p>`;
                 } else {
-                    const errorMsg = Array.isArray(result.data)
-                        ? result.data.join(" ")
-                        : result.data;
+                    const errorMsg = Array.isArray(result.data) ? result.data.join(" ") : result.data;
                     botMessage.innerHTML = `<p class="error">${errorMsg}</p>`;
                 }
                 chatDialog.appendChild(botMessage);
@@ -103,16 +127,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 textarea.placeholder = "Type your message here...";
                 textarea.disabled = true;
                 replaceInputControl(textarea);
-                submitButton.disabled = true;
+                submitButton.classList.add("disabled");
             })
             .catch(error => {
                 console.error("AJAX submission error:", error);
             });
         }
     };
-    
+
     /**
      * Creates an input control based on the field type.
+     * Handles text, checkbox, select, slider, number, buttons, and textarea fields.
      *
      * @param {Object} field - The field configuration.
      * @returns {HTMLElement} The created input control.
@@ -124,7 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
             control.type = "text";
             control.className = "form-control smartforms-text-input";
             control.placeholder = field.placeholder || "Type your answer here...";
-            // Enable live updating of submit button state.
             control.addEventListener("input", (e) => {
                 updateSubmitButtonState(field, e.target.value);
             });
@@ -153,7 +177,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     optionWrapper.appendChild(label);
                     control.appendChild(optionWrapper);
                     
-                    // Update submit button state when any checkbox is changed.
                     checkbox.addEventListener("change", () => {
                         const selected = Array.from(control.querySelectorAll("input[type='checkbox']"))
                             .filter(cb => cb.checked)
@@ -195,7 +218,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 updateSubmitButtonState(field, e.target.value);
             });
         } else if (field.type === "buttons") {
-            // For button groups, allow a selection without immediate submission.
             control = document.createElement("div");
             control.className = "sf-buttons-group d-flex flex-wrap gap-2";
             if (field.options && Array.isArray(field.options)) {
@@ -205,25 +227,25 @@ document.addEventListener("DOMContentLoaded", () => {
                     btn.className = "btn btn-primary";
                     btn.setAttribute("data-value", opt.value);
                     btn.textContent = opt.label;
-                    // Toggle selected state
                     btn.addEventListener("click", () => {
-                        // Remove active class from all siblings
-                        Array.from(control.children).forEach(child => {
-                            child.classList.remove("active");
-                        });
-                        // Add active class to clicked button
-                        btn.classList.add("active");
-                        currentAnswer = opt.value;
+                        // Toggle active state: if the button is already active, deselect it; otherwise, select it.
+                        Array.from(control.children).forEach(child => child.classList.remove("active"));
+                        if (btn.classList.contains("active")) {
+                            btn.classList.remove("active");
+                            currentAnswer = null;
+                        } else {
+                            btn.classList.add("active");
+                            currentAnswer = opt.value;
+                        }
                         updateSubmitButtonState(field, currentAnswer);
                     });
                     control.appendChild(btn);
                 });
             }
-            // Initially disable submit button if field is required.
             updateSubmitButtonState(field, currentAnswer);
             return control;
         } else {
-            // Default: create a textarea.
+            // Default: use a textarea.
             control = document.createElement("textarea");
             control.className = "form-control smartforms-textarea smartforms-chat-input";
             control.rows = 4;
@@ -234,7 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return control;
     };
-    
+
     /**
      * Replaces the current input control with a new one.
      *
@@ -246,7 +268,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         inputBox.insertBefore(newControl, inputBox.firstElementChild);
     };
-    
+
     /**
      * Appends a bot message bubble to the chat dialog.
      *
@@ -276,33 +298,40 @@ document.addEventListener("DOMContentLoaded", () => {
         chatDialog.appendChild(userMessage);
         chatDialog.scrollTop = chatDialog.scrollHeight;
     };
-    
+
     /**
      * Displays the current question as a bot message and loads its input control.
      */
     const showCurrentQuestion = () => {
         const currentField = formData.fields[currentStep];
-        // Reset currentAnswer for new field.
         currentAnswer = null;
-        // Append bot message with the question text.
         appendBotMessage(currentField.label);
-        // Create and set the input control.
         const newControl = createInputControl(currentField);
         replaceInputControl(newControl);
-        // Disable submit button initially if required.
         updateSubmitButtonState(currentField, currentAnswer);
     };
-    
-    // Start the conversation by showing the first question.
+
+    // Begin the chat UI flow by displaying the first question.
     showCurrentQuestion();
     
-    submitButton.disabled = true; // Initially disable the submit button.
-
-    // Submit button handler for fields other than "buttons"
+    // Initially mark the submit button as disabled.
+    submitButton.classList.add("disabled");
+    
+    // Submit button click handler.
     submitButton.addEventListener("click", (e) => {
         e.preventDefault();
+        // If the submit button is disabled, display the validation error message.
+        if (submitButton.classList.contains("disabled")) {
+            const currentField = formData.fields[currentStep];
+            helpContainer.textContent = currentField.requiredMessage || `${currentField.label} is required.`;
+            helpContainer.classList.add("smartforms-error-message");
+            setTimeout(() => {
+                helpContainer.textContent = currentField.helpText || "Enter your help text";
+                helpContainer.classList.remove("smartforms-error-message");
+            }, 3000);
+            return;
+        }
         const currentField = formData.fields[currentStep];
-        // For buttons, use currentAnswer; for others, retrieve value from input.
         let answer;
         if (currentField.type === "buttons") {
             answer = currentAnswer;

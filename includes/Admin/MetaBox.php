@@ -107,11 +107,8 @@ class MetaBox {
 						: ( isset( $block['attrs']['helpText'] ) ? sanitize_text_field( $block['attrs']['helpText'] ) : '' )
 				);
 
-				// Process additional attributes for certain field types.
+				// Process additional attributes for checkbox.
 				if ( 'checkbox' === $type ) {
-					$required_message = ( isset( $block['attrs']['requiredMessage'] ) && '' !== $block['attrs']['requiredMessage'] )
-						? sanitize_text_field( $block['attrs']['requiredMessage'] )
-						: 'This field is required.';
 					$form_field['helpText'] = ( array_key_exists( 'helpText', $block['attrs'] ) && trim( $block['attrs']['helpText'] ) !== '' )
 						? sanitize_text_field( $block['attrs']['helpText'] )
 						: 'Choose one or more options';
@@ -147,29 +144,25 @@ class MetaBox {
 					}
 					$temp_help_text = $form_field['helpText'];
 					$form_field = array(
-						'type'            => $form_field['type'],
-						'label'           => $form_field['label'],
-						'placeholder'     => $form_field['placeholder'],
-						'required'        => $form_field['required'],
-						'requiredMessage' => $required_message,
-						'helpText'        => $temp_help_text,
-						'layout'          => $layout,
-						'options'         => $options,
+						'type'        => $form_field['type'],
+						'label'       => $form_field['label'],
+						'placeholder' => $form_field['placeholder'],
+						'required'    => $form_field['required'],
+						'helpText'    => $temp_help_text,
+						'layout'      => $layout,
+						'options'     => $options,
 					);
 				} elseif ( 'buttons' === $type ) {
 					// Process button group options similar to checkbox.
-					$required_message = ( isset( $block['attrs']['requiredMessage'] ) && '' !== $block['attrs']['requiredMessage'] )
-						? sanitize_text_field( $block['attrs']['requiredMessage'] )
-						: 'This field is required.';
 					$form_field['helpText'] = isset( $block['attrs']['helpText'] ) ? sanitize_text_field( $block['attrs']['helpText'] ) : '';
-
+					
 					if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
 						$options = array();
 						foreach ( $block['attrs']['options'] as $option ) {
 							if ( isset( $option['label'], $option['value'] ) ) {
 								$options[] = array(
 									'label' => sanitize_text_field( $option['label'] ),
-									'value' => sanitize_text_field( $option['value'] ),
+									'value' => sanitize_text_field( $option['value'] )
 								);
 							} else {
 								SmartForms::log_error( "Buttons option missing label or value for post $post_id." );
@@ -183,11 +176,12 @@ class MetaBox {
 							array( 'label' => 'Option 2', 'value' => 'option-2' )
 						);
 					}
+					$multiple = isset( $block['attrs']['multiple'] ) ? (bool) $block['attrs']['multiple'] : false;
 					$form_field = array_merge(
 						$form_field,
 						array(
-							'requiredMessage' => $required_message,
-							'options'         => $options,
+							'options'  => $options,
+							'multiple' => $multiple,
 						)
 					);
 				}
