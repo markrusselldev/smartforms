@@ -107,12 +107,11 @@ class MetaBox {
 						: ( isset( $block['attrs']['helpText'] ) ? sanitize_text_field( $block['attrs']['helpText'] ) : '' )
 				);
 
-				// If this is a checkbox block, include options, layout, and requiredMessage.
+				// Process additional attributes for certain field types.
 				if ( 'checkbox' === $type ) {
 					$required_message = ( isset( $block['attrs']['requiredMessage'] ) && '' !== $block['attrs']['requiredMessage'] )
 						? sanitize_text_field( $block['attrs']['requiredMessage'] )
 						: 'This field is required.';
-					// For helpText, use a default if the attribute is not present or empty.
 					$form_field['helpText'] = ( array_key_exists( 'helpText', $block['attrs'] ) && trim( $block['attrs']['helpText'] ) !== '' )
 						? sanitize_text_field( $block['attrs']['helpText'] )
 						: 'Choose one or more options';
@@ -146,7 +145,6 @@ class MetaBox {
 							$layout = 'horizontal';
 						}
 					}
-					// Reorder keys: requiredMessage before helpText, and layout above options.
 					$temp_help_text = $form_field['helpText'];
 					$form_field = array(
 						'type'            => $form_field['type'],
@@ -158,13 +156,46 @@ class MetaBox {
 						'layout'          => $layout,
 						'options'         => $options,
 					);
+				} elseif ( 'buttons' === $type ) {
+					// Process button group options similar to checkbox.
+					$required_message = ( isset( $block['attrs']['requiredMessage'] ) && '' !== $block['attrs']['requiredMessage'] )
+						? sanitize_text_field( $block['attrs']['requiredMessage'] )
+						: 'This field is required.';
+					$form_field['helpText'] = isset( $block['attrs']['helpText'] ) ? sanitize_text_field( $block['attrs']['helpText'] ) : '';
+
+					if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
+						$options = array();
+						foreach ( $block['attrs']['options'] as $option ) {
+							if ( isset( $option['label'], $option['value'] ) ) {
+								$options[] = array(
+									'label' => sanitize_text_field( $option['label'] ),
+									'value' => sanitize_text_field( $option['value'] ),
+								);
+							} else {
+								SmartForms::log_error( "Buttons option missing label or value for post $post_id." );
+							}
+						}
+						SmartForms::log_error( "Buttons block processed with " . count( $options ) . " options for post $post_id." );
+					} else {
+						SmartForms::log_error( "Buttons block missing options for post $post_id." );
+						$options = array(
+							array( 'label' => 'Option 1', 'value' => 'option-1' ),
+							array( 'label' => 'Option 2', 'value' => 'option-2' )
+						);
+					}
+					$form_field = array_merge(
+						$form_field,
+						array(
+							'requiredMessage' => $required_message,
+							'options'         => $options,
+						)
+					);
 				}
 
 				$form_fields[] = $form_field;
 			}
 		}
 
-		// Encode JSON safely.
 		$json_data = wp_json_encode( array( 'fields' => $form_fields ) );
 
 		if ( false === $json_data ) {
@@ -175,7 +206,6 @@ class MetaBox {
 			);
 		}
 
-		// Store JSON in post meta.
 		update_post_meta( $post_id, 'smartforms_data', $json_data );
 		SmartForms::log_error( "[DEBUG] Form data JSON saved for Form ID: $post_id" );
 	}
@@ -187,25 +217,8 @@ class MetaBox {
 	 * @return string Default label based on the block type.
 	 */
 	private static function get_default_label( $block_name ) {
-		$type = str_replace( 'smartforms/', '', $block_name );
-		switch ( $type ) {
-			case 'text':
-				return 'Text Input';
-			case 'number':
-				return 'Number Input';
-			case 'radio':
-				return 'Radio Input';
-			case 'checkbox':
-				return 'Checkbox Input';
-			case 'select':
-				return 'Select Input';
-			case 'slider':
-				return 'Slider Input';
-			case 'textarea':
-				return 'Textarea Input';
-			default:
-				return 'Input';
-		}
+		// For consistent UX, all default labels are now set to the same prompt.
+		return 'Type your question here...';
 	}
 }
 

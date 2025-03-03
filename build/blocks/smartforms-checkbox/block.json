@@ -24,7 +24,9 @@
   "attributes": {
     "label": {
       "type": "string",
-      "default": "Select your options:"
+      "source": "html",
+      "selector": "label.sf-checkbox-main-label",
+      "default": "Type your question here..."
     },
     "required": {
       "type": "boolean",

@@ -1,15 +1,15 @@
 /**
- * Edit component for the SmartForms Checkbox block.
+ * Edit component for the SmartForms Button Group block.
  *
- * Renders a checkbox field group for the editor with InspectorControls to add, remove, and modify options,
- * and implements inline editing (via RichText) for the main label.
+ * Renders a button group for rapid selection, including InspectorControls
+ * for adjusting options, help text, required state, and an editable question prompt.
  *
  * @package SmartForms
  */
 
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls, RichText } from '@wordpress/block-editor';
-import { PanelBody, TextControl, ToggleControl, Button, SelectControl } from '@wordpress/components';
+import { PanelBody, TextControl, ToggleControl, Button } from '@wordpress/components';
 import { Fragment, useEffect } from '@wordpress/element';
 
 const DEFAULT_OPTIONS = [
@@ -18,29 +18,26 @@ const DEFAULT_OPTIONS = [
 ];
 
 const Edit = ({ attributes, setAttributes, clientId }) => {
+	const { label, helpText, requiredMessage, required, options, groupId } = attributes;
 	const blockProps = useBlockProps();
-	const { label, helpText, requiredMessage, required } = attributes;
 
 	useEffect(() => {
-		if ( ! attributes.groupId ) {
-			setAttributes({ groupId: `sf-checkbox-${ clientId }` });
+		if ( ! groupId ) {
+			setAttributes({ groupId: `sf-buttons-${ clientId }` });
 		}
-		if ( ! attributes.layout ) {
-			setAttributes({ layout: 'horizontal' });
-		}
-		if ( ! attributes.options || !Array.isArray( attributes.options ) || attributes.options.length === 0 ) {
+		if ( ! options || !Array.isArray( options ) || options.length === 0 ) {
 			setAttributes({ options: DEFAULT_OPTIONS });
 		}
-	}, [ attributes.groupId, attributes.layout, attributes.options, clientId, setAttributes ]);
+	}, [ groupId, options, clientId, setAttributes ]);
 
 	/**
 	 * Updates an option's label and derived value.
 	 *
-	 * @param {number} index The index of the option.
-	 * @param {string} newLabel The new label.
+	 * @param {number} index - The index of the option.
+	 * @param {string} newLabel - The new label.
 	 */
 	const updateOption = ( index, newLabel ) => {
-		const newOptions = attributes.options.map( ( option, i ) => {
+		const newOptions = options.map( ( option, i ) => {
 			if ( i === index ) {
 				return {
 					label: newLabel,
@@ -53,13 +50,11 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 	};
 
 	/**
-	 * Adds a new checkbox option.
-	 *
-	 * Automatically assigns a sequential label "Option N" based on the current highest option number.
+	 * Adds a new button option.
 	 */
 	const addOption = () => {
 		let maxNumber = 0;
-		attributes.options.forEach( ( option ) => {
+		options.forEach( ( option ) => {
 			const match = option.label.match( /^Option (\d+)$/ );
 			if ( match ) {
 				const num = parseInt( match[1], 10 );
@@ -70,33 +65,24 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 		} );
 		const newLabel = `Option ${ maxNumber + 1 }`;
 		const newValue = newLabel.toLowerCase().replace( /\s+/g, '-' );
-		const newOptions = [ ...attributes.options, { label: newLabel, value: newValue } ];
+		const newOptions = [ ...options, { label: newLabel, value: newValue } ];
 		setAttributes({ options: newOptions });
 	};
 
 	/**
 	 * Removes an option by its index.
 	 *
-	 * @param {number} index The index to remove.
+	 * @param {number} index - The index to remove.
 	 */
 	const removeOption = ( index ) => {
-		const newOptions = attributes.options.filter( ( _, i ) => i !== index );
+		const newOptions = options.filter( ( _, i ) => i !== index );
 		setAttributes({ options: newOptions });
 	};
 
 	return (
 		<div { ...blockProps }>
 			<InspectorControls>
-				<PanelBody title={ __( 'Checkbox Settings', 'smartforms' ) }>
-					<SelectControl
-						label={ __( 'Layout', 'smartforms' ) }
-						value={ attributes.layout }
-						options={ [
-							{ label: __( 'Horizontal', 'smartforms' ), value: 'horizontal' },
-							{ label: __( 'Vertical', 'smartforms' ), value: 'vertical' }
-						] }
-						onChange={ ( value ) => setAttributes({ layout: value }) }
-					/>
+				<PanelBody title={ __( 'Button Group Settings', 'smartforms' ) }>
 					<ToggleControl
 						label={ __( 'Required', 'smartforms' ) }
 						checked={ required }
@@ -122,9 +108,9 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 						placeholder={ __( 'Enter your help text', 'smartforms' ) }
 					/>
 				</PanelBody>
-				<PanelBody title={ __( 'Checkbox Options', 'smartforms' ) } initialOpen={ true }>
-					{ attributes.options &&
-						attributes.options.map( ( option, index ) => (
+				<PanelBody title={ __( 'Button Options', 'smartforms' ) } initialOpen={ true }>
+					{ options &&
+						options.map( ( option, index ) => (
 							<Fragment key={ index }>
 								<TextControl
 									label={ `${ __( 'Option', 'smartforms' ) } ${ index + 1 }` }
@@ -135,7 +121,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 									{ __( 'Remove Option', 'smartforms' ) }
 								</Button>
 							</Fragment>
-						) )
+						))
 					}
 					<Button isPrimary onClick={ addOption }>
 						{ __( 'Add Option', 'smartforms' ) }
@@ -145,33 +131,23 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 			{/* Editable question prompt */}
 			<RichText
 				tagName="label"
-				className="sf-checkbox-main-label"
-				value={ attributes.label }
+				className="sf-buttons-main-label"
+				value={ label }
 				onChange={ ( value ) => setAttributes({ label: value }) }
 				placeholder={ __( 'Type your question here...', 'smartforms' ) }
 			/>
-			<div
-				className={ `sf-checkbox-group sf-checkbox-group-${ attributes.layout || 'horizontal' }` }
-				data-layout={ attributes.layout || 'horizontal' }
-			>
-				{ attributes.options &&
-					attributes.options.map( ( option, index ) => {
-						const inlineClass = attributes.layout === 'horizontal' ? ' form-check-inline' : '';
-						return (
-							<div key={ index } className={ `sf-checkbox-option form-check${ inlineClass }` }>
-								<input
-									className="form-check-input"
-									type="checkbox"
-									id={ `${ attributes.groupId }-${ index }` }
-									name={ attributes.groupId }
-									required={ required }
-								/>
-								<label className="form-check-label" htmlFor={ `${ attributes.groupId }-${ index }` }>
-									{ option.label }
-								</label>
-							</div>
-						);
-					})
+			<div className="sf-buttons-group d-flex flex-wrap gap-2" role="group" data-group-id={ groupId }>
+				{ options &&
+					options.map( ( option, index ) => (
+						<button
+							key={ index }
+							type="button"
+							className="btn btn-primary"
+							data-value={ option.value }
+						>
+							{ option.label }
+						</button>
+					))
 				}
 			</div>
 		</div>

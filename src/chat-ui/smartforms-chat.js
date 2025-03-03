@@ -10,12 +10,107 @@ document.addEventListener("DOMContentLoaded", () => {
     
     let currentStep = 0;
     const formResponses = {};
-    
+    let currentAnswer = null; // Stores the answer for the current field
+
     const chatDialog = document.getElementById("smartforms-chat-dialog");
     const submitButton = document.getElementById("smartforms-chat-submit-button");
     const inputBox = document.getElementById("smartforms-chat-input-box");
     const helpContainer = document.getElementById("smartforms-chat-help-container");
-  
+
+    /**
+     * Updates the disabled state of the submit button.
+     * It will be disabled if the current field is required and no answer is provided.
+     */
+    const updateSubmitButtonState = (currentField, answer) => {
+        if (currentField.required) {
+            submitButton.disabled = !answer || (typeof answer === "string" && answer.trim().length === 0) || (Array.isArray(answer) && answer.length === 0);
+        } else {
+            submitButton.disabled = false;
+        }
+    };
+
+    /**
+     * Processes the answer for the current question.
+     *
+     * @param {string|array} answer - The answer value.
+     * @param {string} [displayText] - The text to display for the user message; defaults to answer.
+     */
+    const processAnswer = (answer, displayText = answer) => {
+        const currentField = formData.fields[currentStep];
+        
+        // Validate required fields.
+        if (currentField.required) {
+            if ((typeof answer === "string" && answer.trim().length === 0) ||
+                (Array.isArray(answer) && answer.length === 0) ||
+                answer === null) {
+                helpContainer.textContent = currentField.requiredMessage || `${currentField.label} is required.`;
+                helpContainer.classList.add("smartforms-error-message");
+                return;
+            }
+        }
+        
+        // Append the user's message.
+        appendUserMessage(displayText);
+        
+        // Reset help container to default help text.
+        helpContainer.textContent = currentField.helpText || "Enter your help text";
+        helpContainer.classList.remove("smartforms-error-message");
+        
+        // Store the answer.
+        formResponses[currentField.id || currentStep] = answer;
+        
+        // Reset currentAnswer for next field.
+        currentAnswer = null;
+        
+        if (currentStep < formData.fields.length - 1) {
+            currentStep++;
+            showCurrentQuestion();
+        } else {
+            // All fields answered; process form submission.
+            const data = new URLSearchParams();
+            data.append("action", "process_smartform");
+            data.append("smartform_nonce", smartformsData.nonce);
+            data.append("form_id", smartformsData.formId || window.smartformsFormId);
+            data.append("form_data", JSON.stringify(formResponses));
+            
+            fetch(smartformsData.ajaxUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: data.toString()
+            })
+            .then(response => response.json())
+            .then(result => {
+                chatDialog.innerHTML = "";
+                const botMessage = document.createElement("div");
+                botMessage.classList.add("smartforms-chat-message", "bot");
+                if (result.success) {
+                    botMessage.innerHTML = `<p>${result.data.message}</p>`;
+                } else {
+                    const errorMsg = Array.isArray(result.data)
+                        ? result.data.join(" ")
+                        : result.data;
+                    botMessage.innerHTML = `<p class="error">${errorMsg}</p>`;
+                }
+                chatDialog.appendChild(botMessage);
+                chatDialog.scrollTop = chatDialog.scrollHeight;
+                
+                // Replace input control with a disabled textarea after submission.
+                const textarea = document.createElement("textarea");
+                textarea.className = "form-control smartforms-chat-input";
+                textarea.rows = 4;
+                textarea.placeholder = "Type your message here...";
+                textarea.disabled = true;
+                replaceInputControl(textarea);
+                submitButton.disabled = true;
+            })
+            .catch(error => {
+                console.error("AJAX submission error:", error);
+            });
+        }
+    };
+    
     /**
      * Creates an input control based on the field type.
      *
@@ -29,6 +124,10 @@ document.addEventListener("DOMContentLoaded", () => {
             control.type = "text";
             control.className = "form-control smartforms-text-input";
             control.placeholder = field.placeholder || "Type your answer here...";
+            // Enable live updating of submit button state.
+            control.addEventListener("input", (e) => {
+                updateSubmitButtonState(field, e.target.value);
+            });
         } else if (field.type === "checkbox") {
             control = document.createElement("div");
             control.className = "sf-checkbox-group sf-checkbox-group-" + (field.layout || "horizontal");
@@ -53,6 +152,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     optionWrapper.appendChild(checkbox);
                     optionWrapper.appendChild(label);
                     control.appendChild(optionWrapper);
+                    
+                    // Update submit button state when any checkbox is changed.
+                    checkbox.addEventListener("change", () => {
+                        const selected = Array.from(control.querySelectorAll("input[type='checkbox']"))
+                            .filter(cb => cb.checked)
+                            .map(cb => cb.value);
+                        updateSubmitButtonState(field, selected);
+                    });
                 });
             }
         } else if (field.type === "select") {
@@ -66,6 +173,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     control.appendChild(option);
                 });
             }
+            control.addEventListener("change", (e) => {
+                updateSubmitButtonState(field, e.target.value);
+            });
         } else if (field.type === "slider") {
             control = document.createElement("input");
             control.type = "range";
@@ -73,17 +183,54 @@ document.addEventListener("DOMContentLoaded", () => {
             control.min = field.min || 0;
             control.max = field.max || 100;
             control.value = field.value || Math.floor(((field.min || 0) + (field.max || 100)) / 2);
+            control.addEventListener("input", (e) => {
+                updateSubmitButtonState(field, e.target.value);
+            });
         } else if (field.type === "number") {
             control = document.createElement("input");
             control.type = "number";
             control.className = "form-control smartforms-number";
             control.placeholder = field.placeholder || "";
+            control.addEventListener("input", (e) => {
+                updateSubmitButtonState(field, e.target.value);
+            });
+        } else if (field.type === "buttons") {
+            // For button groups, allow a selection without immediate submission.
+            control = document.createElement("div");
+            control.className = "sf-buttons-group d-flex flex-wrap gap-2";
+            if (field.options && Array.isArray(field.options)) {
+                field.options.forEach(opt => {
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.className = "btn btn-primary";
+                    btn.setAttribute("data-value", opt.value);
+                    btn.textContent = opt.label;
+                    // Toggle selected state
+                    btn.addEventListener("click", () => {
+                        // Remove active class from all siblings
+                        Array.from(control.children).forEach(child => {
+                            child.classList.remove("active");
+                        });
+                        // Add active class to clicked button
+                        btn.classList.add("active");
+                        currentAnswer = opt.value;
+                        updateSubmitButtonState(field, currentAnswer);
+                    });
+                    control.appendChild(btn);
+                });
+            }
+            // Initially disable submit button if field is required.
+            updateSubmitButtonState(field, currentAnswer);
+            return control;
         } else {
-            // For other field types, create a textarea.
+            // Default: create a textarea.
             control = document.createElement("textarea");
             control.className = "form-control smartforms-textarea smartforms-chat-input";
             control.rows = 4;
             control.placeholder = field.placeholder || "Type your answer here...";
+            control.addEventListener("input", (e) => {
+                updateSubmitButtonState(field, e.target.value);
+            });
         }
         return control;
     };
@@ -135,31 +282,35 @@ document.addEventListener("DOMContentLoaded", () => {
      */
     const showCurrentQuestion = () => {
         const currentField = formData.fields[currentStep];
+        // Reset currentAnswer for new field.
+        currentAnswer = null;
         // Append bot message with the question text.
         appendBotMessage(currentField.label);
         // Create and set the input control.
         const newControl = createInputControl(currentField);
         replaceInputControl(newControl);
+        // Disable submit button initially if required.
+        updateSubmitButtonState(currentField, currentAnswer);
     };
     
     // Start the conversation by showing the first question.
     showCurrentQuestion();
     
-    if (!submitButton) {
-        console.error("Submit button not found in the chat form.");
-        return;
-    }
-    
+    submitButton.disabled = true; // Initially disable the submit button.
+
+    // Submit button handler for fields other than "buttons"
     submitButton.addEventListener("click", (e) => {
         e.preventDefault();
         const currentField = formData.fields[currentStep];
+        // For buttons, use currentAnswer; for others, retrieve value from input.
         let answer;
-        if (currentField.type === "checkbox") {
+        if (currentField.type === "buttons") {
+            answer = currentAnswer;
+        } else if (currentField.type === "checkbox") {
             const checkboxes = inputBox.querySelectorAll("input[type='checkbox']");
             answer = Array.from(checkboxes)
                 .filter(cb => cb.checked)
                 .map(cb => cb.value);
-            // For checkbox, convert answer array to a comma-separated string for display.
             answer = answer.join(", ");
         } else if (currentField.type === "text") {
             const inputControl = inputBox.querySelector("input");
@@ -170,69 +321,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!inputControl) return;
             answer = inputControl.value;
         }
-        
-        // Validate required fields.
-        if (currentField.required) {
-            if ((currentField.type === "checkbox" && (!answer || answer.trim().length === 0)) ||
-                (typeof answer === "string" && answer.trim().length === 0)) {
-                helpContainer.textContent = currentField.requiredMessage || `${currentField.label} is required.`;
-                helpContainer.classList.add("smartforms-error-message");
-                return;
-            }
-        }
-        
-        // Append the user's message to the chat dialog.
-        appendUserMessage(answer);
-        
-        // Reset the help container to show default help text.
-        helpContainer.textContent = currentField.helpText || "Enter your help text";
-        helpContainer.classList.remove("smartforms-error-message");
-        
-        formResponses[currentField.id || currentStep] = answer;
-        
-        if (currentStep < formData.fields.length - 1) {
-            currentStep++;
-            showCurrentQuestion();
-        } else {
-            // All fields answered; process the form submission.
-            const data = new URLSearchParams();
-            data.append("action", "process_smartform");
-            data.append("smartform_nonce", smartformsData.nonce);
-            data.append("form_id", smartformsData.formId || window.smartformsFormId);
-            data.append("form_data", JSON.stringify(formResponses));
-            
-            fetch(smartformsData.ajaxUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: data.toString()
-            })
-            .then(response => response.json())
-            .then(result => {
-                chatDialog.innerHTML = "";
-                const botMessage = document.createElement("div");
-                botMessage.classList.add("smartforms-chat-message", "bot");
-                if (result.success) {
-                    botMessage.innerHTML = `<p>${result.data.message}</p>`;
-                } else {
-                    const errorMsg = Array.isArray(result.data)
-                        ? result.data.join(" ")
-                        : result.data;
-                    botMessage.innerHTML = `<p class="error">${errorMsg}</p>`;
-                }
-                chatDialog.appendChild(botMessage);
-                chatDialog.scrollTop = chatDialog.scrollHeight;
-                
-                const textarea = document.createElement("textarea");
-                textarea.className = "form-control smartforms-chat-input";
-                textarea.rows = 4;
-                textarea.placeholder = "Type your message here...";
-                replaceInputControl(textarea);
-            })
-            .catch(error => {
-                console.error("AJAX submission error:", error);
-            });
-        }
+        processAnswer(answer);
     });
 });
