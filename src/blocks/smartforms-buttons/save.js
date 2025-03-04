@@ -1,7 +1,8 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import { useBlockProps } from '@wordpress/block-editor';
 
 const Save = ( { attributes } ) => {
-	const { label, options, required, helpText, groupId } = attributes;
+	const { label, options, required, groupId } = attributes;
 	const blockProps = useBlockProps.save();
 
 	return (

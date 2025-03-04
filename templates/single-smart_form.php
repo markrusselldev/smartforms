@@ -8,11 +8,10 @@
 \SmartForms\Core\SmartForms::log_error( 'single-smart_form.php loaded for Form ID: ' . get_the_ID() );
 
 // Prevent WordPress from loading the default theme layout.
-define( 'DONOTCACHEPAGE', true ); // Prevent caching if necessary.
-
+define( 'DONOTCACHEPAGE', true );
 header( 'Content-Type: text/html; charset=' . get_bloginfo( 'charset' ) );
 
-// Start output buffering
+// Start output buffering.
 ob_start();
 ?>
 <!DOCTYPE html>
@@ -41,18 +40,10 @@ ob_start();
             \SmartForms\Core\SmartForms::log_error( 'single-smart_form.php rendering Form ID: ' . $form_id );
             
             if ( method_exists( '\SmartForms\Core\ChatUI', 'render' ) ) {
-                $chat_ui_output = \SmartForms\Core\ChatUI::render( $form_id );
-
-                if ( empty( $chat_ui_output ) ) {
-                    $error = new \WP_Error( 'chat_ui_render_failed', __( 'Chat UI rendering failed.', 'smartforms' ) );
-                    \SmartForms\Core\SmartForms::log_error( 'single-smart_form.php failed: Chat UI did not render.', $error );
-                    echo '<p class="text-danger">' . esc_html__( 'Error: Chat UI could not be loaded.', 'smartforms' ) . '</p>';
-                } else {
-                    echo $chat_ui_output;
-                }
+                echo \SmartForms\Core\ChatUI::render( $form_id );
             } else {
-                $error = new \WP_Error( 'function_not_found', __( 'smartforms_render_chat_ui function not found.', 'smartforms' ) );
-                \SmartForms\Core\SmartForms::log_error( 'single-smart_form.php failed: Function smartforms_render_chat_ui not found.', $error );
+                $error = new \WP_Error( 'function_not_found', __( 'ChatUI::render function not found.', 'smartforms' ) );
+                \SmartForms\Core\SmartForms::log_error( 'single-smart_form.php failed: ChatUI::render function missing.', $error );
                 echo '<p class="text-danger">' . esc_html__( 'Error: Chat UI function missing.', 'smartforms' ) . '</p>';
             }
         endwhile;
@@ -69,5 +60,5 @@ ob_start();
 </body>
 </html>
 <?php
-// Flush the buffer to output the page.
+// Flush the output buffer.
 ob_end_flush();

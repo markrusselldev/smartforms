@@ -18,7 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * MetaBox class for handling form JSON generation.
  */
 class MetaBox {
-
 	/**
 	 * The singleton instance.
 	 *
@@ -70,25 +69,20 @@ class MetaBox {
 		if ( 'smart_form' !== get_post_type( $post_id ) ) {
 			return;
 		}
-
 		// Prevent autosave interference.
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return;
 		}
-
 		// Check for a valid post status.
 		$post_status = get_post_status( $post_id );
 		if ( 'auto-draft' === $post_status || 'trash' === $post_status ) {
 			return;
 		}
-
 		// Get post content (Gutenberg block structure).
 		$post_content = get_post_field( 'post_content', $post_id );
 		$blocks       = parse_blocks( $post_content );
-
 		// Convert blocks to structured JSON format.
 		$form_fields = array();
-
 		foreach ( $blocks as $block ) {
 			if ( isset( $block['blockName'] ) && false !== strpos( $block['blockName'], 'smartforms/' ) ) {
 				// Determine the block type (e.g., "text", "number", etc.)
@@ -104,15 +98,13 @@ class MetaBox {
 						? ( isset( $block['attrs']['helpText'] ) && trim( $block['attrs']['helpText'] ) !== ''
 							? sanitize_text_field( $block['attrs']['helpText'] )
 							: 'Only letters, numbers, punctuation, symbols & spaces allowed.' )
-						: ( isset( $block['attrs']['helpText'] ) ? sanitize_text_field( $block['attrs']['helpText'] ) : '' )
+						: ( isset( $block['attrs']['helpText'] ) ? sanitize_text_field( $block['attrs']['helpText'] ) : '' ),
 				);
-
 				// Process additional attributes for checkbox.
 				if ( 'checkbox' === $type ) {
 					$form_field['helpText'] = ( array_key_exists( 'helpText', $block['attrs'] ) && trim( $block['attrs']['helpText'] ) !== '' )
 						? sanitize_text_field( $block['attrs']['helpText'] )
 						: 'Choose one or more options';
-					
 					if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
 						$options = array();
 						foreach ( $block['attrs']['options'] as $option ) {
@@ -153,9 +145,7 @@ class MetaBox {
 						'options'     => $options,
 					);
 				} elseif ( 'buttons' === $type ) {
-					// Process button group options similar to checkbox.
 					$form_field['helpText'] = isset( $block['attrs']['helpText'] ) ? sanitize_text_field( $block['attrs']['helpText'] ) : '';
-					
 					if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
 						$options = array();
 						foreach ( $block['attrs']['options'] as $option ) {
@@ -185,13 +175,10 @@ class MetaBox {
 						)
 					);
 				}
-
 				$form_fields[] = $form_field;
 			}
 		}
-
 		$json_data = wp_json_encode( array( 'fields' => $form_fields ) );
-
 		if ( false === $json_data ) {
 			SmartForms::log_error( '[ERROR] Failed to encode form data JSON for Form ID: ' . esc_html( $post_id ) );
 			return new WP_Error(
@@ -199,7 +186,6 @@ class MetaBox {
 				esc_html__( 'Failed to encode form data JSON.', 'smartforms' )
 			);
 		}
-
 		update_post_meta( $post_id, 'smartforms_data', $json_data );
 		SmartForms::log_error( "[DEBUG] Form data JSON saved for Form ID: $post_id" );
 	}
@@ -216,4 +202,5 @@ class MetaBox {
 	}
 }
 
-MetaBox::get_instance();
+// Note: Do not call MetaBox::get_instance() here.
+// It is now initialized via SmartForms::initialize_classes().

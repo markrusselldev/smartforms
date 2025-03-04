@@ -7,14 +7,14 @@ module.exports = {
 	extends: [
 	  'eslint:recommended',
 	  'plugin:@wordpress/eslint-plugin/recommended',
-	  'plugin:prettier/recommended'
+	  'plugin:prettier/recommended' // Disables conflicting rules and integrates Prettier
 	],
 	parserOptions: {
 	  ecmaVersion: 12,
 	  sourceType: 'module'
 	},
 	rules: {
-	  // Add or override rules here if needed.
+	  // Customize any additional rules here.
 	}
   };
   

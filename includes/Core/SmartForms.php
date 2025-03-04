@@ -144,7 +144,7 @@ class SmartForms {
 		// Enqueue our Chat UI script.
 		wp_enqueue_script(
 			'smartforms-chatui',
-			plugins_url( 'build/js/smartforms-chat.js', dirname( __FILE__, 3 ) . '/smartforms.php' ),
+			plugins_url( 'build/js/smartforms-chat.js', SMARTFORMS_PLUGIN_FILE ),
 			array( 'wp-element', 'just-validate' ),
 			'1.0.0',
 			true
@@ -152,7 +152,7 @@ class SmartForms {
 		// Enqueue the generated Chat UI CSS file.
 		wp_enqueue_style(
 			'smartforms-chat',
-			plugins_url( 'build/css/smartforms-chat.css', dirname( __FILE__, 3 ) . '/smartforms.php' ),
+			plugins_url( 'build/css/smartforms-chat.css', SMARTFORMS_PLUGIN_FILE ),
 			array( 'bootstrap-css', 'fontawesome' ),
 			'1.0.0'
 		);
@@ -207,7 +207,9 @@ class SmartForms {
 		if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
 			return;
 		}
-		$message = is_string( $message ) ? sanitize_text_field( $message ) : wp_json_encode( $message );
+		$message = is_string( $message )
+			? sanitize_text_field( $message )
+			: wp_json_encode( $message );
 		if ( is_wp_error( $wp_error ) ) {
 			$error_messages = implode( ' | ', $wp_error->get_error_messages() );
 			$message       .= ' | WP_Error: ' . sanitize_text_field( $error_messages );
@@ -225,5 +227,11 @@ class SmartForms {
 SmartForms::get_instance();
 
 // Register activation and deactivation hooks.
-register_activation_hook( dirname( __DIR__, 2 ) . '/smartforms.php', array( '\SmartForms\Core\SmartForms', 'activate' ) );
-register_deactivation_hook( dirname( __DIR__, 2 ) . '/smartforms.php', array( '\SmartForms\Core\SmartForms', 'deactivate' ) );
+register_activation_hook(
+	dirname( __DIR__, 2 ) . '/smartforms.php',
+	array( '\SmartForms\Core\SmartForms', 'activate' )
+);
+register_deactivation_hook(
+	dirname( __DIR__, 2 ) . '/smartforms.php',
+	array( '\SmartForms\Core\SmartForms', 'deactivate' )
+);

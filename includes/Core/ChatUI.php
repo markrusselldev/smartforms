@@ -16,7 +16,6 @@ namespace SmartForms\Core;
 use SmartForms\CPT\ChatUISettings;
 
 class ChatUI {
-
 	/**
 	 * Renders the chat UI for a given form ID.
 	 *
@@ -97,7 +96,7 @@ class ChatUI {
 </style>
 CSS;
 
-		// Conditionally add classes based on context.
+		// Determine wrapper classes based on context.
 		$wrapper_class = 'smartforms-chat-wrapper';
 		if ( is_admin() ) {
 			$wrapper_class .= ' admin-display';
@@ -137,11 +136,15 @@ CSS;
 				</form>
 			</div>
 		</div>
-		<script>
-			document.addEventListener("DOMContentLoaded", () => {
-				window.formData = <?php echo wp_json_encode( $form_data ); ?>;
-				window.smartformsFormId = <?php echo get_the_ID(); ?>;
-			});
+		<?php
+		// Output configuration as JSON in a dedicated script tag.
+		$config = array(
+			'formData' => $form_data,
+			'formId'   => get_the_ID(),
+		);
+		?>
+		<script type="application/json" id="smartforms-config">
+			<?php echo wp_json_encode( $config ); ?>
 		</script>
 		<?php
 		return ob_get_clean();
