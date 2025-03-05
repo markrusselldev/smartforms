@@ -16,6 +16,7 @@ namespace SmartForms\Core;
 use SmartForms\CPT\ChatUISettings;
 
 class ChatUI {
+
 	/**
 	 * Renders the chat UI for a given form ID.
 	 *
@@ -55,17 +56,17 @@ class ChatUI {
 						'label'             => 'Text Input',
 						'placeholder'       => '',
 						'required'          => true,
-						'helpText'          => 'Only letters, numbers, punctuation, symbols & spaces allowed.',
+						'helpText'          => '',
 						'validationMessage' => '',
 					),
 				),
 			);
 		}
 
-		// Assume the current field is the first one for default help text.
+		// Assume the current field is the first one for help text.
 		$current_field = isset( $form_data['fields'][0] ) ? $form_data['fields'][0] : array();
 
-		// Build dynamic CSS using heredoc for clarity.
+		// Build dynamic CSS.
 		$chat_bg_color   = esc_attr( $theme_styles['smartforms_chat_container_background_color'] ?? '#ffffff' );
 		$border_color    = esc_attr( $theme_styles['smartforms_chat_container_border_color'] ?? '#cccccc' );
 		$border_style    = esc_attr( $theme_styles['smartforms_chat_container_border_style'] ?? 'solid' );
@@ -96,7 +97,7 @@ class ChatUI {
 </style>
 CSS;
 
-		// Determine wrapper classes based on context.
+		// Determine wrapper classes.
 		$wrapper_class = 'smartforms-chat-wrapper';
 		if ( is_admin() ) {
 			$wrapper_class .= ' admin-display';
@@ -121,11 +122,8 @@ CSS;
 						<div id="smartforms-chat-submit-row" class="smartforms-chat-submit-row">
 							<div id="smartforms-chat-help-container" class="smartforms-chat-help-container">
 								<?php
-								if ( isset( $current_field['helpText'] ) && '' !== $current_field['helpText'] ) {
-									echo esc_html( $current_field['helpText'] );
-								} else {
-									echo esc_html__( 'Enter your help text', 'smartforms' );
-								}
+								// For non-buttons fields, output their saved helpText.
+								echo isset( $current_field['helpText'] ) ? esc_html( $current_field['helpText'] ) : '';
 								?>
 							</div>
 							<button type="button" id="smartforms-chat-submit-button" class="btn smartforms-chat-submit-button">
@@ -136,15 +134,8 @@ CSS;
 				</form>
 			</div>
 		</div>
-		<?php
-		// Output configuration as JSON in a dedicated script tag.
-		$config = array(
-			'formData' => $form_data,
-			'formId'   => get_the_ID(),
-		);
-		?>
 		<script type="application/json" id="smartforms-config">
-			<?php echo wp_json_encode( $config ); ?>
+			<?php echo wp_json_encode( array( 'formData' => $form_data, 'formId' => get_the_ID() ) ); ?>
 		</script>
 		<?php
 		return ob_get_clean();

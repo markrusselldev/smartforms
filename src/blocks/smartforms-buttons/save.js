@@ -1,14 +1,30 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
+/**
+ * Save function for the SmartForms Button Group block.
+ *
+ * This function outputs a minimal static markup that includes the data attributes for:
+ * - required,
+ * - multiple, and
+ * - helpText.
+ *
+ * This markup is stored in the post content so that MetaBox::smartforms_generate_json_on_save()
+ * can parse these values. (The dynamic render callback will override this on the frontend.)
+ *
+ * @package SmartForms
+ */
 import { useBlockProps } from '@wordpress/block-editor';
+import { RichText } from '@wordpress/block-editor';
 
 const Save = ( { attributes } ) => {
-	const { label, options, required, groupId } = attributes;
-	const blockProps = useBlockProps.save();
-
+	const { label, required, helpText, options, groupId, multiple } = attributes;
+	const blockProps = useBlockProps.save({
+		"data-required": required ? "true" : "false",
+		"data-multiple": multiple ? "true" : "false",
+		"data-help-text": helpText
+	});
 	return (
 		<div { ...blockProps }>
-			<label className="sf-buttons-main-label">{ label }</label>
-			<div className="sf-buttons-group d-flex flex-wrap gap-2" role="group" data-group-id={ groupId }>
+			<RichText.Content tagName="label" className="sf-buttons-main-label" value={ label } />
+			<div className="sf-buttons-group" data-group-id={ groupId }>
 				{ options.map( ( option, index ) => (
 					<button
 						key={ index }

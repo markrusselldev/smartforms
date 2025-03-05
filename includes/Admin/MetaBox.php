@@ -56,7 +56,7 @@ class MetaBox {
 	/**
 	 * Prevent unserialization.
 	 */
-	private function __wakeup() {}
+	public function __wakeup() {}
 
 	/**
 	 * Extracts block data and saves JSON into post meta.
@@ -87,6 +87,7 @@ class MetaBox {
 			if ( isset( $block['blockName'] ) && false !== strpos( $block['blockName'], 'smartforms/' ) ) {
 				// Determine the block type (e.g., "text", "number", etc.)
 				$type = str_replace( 'smartforms/', '', sanitize_text_field( $block['blockName'] ) );
+				// Common field data.
 				$form_field = array(
 					'type'        => $type,
 					'label'       => isset( $block['attrs']['label'] ) && ! empty( $block['attrs']['label'] )
@@ -94,17 +95,10 @@ class MetaBox {
 						: self::get_default_label( $block['blockName'] ),
 					'placeholder' => isset( $block['attrs']['placeholder'] ) ? sanitize_text_field( $block['attrs']['placeholder'] ) : '',
 					'required'    => isset( $block['attrs']['required'] ) ? (bool) $block['attrs']['required'] : false,
-					'helpText'    => ( 'text' === $type )
-						? ( isset( $block['attrs']['helpText'] ) && trim( $block['attrs']['helpText'] ) !== ''
-							? sanitize_text_field( $block['attrs']['helpText'] )
-							: 'Only letters, numbers, punctuation, symbols & spaces allowed.' )
-						: ( isset( $block['attrs']['helpText'] ) ? sanitize_text_field( $block['attrs']['helpText'] ) : '' ),
+					'helpText'    => isset( $block['attrs']['helpText'] ) ? sanitize_text_field( $block['attrs']['helpText'] ) : '',
 				);
-				// Process additional attributes for checkbox.
+				// Additional processing for specific block types.
 				if ( 'checkbox' === $type ) {
-					$form_field['helpText'] = ( array_key_exists( 'helpText', $block['attrs'] ) && trim( $block['attrs']['helpText'] ) !== '' )
-						? sanitize_text_field( $block['attrs']['helpText'] )
-						: 'Choose one or more options';
 					if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
 						$options = array();
 						foreach ( $block['attrs']['options'] as $option ) {
@@ -117,7 +111,6 @@ class MetaBox {
 								SmartForms::log_error( "Checkbox option missing label or value for post $post_id." );
 							}
 						}
-						SmartForms::log_error( "Checkbox block processed with " . count( $options ) . " options for post $post_id." );
 					} else {
 						SmartForms::log_error( "Checkbox block missing options for post $post_id." );
 						$options = array(
@@ -125,29 +118,23 @@ class MetaBox {
 							array( 'label' => 'Option 2', 'value' => 'option-2' )
 						);
 					}
+					$layout = 'horizontal';
 					if ( isset( $block['attrs']['layout'] ) && ! empty( $block['attrs']['layout'] ) ) {
 						$layout = sanitize_text_field( $block['attrs']['layout'] );
-					} else {
-						if ( isset( $block['innerHTML'] ) && preg_match( '/data-layout="([^"]+)"/', $block['innerHTML'], $matches ) ) {
-							$layout = sanitize_text_field( $matches[1] );
-						} else {
-							$layout = 'horizontal';
-						}
+					} else if ( isset( $block['innerHTML'] ) && preg_match( '/data-layout="([^"]+)"/', $block['innerHTML'], $matches ) ) {
+						$layout = sanitize_text_field( $matches[1] );
 					}
-					$temp_help_text = $form_field['helpText'];
-					$form_field = array(
-						'type'        => $form_field['type'],
-						'label'       => $form_field['label'],
-						'placeholder' => $form_field['placeholder'],
-						'required'    => $form_field['required'],
-						'helpText'    => $temp_help_text,
-						'layout'      => $layout,
-						'options'     => $options,
+					$form_field = array_merge(
+						$form_field,
+						array(
+							'layout'  => $layout,
+							'options' => $options,
+						)
 					);
 				} elseif ( 'buttons' === $type ) {
-					$form_field['helpText'] = isset( $block['attrs']['helpText'] ) ? sanitize_text_field( $block['attrs']['helpText'] ) : '';
+					// For buttons, simply merge in all attributes.
+					$options  = array();
 					if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
-						$options = array();
 						foreach ( $block['attrs']['options'] as $option ) {
 							if ( isset( $option['label'], $option['value'] ) ) {
 								$options[] = array(
@@ -158,7 +145,6 @@ class MetaBox {
 								SmartForms::log_error( "Buttons option missing label or value for post $post_id." );
 							}
 						}
-						SmartForms::log_error( "Buttons block processed with " . count( $options ) . " options for post $post_id." );
 					} else {
 						SmartForms::log_error( "Buttons block missing options for post $post_id." );
 						$options = array(

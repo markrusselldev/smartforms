@@ -24,8 +24,6 @@
   "attributes": {
     "label": {
       "type": "string",
-      "source": "html",
-      "selector": "label.sf-buttons-main-label",
       "default": "Type your question here..."
     },
     "required": {
@@ -34,7 +32,7 @@
     },
     "helpText": {
       "type": "string",
-      "default": "Select an option"
+      "default": ""
     },
     "options": {
       "type": "array",
@@ -56,9 +54,14 @@
     "multiple": {
       "type": "boolean",
       "default": false
+    },
+    "currentAnswer": {
+      "type": "string",
+      "default": ""
     }
   },
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
-  "style": "file:./style-index.css"
+  "style": "file:./style-index.css",
+  "save": null
 }

@@ -7,7 +7,6 @@
 
 namespace SmartForms\Core;
 
-use WP_Error;
 use SmartForms\Core\SmartForms;
 
 class BlockFrontendAssets {
@@ -20,7 +19,7 @@ class BlockFrontendAssets {
 	private static $instance = null;
 
 	/**
-	 * Get or create the singleton instance.
+	 * Returns the singleton instance.
 	 *
 	 * @return BlockFrontendAssets The singleton instance.
 	 */
@@ -41,9 +40,10 @@ class BlockFrontendAssets {
 	}
 
 	/**
-	 * Enqueue frontend styles for SmartForms blocks.
+	 * Enqueues frontend styles and scripts for SmartForms blocks.
 	 *
-	 * Enqueues the frontend stylesheet (style-index.css) for each block.
+	 * It scans the build/blocks/ directory for each block’s CSS and a frontend JS file,
+	 * enqueuing them as necessary.
 	 *
 	 * @return void
 	 */
@@ -65,20 +65,32 @@ class BlockFrontendAssets {
 			return;
 		}
 
-		// Enqueue each block's frontend stylesheet.
+		// Enqueue each block's frontend stylesheet and script if available.
 		foreach ( $block_folders as $folder ) {
 			if ( '.' === $folder || '..' === $folder ) {
 				continue;
 			}
 
-			// Build the full filesystem path to the frontend style.
+			// Enqueue frontend stylesheet if it exists.
 			$frontend_style_path = $build_dir . $folder . '/style-index.css';
 			if ( file_exists( $frontend_style_path ) ) {
 				wp_enqueue_style(
 					'smartforms-' . $folder . '-frontend-style',
 					plugins_url( 'build/blocks/' . $folder . '/style-index.css', SMARTFORMS_PLUGIN_FILE ),
-					array( 'bootstrap-css' ), // Ensure Bootstrap loads first
+					array( 'bootstrap-css' ), // Ensuring Bootstrap loads first.
 					filemtime( $frontend_style_path )
+				);
+			}
+
+			// Enqueue frontend JavaScript if it exists.
+			$frontend_js_path = $build_dir . $folder . '/frontend.js';
+			if ( file_exists( $frontend_js_path ) ) {
+				wp_enqueue_script(
+					'smartforms-' . $folder . '-frontend-script',
+					plugins_url( 'build/blocks/' . $folder . '/frontend.js', SMARTFORMS_PLUGIN_FILE ),
+					array(), // Add dependencies here if needed.
+					filemtime( $frontend_js_path ),
+					true
 				);
 			}
 		}
