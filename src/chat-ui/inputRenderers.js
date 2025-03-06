@@ -111,12 +111,15 @@ export function createInputControl(field, updateSubmitButtonState) {
 		  btn.setAttribute("data-value", opt.value);
 		  btn.textContent = opt.label;
 		  btn.addEventListener("click", () => {
-			// Toggle active state on button click.
-			Array.from(control.children).forEach(child => child.classList.remove("active"));
-			if (btn.classList.contains("active")) {
-			  btn.classList.remove("active");
-			  updateSubmitButtonState(field, null);
+			if (field.multiple) {
+			  // For multiple selections, toggle this button without clearing others.
+			  btn.classList.toggle("active");
+			  const activeButtons = Array.from(control.querySelectorAll("button.active"));
+			  const values = activeButtons.map((btn) => btn.getAttribute("data-value"));
+			  updateSubmitButtonState(field, values);
 			} else {
+			  // For single selection, clear all and add active to this one.
+			  Array.from(control.children).forEach(child => child.classList.remove("active"));
 			  btn.classList.add("active");
 			  updateSubmitButtonState(field, opt.value);
 			}
@@ -136,18 +139,17 @@ export function createInputControl(field, updateSubmitButtonState) {
 	}
 	
 	return control;
-  }
+}
   
-  /**
-   * Replaces the current input control within a container with a new control.
-   * 
-   * @param {HTMLElement} container - The DOM element that holds the input control.
-   * @param {HTMLElement} newControl - The new input control element to insert.
-   */
-  export function replaceInputControl(container, newControl) {
+/**
+ * Replaces the current input control within a container with a new control.
+ * 
+ * @param {HTMLElement} container - The DOM element that holds the input control.
+ * @param {HTMLElement} newControl - The new input control element to insert.
+ */
+export function replaceInputControl(container, newControl) {
 	if (container.firstElementChild) {
 	  container.firstElementChild.remove();
 	}
 	container.insertBefore(newControl, container.firstElementChild);
-  }
-  
+}

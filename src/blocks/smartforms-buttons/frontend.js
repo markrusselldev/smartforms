@@ -1,51 +1,55 @@
 document.addEventListener('DOMContentLoaded', function () {
-	// Find all button group containers.
+	// Process every button group on the page.
 	const buttonGroups = document.querySelectorAll('.sf-buttons-group');
+	
 	buttonGroups.forEach(group => {
-	  // Read the "data-multiple" attribute from the container.
-	  const isMultiple = group.getAttribute('data-multiple') === 'true';
-	  // Find the hidden input from the parent container.
+	  // Read the "data-multiple" attribute; default to true if not explicitly set.
+	  const isMultiple = group.getAttribute('data-multiple') === 'true' || group.getAttribute('data-multiple') === null;
+	  
+	  // Find the associated hidden input. In our dynamic PHP, the hidden input is a sibling of the group.
 	  const hiddenInput = group.parentElement.querySelector('input[type="hidden"]');
 	  if (!hiddenInput) return;
 	  
 	  // Function to update the hidden input's value based on active buttons.
-	  function updateHiddenValue() {
-		const activeButtons = group.querySelectorAll('button.active');
+	  function updateHiddenInput() {
 		if (isMultiple) {
-		  // For multiple, store comma-separated values.
+		  // In multiple mode, join the data-values of all active buttons with commas.
+		  const activeButtons = group.querySelectorAll('button.active');
 		  const values = Array.from(activeButtons).map(btn => btn.getAttribute('data-value'));
 		  hiddenInput.value = values.join(',');
 		} else {
-		  // For single selection, store the value of the one active button.
-		  if (activeButtons.length > 0) {
-			hiddenInput.value = activeButtons[0].getAttribute('data-value');
-		  } else {
-			hiddenInput.value = '';
-		  }
+		  // In single mode, only one button should be active.
+		  const activeButton = group.querySelector('button.active');
+		  hiddenInput.value = activeButton ? activeButton.getAttribute('data-value') : '';
 		}
 	  }
 	  
-	  // Attach click event to each button.
+	  // Attach click events to each button in this group.
 	  const buttons = group.querySelectorAll('button');
-	  buttons.forEach(btn => {
-		btn.addEventListener('click', function () {
+	  buttons.forEach(button => {
+		button.addEventListener('click', function () {
 		  if (isMultiple) {
-			// Toggle active class for multiple selections.
-			btn.classList.toggle('active');
+			// In multiple mode, toggle the active class.
+			button.classList.toggle('active');
 		  } else {
-			// In single selection mode, remove active from all and add to clicked button.
+			// In single mode, remove active class from all buttons and add to the clicked one.
 			buttons.forEach(b => b.classList.remove('active'));
-			btn.classList.add('active');
+			// If the clicked button was already active, deselect it.
+			if (button.classList.contains('active')) {
+			  button.classList.remove('active');
+			} else {
+			  button.classList.add('active');
+			}
 		  }
-		  updateHiddenValue();
+		  updateHiddenInput();
 		});
 	  });
 	  
-	  // For single selection, if required and no button is selected, automatically select the first button.
-	  if (hiddenInput.hasAttribute('required') && hiddenInput.value === "" && !isMultiple) {
+	  // Optionally initialize: for single selection, if required and no selection exists, select the first button.
+	  if (!isMultiple && hiddenInput.hasAttribute('required') && hiddenInput.value.trim() === "") {
 		if (buttons.length > 0) {
 		  buttons[0].classList.add('active');
-		  updateHiddenValue();
+		  updateHiddenInput();
 		}
 	  }
 	});

@@ -38,8 +38,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentStep = 0;
   const formResponses = {};
-  let currentAnswer = null;
-
+  // Note: currentAnswer variable is no longer used for buttons type.
+  
   const chatDialog = document.getElementById("smartforms-chat-dialog");
   const submitButton = document.getElementById("smartforms-chat-submit-button");
   const inputContainer = document.getElementById("smartforms-chat-input-box");
@@ -85,11 +85,11 @@ document.addEventListener("DOMContentLoaded", () => {
    */
   function showCurrentQuestion() {
     const currentField = formData.fields[currentStep];
-    currentAnswer = null;
     appendMessage(currentField.label, "bot");
     const inputControl = createInputControl(currentField, updateSubmitButtonState);
     replaceInputControl(inputContainer, inputControl);
-    updateSubmitButtonState(currentField, currentAnswer);
+    // Immediately update the button state based on the new control (initially, answer is empty).
+    updateSubmitButtonState(currentField, null);
   }
 
   /**
@@ -121,7 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
     helpContainer.textContent = currentField.helpText || "Enter your help text";
     helpContainer.classList.remove("smartforms-error-message");
     formResponses[currentField.id || currentStep] = answer;
-    currentAnswer = null;
 
     if (currentStep < formData.fields.length - 1) {
       currentStep++;
@@ -189,7 +188,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const currentField = formData.fields[currentStep];
     let answer;
     if (currentField.type === "buttons") {
-      answer = currentAnswer;
+      // Instead of relying on an external variable, read the active buttons from the DOM.
+      const activeButtons = inputContainer.querySelectorAll(".sf-buttons-group button.active");
+      if (currentField.multiple) {
+        answer = Array.from(activeButtons).map(btn => btn.getAttribute("data-value"));
+      } else {
+        answer = activeButtons.length > 0 ? activeButtons[0].getAttribute("data-value") : null;
+      }
     } else if (currentField.type === "checkbox") {
       const checkboxes = inputContainer.querySelectorAll("input[type='checkbox']");
       answer = Array.from(checkboxes)
