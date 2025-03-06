@@ -3,10 +3,7 @@
  * Dynamic render callback for the SmartForms Button Group block.
  *
  * Renders the button group on the frontend using block attributes.
- * If no helpText is provided by the user, a default help message is computed based on the "multiple" attribute:
- * - "Select one option" for single selection,
- * - "Select one or more options" for multiple selections.
- *
+ * The help text is simply what the user has provided—even if blank.
  * When in multiple mode, the hidden input is not marked as "required" to prevent native validation errors.
  *
  * @package SmartForms
@@ -22,9 +19,8 @@ function smartforms_render_button_group( $attributes ) {
 	$required      = isset( $attributes['required'] ) ? (bool) $attributes['required'] : false;
 	$multiple      = isset( $attributes['multiple'] ) ? (bool) $attributes['multiple'] : false;
 	$raw_help_text = isset( $attributes['helpText'] ) ? trim( $attributes['helpText'] ) : "";
-	$display_help_text = ( "" === $raw_help_text )
-		? ( $multiple ? "Select one or more options" : "Select one option" )
-		: sanitize_text_field( $raw_help_text );
+	// Do not force a default – simply use what the user provided.
+	$display_help_text = sanitize_text_field( $raw_help_text );
 	$options  = isset( $attributes['options'] ) && is_array( $attributes['options'] ) ? $attributes['options'] : array();
 	$group_id = isset( $attributes['groupId'] ) ? sanitize_text_field( $attributes['groupId'] ) : "";
 	

@@ -34,6 +34,10 @@
       "type": "string",
       "default": ""
     },
+    "helpTextEdited": {
+      "type": "boolean",
+      "default": false
+    },
     "options": {
       "type": "array",
       "default": [

@@ -1,26 +1,20 @@
 /**
  * Edit component for the SmartForms Button Group dynamic block.
  *
- * This component renders the block in the editor with InspectorControls for:
- * - Toggling whether the field is required.
+ * Renders the block in the editor with InspectorControls for:
+ * - Toggling required status.
  * - Enabling/disabling multiple selections.
  * - Editing the help text.
  * - Managing the button options.
  *
- * On initial mount (and whenever the "multiple" setting changes),
- * if the helpText attribute is empty or matches the previous computed default,
- * it is automatically updated to the computed default based on the "multiple" attribute:
- * - "Select one option" when multiple is false.
- * - "Select one or more options" when multiple is true.
- *
- * If the user edits the helpText field, that value is preserved.
+ * The help text field now lets the user leave it blank (i.e. no automatic default value is forced).
  *
  * @package SmartForms
  */
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls, RichText } from '@wordpress/block-editor';
 import { PanelBody, TextControl, ToggleControl, Button } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 
 const DEFAULT_OPTIONS = [
 	{ label: 'Option 1', value: 'option-1' },
@@ -35,14 +29,6 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 		"data-help-text": helpText
 	});
 
-	// Local state to track if the helpText field has been manually edited.
-	const [ helpTextEdited, setHelpTextEdited ] = useState(false);
-	// Local state to store the previously computed default.
-	const [ computedDefaultPrev, setComputedDefaultPrev ] = useState("");
-
-	// Compute the default help text based on the "multiple" attribute.
-	const computedDefault = multiple ? "Select one or more options" : "Select one option";
-
 	// Initialize groupId and default options if not already set.
 	useEffect(() => {
 		if (!groupId) {
@@ -51,26 +37,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 		if (!options || !Array.isArray(options) || options.length === 0) {
 			setAttributes({ options: DEFAULT_OPTIONS });
 		}
-	}, [groupId, options, clientId, setAttributes]);
-
-	// On mount, if helpText is empty, set it to the computed default.
-	useEffect(() => {
-		if (!helpTextEdited && helpText === "") {
-			setAttributes({ helpText: computedDefault });
-		}
-		setComputedDefaultPrev(computedDefault);
-		// We run this only once on mount.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
-
-	// When "multiple" changes, if the helpText is either empty or still equals the previously computed default,
-	// update it to the new computed default.
-	useEffect(() => {
-		if (!helpTextEdited || helpText === computedDefaultPrev) {
-			setAttributes({ helpText: computedDefault });
-		}
-		setComputedDefaultPrev(computedDefault);
-	}, [multiple, computedDefault, helpText, helpTextEdited, setAttributes]);
+	}, [ groupId, options, clientId, setAttributes ]);
 
 	/**
 	 * Update an option’s label and corresponding value.
@@ -140,11 +107,8 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 					<TextControl
 						label={__( 'Help Text', 'smartforms' )}
 						value={helpText}
-						onChange={(value) => {
-							setAttributes({ helpText: value });
-							setHelpTextEdited(true);
-						}}
-						placeholder={__( 'Enter custom help text (leave blank for default)', 'smartforms' )}
+						onChange={(value) => setAttributes({ helpText: value })}
+						placeholder={__( 'Custom help text (optional)', 'smartforms' )}
 					/>
 				</PanelBody>
 				<PanelBody title={__( 'Button Options', 'smartforms' )} initialOpen={true}>
@@ -207,7 +171,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 				))}
 			</div>
 			<p className="sf-buttons-help-text" style={{ color: '#999' }}>
-				{helpText === "" ? (multiple ? "Select one or more options" : "Select one option") : helpText}
+				{helpText}
 			</p>
 		</div>
 	);
