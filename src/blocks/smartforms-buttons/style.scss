@@ -6,20 +6,24 @@
  * @package SmartForms
  */
 
-.wp-block-smartforms-buttons {
-  .sf-buttons-group {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  
-  .sf-buttons-group .btn {
-    /* Inherit Bootstrap primary styles */
-  }
-  
-  .sf-buttons-help-text {
-    margin-top: 4px;
-    color: #6c757d;
-    font-size: 0.875rem;
-  }
-}
+ @import "../_theme.scss";
+
+ .wp-block-smartforms-buttons {
+   .sf-buttons-group {
+     display: flex;
+     gap: 10px;
+     flex-wrap: wrap;
+   }
+   
+   .sf-buttons-group .btn {
+     /* Inherit Bootstrap primary styles */
+   }
+   
+   /* Use our unified field help styling */
+   .sf-field-help {
+     margin-top: 4px;
+     color: #999;
+     font-size: 0.75rem;
+   }
+ }
+ 

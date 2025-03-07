@@ -1,3 +1,5 @@
+@import "../_theme.scss";
+
 /**
  * Frontend and shared styles for the SmartForms Checkbox block.
  *
@@ -11,21 +13,19 @@
  * @package SmartForms
  */
 
- .wp-block-smartforms-checkbox {
+.wp-block-smartforms-checkbox {
   /* Block container styling */
   padding: 10px;
 }
 
 .sf-checkbox-group-horizontal {
   display: grid;
-  /* Use explicit row and column gaps for consistent spacing */
   row-gap: 10px;
   column-gap: 0;
   grid-auto-flow: row;
-  /* Each column is at least 120px wide and grows only to fit its content */
   grid-template-columns: repeat(auto-fit, minmax(120px, max-content));
   justify-content: start;
-  
+
   /* Prevent text wrapping in labels for a compact layout */
   .sf-checkbox-option label {
     white-space: nowrap;
@@ -34,16 +34,13 @@
 
 .sf-checkbox-group-vertical {
   display: grid;
-  /* Use the same explicit gaps as horizontal mode */
   row-gap: 10px;
   column-gap: 35px;
   grid-auto-flow: column;
-  /* Exactly 3 rows so that additional items wrap */
   grid-template-rows: repeat(3, max-content);
   justify-content: start;
 }
 
-/* Styling for individual checkbox options */
 .sf-checkbox-option {
   display: flex;
   align-items: center;
@@ -52,3 +49,4 @@
 .sf-checkbox-option input[type="checkbox"] {
   margin-right: 5px;
 }
+

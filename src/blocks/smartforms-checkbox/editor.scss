@@ -1,3 +1,5 @@
+@import "../_theme.scss";
+
 /**
  * Editor styles for the SmartForms Checkbox block.
  *
@@ -74,7 +76,7 @@ body.wp-admin {
   justify-content: start;
 }
 
-/* Main Label */
+/* (The original .sf-checkbox-main-label remains here if needed for fallback) */
 .sf-checkbox-main-label {
   display: block;
   margin-bottom: 10px; 

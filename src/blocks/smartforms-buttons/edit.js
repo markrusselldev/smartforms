@@ -4,10 +4,9 @@
  * Renders the block in the editor with InspectorControls for:
  * - Toggling required status.
  * - Enabling/disabling multiple selections.
- * - Editing the help text.
  * - Managing the button options.
  *
- * The help text field now lets the user leave it blank (i.e. no automatic default value is forced).
+ * The field label and help text are editable inline using RichText.
  *
  * @package SmartForms
  */
@@ -22,7 +21,7 @@ const DEFAULT_OPTIONS = [
 ];
 
 const Edit = ({ attributes, setAttributes, clientId }) => {
-	const { label, required, helpText, options, groupId, multiple, currentAnswer } = attributes;
+	const { label, helpText, required, options, groupId, multiple, currentAnswer } = attributes;
 	const blockProps = useBlockProps({
 		"data-required": required ? "true" : "false",
 		"data-multiple": multiple ? "true" : "false",
@@ -32,7 +31,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 	// Initialize groupId and default options if not already set.
 	useEffect(() => {
 		if (!groupId) {
-			setAttributes({ groupId: `sf-buttons-${clientId}` });
+			setAttributes({ groupId: `sf-buttons-${ clientId }` });
 		}
 		if (!options || !Array.isArray(options) || options.length === 0) {
 			setAttributes({ options: DEFAULT_OPTIONS });
@@ -104,12 +103,6 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 							setAttributes({ multiple: value, currentAnswer: value ? [] : '' })
 						}
 					/>
-					<TextControl
-						label={__( 'Help Text', 'smartforms' )}
-						value={helpText}
-						onChange={(value) => setAttributes({ helpText: value })}
-						placeholder={__( 'Custom help text (optional)', 'smartforms' )}
-					/>
 				</PanelBody>
 				<PanelBody title={__( 'Button Options', 'smartforms' )} initialOpen={true}>
 					{options.map((option, index) => (
@@ -119,7 +112,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 								value={option.label}
 								onChange={(value) => updateOption(index, value)}
 							/>
-							<Button variant="secondary" onClick={() => removeOption(index)} isSmall>
+							<Button variant="secondary" onClick={() => removeOption(index)} size="small">
 								{__( 'Remove Option', 'smartforms' )}
 							</Button>
 						</div>
@@ -129,9 +122,10 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 					</Button>
 				</PanelBody>
 			</InspectorControls>
+			{/* Editable main field label */}
 			<RichText
 				tagName="label"
-				className="sf-buttons-main-label"
+				className="sf-field-label"
 				value={label}
 				onChange={(value) => setAttributes({ label: value })}
 				placeholder={__( 'Type your question here…', 'smartforms' )}
@@ -170,9 +164,14 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 					</button>
 				))}
 			</div>
-			<p className="sf-buttons-help-text" style={{ color: '#999' }}>
-				{helpText}
-			</p>
+			{/* Editable help text inserted inline */}
+			<RichText
+				tagName="p"
+				className="sf-field-help"
+				value={helpText}
+				onChange={(value) => setAttributes({ helpText: value })}
+				placeholder={__( 'Enter your help text', 'smartforms' )}
+			/>
 		</div>
 	);
 };
