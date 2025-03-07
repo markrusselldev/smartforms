@@ -119,12 +119,12 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 								value={option.label}
 								onChange={(value) => updateOption(index, value)}
 							/>
-							<Button isSecondary onClick={() => removeOption(index)} isSmall>
+							<Button variant="secondary" onClick={() => removeOption(index)} isSmall>
 								{__( 'Remove Option', 'smartforms' )}
 							</Button>
 						</div>
 					))}
-					<Button isPrimary onClick={addOption}>
+					<Button variant="primary" onClick={addOption}>
 						{__( 'Add Option', 'smartforms' )}
 					</Button>
 				</PanelBody>
