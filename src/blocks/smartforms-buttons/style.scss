@@ -6,7 +6,7 @@
  * @package SmartForms
  */
 
- @import "../_theme.scss";
+ @use "../_theme.scss" as *;
 
  .wp-block-smartforms-buttons {
    .sf-buttons-group {
