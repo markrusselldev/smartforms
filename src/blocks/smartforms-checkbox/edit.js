@@ -11,11 +11,9 @@ import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls, RichText } from '@wordpress/block-editor';
 import { PanelBody, TextControl, ToggleControl, Button, SelectControl } from '@wordpress/components';
 import { Fragment, useEffect } from '@wordpress/element';
+import { blockDefaults } from '../../config/blockDefaults';
 
-const DEFAULT_OPTIONS = [
-	{ label: 'Option 1', value: 'option-1' },
-	{ label: 'Option 2', value: 'option-2' }
-];
+const { placeholders, defaultOptions } = blockDefaults;
 
 const Edit = ({ attributes, setAttributes, clientId }) => {
 	const { label, helpText, required, options, groupId, layout } = attributes;
@@ -30,7 +28,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 			setAttributes({ layout: 'horizontal' });
 		}
 		if (!options || !Array.isArray(options) || options.length === 0) {
-			setAttributes({ options: DEFAULT_OPTIONS });
+			setAttributes({ options: defaultOptions });
 		}
 	}, [ groupId, layout, options, clientId, setAttributes ]);
 
@@ -137,7 +135,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 				className="sf-field-label"
 				value={ label }
 				onChange={ ( value ) => setAttributes({ label: value }) }
-				placeholder={ __( 'Type your question here...', 'smartforms' ) }
+				placeholder={ placeholders.label }
 			/>
 			<div className={ `sf-checkbox-group sf-checkbox-group-${ layout || 'horizontal' }` } data-layout={ layout || 'horizontal' }>
 				{ options &&
@@ -163,7 +161,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 				className="sf-field-help"
 				value={ helpText }
 				onChange={ ( value ) => setAttributes({ helpText: value }) }
-				placeholder={ __( 'Enter your help text', 'smartforms' ) }
+				placeholder={ placeholders.helpText }
 			/>
 		</div>
 	);
