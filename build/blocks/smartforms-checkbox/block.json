@@ -55,10 +55,7 @@
     },
     "layout": {
       "type": "string",
-      "default": "horizontal",
-      "source": "attribute",
-      "selector": "div.sf-checkbox-group",
-      "attribute": "data-layout"
+      "default": "horizontal"
     }
   },
   "editorScript": "file:./index.js",
