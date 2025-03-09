@@ -1,8 +1,21 @@
 {
-    "editor.codeActionsOnSave": {
-        "source.fixAll.phpcs": "explicit"
-    },
-    "phpcs.executablePath": "/var/www/html/wp-content/plugins/smartforms/vendor/bin/phpcs",
-    "phpcbf.executablePath": "/var/www/html/wp-content/plugins/smartforms/vendor/bin/phpcbf",
-    "phpcs.standard": "WordPress-Core"
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "phpcs.executablePath": "/var/www/html/wp-content/plugins/smartforms/vendor/bin/phpcs",
+  "phpcbf.executablePath": "/var/www/html/wp-content/plugins/smartforms/vendor/bin/phpcbf",
+  "phpcs.standard": "WordPress-Core",
+  "prettier.requireConfig": true,
+  "[php]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": null
+  }
 }
