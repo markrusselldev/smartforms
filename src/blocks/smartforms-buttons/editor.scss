@@ -1,7 +1,11 @@
-@use "../_theme.scss" as *;
-
 /**
  * Editor styles for the SmartForms Button Group block.
+ *
+ * These styles are applied only in the block editor.
+ *
+ * The container is given a border and padding to match other blocks.
+ * For horizontal layout, the buttons are laid out using flex with a 10px gap.
+ * For vertical layout, the buttons stack and size to their content.
  *
  * @package SmartForms
  */
@@ -11,9 +15,24 @@
   padding: 10px;
 }
 
-.sf-buttons-group {
-  margin-top: 10px;
+.editor-styles-wrapper
+  .wp-block-smartforms-buttons
+  .sf-buttons-group[data-layout='horizontal'] {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-/* The .sf-buttons-help-text rule is replaced by the unified .sf-field-help from _theme.scss;
-   if needed, you can remove this block or leave it here as an override. For now, we remove inline styling. */
+.editor-styles-wrapper
+  .wp-block-smartforms-buttons
+  .sf-buttons-group[data-layout='vertical'] {
+  display: block;
+}
+
+.editor-styles-wrapper
+  .wp-block-smartforms-buttons
+  .sf-buttons-group[data-layout='vertical']
+  .btn {
+  width: auto !important;
+  margin-bottom: 10px;
+}

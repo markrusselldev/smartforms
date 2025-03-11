@@ -1,61 +1,65 @@
 {
-	"apiVersion": 2,
-	"name": "smartforms/buttons",
-	"title": "Button Group",
-	"category": "smartforms",
-	"icon": null,
-	"description": "A button group for rapid selection among options.",
-	"supports": {
-		"html": false,
-		"color": {
-			"background": true,
-			"text": true,
-			"gradients": true
-		},
-		"spacing": {
-			"margin": true,
-			"padding": true
-		},
-		"typography": {
-			"fontSize": true,
-			"lineHeight": true
-		}
-	},
-	"attributes": {
-		"label": {
-			"type": "string",
-			"default": "Type your question here..."
-		},
-		"required": {
-			"type": "boolean",
-			"default": false
-		},
-		"helpText": {
-			"type": "string",
-			"default": ""
-		},
-		"options": {
-			"type": "array",
-			"default": [
-				{ "label": "Option 1", "value": "option-1" },
-				{ "label": "Option 2", "value": "option-2" }
-			]
-		},
-		"groupId": {
-			"type": "string",
-			"default": ""
-		},
-		"multiple": {
-			"type": "boolean",
-			"default": false
-		},
-		"currentAnswer": {
-			"type": "string",
-			"default": ""
-		}
-	},
-	"editorScript": "file:./index.js",
-	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css",
-	"save": null
+  "apiVersion": 2,
+  "name": "smartforms/buttons",
+  "title": "Button Group",
+  "category": "smartforms",
+  "icon": null,
+  "description": "A button group for rapid selection among options.",
+  "supports": {
+    "html": false,
+    "color": {
+      "background": true,
+      "text": true,
+      "gradients": true
+    },
+    "spacing": {
+      "margin": true,
+      "padding": true
+    },
+    "typography": {
+      "fontSize": true,
+      "lineHeight": true
+    }
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "default": "Type your question here..."
+    },
+    "required": {
+      "type": "boolean",
+      "default": false
+    },
+    "helpText": {
+      "type": "string",
+      "default": ""
+    },
+    "options": {
+      "type": "array",
+      "default": [
+        { "label": "Option 1", "value": "option-1" },
+        { "label": "Option 2", "value": "option-2" }
+      ]
+    },
+    "groupId": {
+      "type": "string",
+      "default": ""
+    },
+    "multiple": {
+      "type": "boolean",
+      "default": false
+    },
+    "layout": {
+      "type": "string",
+      "default": "horizontal"
+    },
+    "currentAnswer": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "save": null
 }

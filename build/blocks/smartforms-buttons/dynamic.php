@@ -15,20 +15,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 function smartforms_render_button_group( $attributes ) {
 	// Sanitize and assign attributes.
-	$label         = isset( $attributes['label'] ) ? sanitize_text_field( $attributes['label'] ) : '';
-	$required      = isset( $attributes['required'] ) ? (bool) $attributes['required'] : false;
-	$multiple      = isset( $attributes['multiple'] ) ? (bool) $attributes['multiple'] : false;
-	$raw_help_text = isset( $attributes['helpText'] ) ? trim( $attributes['helpText'] ) : '';
-	// Do not force a default – simply use what the user provided.
+	$label             = isset( $attributes['label'] ) ? sanitize_text_field( $attributes['label'] ) : '';
+	$required          = isset( $attributes['required'] ) ? (bool) $attributes['required'] : false;
+	$raw_help_text     = isset( $attributes['helpText'] ) ? trim( $attributes['helpText'] ) : '';
 	$display_help_text = sanitize_text_field( $raw_help_text );
 	$options           = isset( $attributes['options'] ) && is_array( $attributes['options'] ) ? $attributes['options'] : array();
 	$group_id          = isset( $attributes['groupId'] ) ? sanitize_text_field( $attributes['groupId'] ) : '';
+	$multiple          = isset( $attributes['multiple'] ) ? (bool) $attributes['multiple'] : false;
+
+	// Retrieve layout; default to "horizontal" if not set.
+	$layout = 'horizontal';
+	if ( isset( $attributes['layout'] ) && ! empty( $attributes['layout'] ) ) {
+		$layout = sanitize_text_field( $attributes['layout'] );
+	} elseif ( isset( $attributes['innerHTML'] ) && preg_match( '/data-layout="([^"]+)"/', $attributes['innerHTML'], $matches ) ) {
+		$layout = sanitize_text_field( $matches[1] );
+	}
 
 	ob_start();
 	?>
 	<div class="wp-block-smartforms-buttons">
 		<label class="sf-buttons-main-label"><?php echo esc_html( $label ); ?></label>
-		<div class="sf-buttons-group"
+		<div class="sf-buttons-group sf-buttons-group-<?php echo esc_attr( $layout ); ?>"
+			data-layout="<?php echo esc_attr( $layout ); ?>"
 			data-group-id="<?php echo esc_attr( $group_id ); ?>"
 			data-required="<?php echo esc_attr( $required ? 'true' : 'false' ); ?>"
 			data-multiple="<?php echo esc_attr( $multiple ? 'true' : 'false' ); ?>"

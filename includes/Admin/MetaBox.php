@@ -97,7 +97,8 @@ class MetaBox {
 					'required'    => isset( $block['attrs']['required'] ) ? (bool) $block['attrs']['required'] : false,
 					'helpText'    => isset( $block['attrs']['helpText'] ) ? sanitize_text_field( $block['attrs']['helpText'] ) : '',
 				);
-				// Additional processing for specific block types.
+
+				// For checkbox and buttons blocks, we need additional data.
 				if ( 'checkbox' === $type ) {
 					if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
 						$options = array();
@@ -114,16 +115,18 @@ class MetaBox {
 					} else {
 						SmartForms::log_error( "Checkbox block missing options for post $post_id." );
 						$options = array(
-							array( 'label' => 'Option 1', 'value' => 'option-1' ),
-							array( 'label' => 'Option 2', 'value' => 'option-2' )
+							array(
+								'label' => 'Option 1',
+								'value' => 'option-1',
+							),
+							array(
+								'label' => 'Option 2',
+								'value' => 'option-2',
+							),
 						);
 					}
-					$layout = 'horizontal';
-					if ( isset( $block['attrs']['layout'] ) && ! empty( $block['attrs']['layout'] ) ) {
-						$layout = sanitize_text_field( $block['attrs']['layout'] );
-					} else if ( isset( $block['innerHTML'] ) && preg_match( '/data-layout="([^"]+)"/', $block['innerHTML'], $matches ) ) {
-						$layout = sanitize_text_field( $matches[1] );
-					}
+					// Force layout from attributes only.
+					$layout     = array_key_exists( 'layout', $block['attrs'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal';
 					$form_field = array_merge(
 						$form_field,
 						array(
@@ -132,14 +135,13 @@ class MetaBox {
 						)
 					);
 				} elseif ( 'buttons' === $type ) {
-					// For buttons, simply merge in all attributes.
-					$options  = array();
+					$options = array();
 					if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
 						foreach ( $block['attrs']['options'] as $option ) {
 							if ( isset( $option['label'], $option['value'] ) ) {
 								$options[] = array(
 									'label' => sanitize_text_field( $option['label'] ),
-									'value' => sanitize_text_field( $option['value'] )
+									'value' => sanitize_text_field( $option['value'] ),
 								);
 							} else {
 								SmartForms::log_error( "Buttons option missing label or value for post $post_id." );
@@ -148,16 +150,25 @@ class MetaBox {
 					} else {
 						SmartForms::log_error( "Buttons block missing options for post $post_id." );
 						$options = array(
-							array( 'label' => 'Option 1', 'value' => 'option-1' ),
-							array( 'label' => 'Option 2', 'value' => 'option-2' )
+							array(
+								'label' => 'Option 1',
+								'value' => 'option-1',
+							),
+							array(
+								'label' => 'Option 2',
+								'value' => 'option-2',
+							),
 						);
 					}
 					$multiple = isset( $block['attrs']['multiple'] ) ? (bool) $block['attrs']['multiple'] : false;
+					// Force layout from attributes only.
+					$layout     = array_key_exists( 'layout', $block['attrs'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal';
 					$form_field = array_merge(
 						$form_field,
 						array(
 							'options'  => $options,
 							'multiple' => $multiple,
+							'layout'   => $layout,
 						)
 					);
 				}

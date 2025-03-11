@@ -5,6 +5,7 @@
  * - Toggling required status.
  * - Enabling/disabling multiple selections.
  * - Managing the button options.
+ * - Selecting the layout (horizontal or vertical).
  *
  * The field label and help text are editable inline using RichText.
  *
@@ -21,6 +22,7 @@ import {
   TextControl,
   ToggleControl,
   Button,
+  SelectControl,
 } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { blockDefaults } from '../../config/blockDefaults';
@@ -36,6 +38,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     groupId,
     multiple,
     currentAnswer,
+    layout,
   } = attributes;
   const blockProps = useBlockProps({
     'data-required': required ? 'true' : 'false',
@@ -43,7 +46,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     'data-help-text': helpText,
   });
 
-  // Initialize groupId and default options if not already set.
+  // Initialize groupId, default options, and layout if not already set.
   useEffect(() => {
     if (!groupId) {
       setAttributes({ groupId: `sf-buttons-${clientId}` });
@@ -51,7 +54,10 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     if (!options || !Array.isArray(options) || options.length === 0) {
       setAttributes({ options: defaultOptions });
     }
-  }, [groupId, options, clientId, setAttributes]);
+    if (!layout) {
+      setAttributes({ layout: 'horizontal' });
+    }
+  }, [groupId, options, layout, clientId, setAttributes]);
 
   /**
    * Update an option’s label and corresponding value.
@@ -118,6 +124,15 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
               setAttributes({ multiple: value, currentAnswer: value ? [] : '' })
             }
           />
+          <SelectControl
+            label={__('Layout', 'smartforms')}
+            value={layout}
+            options={[
+              { label: __('Horizontal', 'smartforms'), value: 'horizontal' },
+              { label: __('Vertical', 'smartforms'), value: 'vertical' },
+            ]}
+            onChange={(value) => setAttributes({ layout: value })}
+          />
         </PanelBody>
         <PanelBody
           title={__('Button Options', 'smartforms')}
@@ -152,7 +167,11 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
         onChange={(value) => setAttributes({ label: value })}
         placeholder={placeholders.label}
       />
-      <div className="sf-buttons-group" data-group-id={groupId}>
+      <div
+        className={`sf-buttons-group sf-buttons-group-${layout}`}
+        data-group-id={groupId}
+        data-layout={layout}
+      >
         {options.map((option, index) => (
           <button
             key={index}

@@ -1,29 +1,52 @@
 /**
  * Frontend and shared styles for the SmartForms Button Group block.
  *
- * Uses Bootstrap button styles and WordPress theme defaults for primary buttons.
+ * For vertical layout, the buttons stack vertically.
+ * For horizontal layout, a gap is applied.
+ * A min-width is added so that buttons with very short content don’t shrink too much.
  *
  * @package SmartForms
  */
 
- @use "../_theme.scss" as *;
+@use '../_theme.scss' as *;
 
- .wp-block-smartforms-buttons {
-   .sf-buttons-group {
-     display: flex;
-     gap: 10px;
-     flex-wrap: wrap;
-   }
-   
-   .sf-buttons-group .btn {
-     /* Inherit Bootstrap primary styles */
-   }
-   
-   /* Use our unified field help styling */
-   .sf-field-help {
-     margin-top: 4px;
-     color: #999;
-     font-size: 0.75rem;
-   }
- }
- 
+/* Global rules for vertical layout */
+.sf-buttons-group[data-layout='vertical'] {
+  display: block !important;
+}
+
+.sf-buttons-group[data-layout='vertical'] .btn {
+  display: block !important;
+  width: auto !important;
+  min-width: 80px; // Added minimum width
+  margin-bottom: 10px !important;
+}
+
+/* Global rules for horizontal layout */
+.sf-buttons-group[data-layout='horizontal'] {
+  display: flex !important;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sf-buttons-group[data-layout='horizontal'] .btn {
+  min-width: 80px; // Apply min-width for horizontal too, if desired
+}
+
+/* In the chat UI container (frontend), ensure vertical layout applies */
+.smartforms-chat-container .sf-buttons-group[data-layout='vertical'] {
+  display: block !important;
+}
+
+.smartforms-chat-container .sf-buttons-group[data-layout='vertical'] .btn {
+  display: block !important;
+  width: auto !important;
+  min-width: 80px;
+  margin-bottom: 10px !important;
+}
+
+/* Editor override: in the block editor, reset the button width so they don’t fill the entire width */
+.editor-styles-wrapper .sf-buttons-group[data-layout='vertical'] .btn {
+  width: auto !important;
+  min-width: 80px;
+}

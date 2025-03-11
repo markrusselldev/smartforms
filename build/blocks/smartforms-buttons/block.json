@@ -55,6 +55,10 @@
       "type": "boolean",
       "default": false
     },
+    "layout": {
+      "type": "string",
+      "default": "horizontal"
+    },
     "currentAnswer": {
       "type": "string",
       "default": ""
