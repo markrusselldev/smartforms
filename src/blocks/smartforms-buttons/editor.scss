@@ -4,8 +4,12 @@
  * These styles are applied only in the block editor.
  *
  * The container is given a border and padding to match other blocks.
- * For horizontal layout, the buttons are laid out using flex with a 10px gap.
- * For vertical layout, the buttons stack and size to their content.
+ * For horizontal layout, the buttons are arranged in a flex container with a 10px gap.
+ * For vertical layout, the buttons stack with auto width, a minimum width of 80px,
+ * and a 10px bottom margin.
+ *
+ * This file targets both our intended BEM classes (with double dashes)
+ * and a fallback in case the class is rendered with a single dash.
  *
  * @package SmartForms
  */
@@ -13,26 +17,29 @@
 .wp-block-smartforms-buttons {
   border: 1px solid #ddd;
   padding: 10px;
-}
 
-.editor-styles-wrapper
-  .wp-block-smartforms-buttons
-  .sf-buttons-group[data-layout='horizontal'] {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+  /* Vertical layout: target both BEM formats */
+  .sf-buttons-group--vertical,
+  .sf-buttons-group-vertical {
+    display: block !important;
 
-.editor-styles-wrapper
-  .wp-block-smartforms-buttons
-  .sf-buttons-group[data-layout='vertical'] {
-  display: block;
-}
+    .btn {
+      display: block !important;
+      width: auto !important;
+      min-width: 80px;
+      margin-bottom: 10px !important;
+    }
+  }
 
-.editor-styles-wrapper
-  .wp-block-smartforms-buttons
-  .sf-buttons-group[data-layout='vertical']
-  .btn {
-  width: auto !important;
-  margin-bottom: 10px;
+  /* Horizontal layout: target both BEM formats */
+  .sf-buttons-group--horizontal,
+  .sf-buttons-group-horizontal {
+    display: flex !important;
+    gap: 10px;
+    flex-wrap: wrap !important;
+
+    .btn {
+      min-width: 80px;
+    }
+  }
 }

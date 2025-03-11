@@ -3,14 +3,13 @@
  * Dynamic render callback for the SmartForms Button Group block.
  *
  * Renders the button group on the frontend using block attributes.
- * The help text is simply what the user has provided—even if blank.
- * When in multiple mode, the hidden input is not marked as "required" to prevent native validation errors.
+ * Uses only the new BEM‑style classes and reads the layout solely from attributes.
  *
  * @package SmartForms
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+	exit; // Prevent direct access.
 }
 
 function smartforms_render_button_group( $attributes ) {
@@ -22,25 +21,19 @@ function smartforms_render_button_group( $attributes ) {
 	$options           = isset( $attributes['options'] ) && is_array( $attributes['options'] ) ? $attributes['options'] : array();
 	$group_id          = isset( $attributes['groupId'] ) ? sanitize_text_field( $attributes['groupId'] ) : '';
 	$multiple          = isset( $attributes['multiple'] ) ? (bool) $attributes['multiple'] : false;
-
-	// Retrieve layout; default to "horizontal" if not set.
-	$layout = 'horizontal';
-	if ( isset( $attributes['layout'] ) && ! empty( $attributes['layout'] ) ) {
-		$layout = sanitize_text_field( $attributes['layout'] );
-	} elseif ( isset( $attributes['innerHTML'] ) && preg_match( '/data-layout="([^"]+)"/', $attributes['innerHTML'], $matches ) ) {
-		$layout = sanitize_text_field( $matches[1] );
-	}
+	// Read layout strictly from attributes (default "horizontal")
+	$layout    = isset( $attributes['layout'] ) && ! empty( $attributes['layout'] )
+		? sanitize_text_field( $attributes['layout'] )
+		: 'horizontal';
+	$bem_class = 'sf-buttons-group--' . $layout;
 
 	ob_start();
 	?>
 	<div class="wp-block-smartforms-buttons">
 		<label class="sf-buttons-main-label"><?php echo esc_html( $label ); ?></label>
-		<div class="sf-buttons-group sf-buttons-group-<?php echo esc_attr( $layout ); ?>"
-			data-layout="<?php echo esc_attr( $layout ); ?>"
+		<div class="sf-buttons-group <?php echo esc_attr( $bem_class ); ?>"
 			data-group-id="<?php echo esc_attr( $group_id ); ?>"
-			data-required="<?php echo esc_attr( $required ? 'true' : 'false' ); ?>"
-			data-multiple="<?php echo esc_attr( $multiple ? 'true' : 'false' ); ?>"
-			data-help-text="<?php echo esc_attr( $raw_help_text ); ?>"
+			data-layout="<?php echo esc_attr( $layout ); ?>"
 		>
 			<?php foreach ( $options as $option ) : ?>
 				<button type="button" class="btn btn-primary" data-value="<?php echo esc_attr( $option['value'] ); ?>">

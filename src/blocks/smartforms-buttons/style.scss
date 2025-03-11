@@ -2,7 +2,7 @@
  * Frontend and shared styles for the SmartForms Button Group block.
  *
  * For vertical layout, the buttons stack vertically.
- * For horizontal layout, a gap is applied.
+ * For horizontal layout, a 10px gap is applied.
  * A min-width is added so that buttons with very short content don’t shrink too much.
  *
  * @package SmartForms
@@ -10,43 +10,41 @@
 
 @use '../_theme.scss' as *;
 
-/* Global rules for vertical layout */
-.sf-buttons-group[data-layout='vertical'] {
-  display: block !important;
+.wp-block-smartforms-buttons {
+  /* Horizontal layout using our BEM class */
+  .sf-buttons-group--horizontal {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    .btn {
+      min-width: 80px;
+    }
+  }
+
+  /* Vertical layout using our BEM class */
+  .sf-buttons-group--vertical {
+    display: block;
+
+    .btn {
+      display: block;
+      width: auto;
+      min-width: 80px;
+      margin-bottom: 10px;
+    }
+  }
 }
 
-.sf-buttons-group[data-layout='vertical'] .btn {
-  display: block !important;
-  width: auto !important;
-  min-width: 80px; // Added minimum width
-  margin-bottom: 10px !important;
-}
+/* In the chat UI container, ensure vertical styling applies */
+.smartforms-chat-container {
+  .sf-buttons-group--vertical {
+    display: block;
 
-/* Global rules for horizontal layout */
-.sf-buttons-group[data-layout='horizontal'] {
-  display: flex !important;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.sf-buttons-group[data-layout='horizontal'] .btn {
-  min-width: 80px; // Apply min-width for horizontal too, if desired
-}
-
-/* In the chat UI container (frontend), ensure vertical layout applies */
-.smartforms-chat-container .sf-buttons-group[data-layout='vertical'] {
-  display: block !important;
-}
-
-.smartforms-chat-container .sf-buttons-group[data-layout='vertical'] .btn {
-  display: block !important;
-  width: auto !important;
-  min-width: 80px;
-  margin-bottom: 10px !important;
-}
-
-/* Editor override: in the block editor, reset the button width so they don’t fill the entire width */
-.editor-styles-wrapper .sf-buttons-group[data-layout='vertical'] .btn {
-  width: auto !important;
-  min-width: 80px;
+    .btn {
+      display: block;
+      width: auto;
+      min-width: 80px;
+      margin-bottom: 10px;
+    }
+  }
 }

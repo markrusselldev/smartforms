@@ -1,5 +1,3 @@
-// src/blocks/smartforms-buttons/inputRenderers.js
-
 /**
  * Creates an input control element based on the provided field configuration.
  * For all fields except "buttons", it assigns an ID (if not already provided) so that
@@ -14,13 +12,11 @@ export function createInputControl(field, updateSubmitButtonState) {
 
   switch (field.type) {
     case 'text':
-      // Create a text input element.
       control = document.createElement('input');
       control.type = 'text';
       control.className = 'form-control smartforms-text-input';
       control.placeholder = field.placeholder || 'Type your answer here...';
       if (!field.id) {
-        // Assign a default ID so JustValidate can reference it.
         control.id = 'smartforms-current-input';
       }
       control.addEventListener('input', (e) => {
@@ -29,7 +25,6 @@ export function createInputControl(field, updateSubmitButtonState) {
       break;
 
     case 'number':
-      // Create a number input element.
       control = document.createElement('input');
       control.type = 'number';
       control.className = 'form-control smartforms-number';
@@ -43,13 +38,11 @@ export function createInputControl(field, updateSubmitButtonState) {
       break;
 
     case 'slider':
-      // Create a slider (range input) element.
       control = document.createElement('input');
       control.type = 'range';
       control.className = 'form-control smartforms-slider';
       control.min = field.min || 0;
       control.max = field.max || 100;
-      // Set default value to the midpoint if no value provided.
       control.value =
         field.value || Math.floor(((field.min || 0) + (field.max || 100)) / 2);
       if (!field.id) {
@@ -61,7 +54,6 @@ export function createInputControl(field, updateSubmitButtonState) {
       break;
 
     case 'textarea':
-      // Create a textarea element.
       control = document.createElement('textarea');
       control.className =
         'form-control smartforms-textarea smartforms-chat-input';
@@ -76,7 +68,6 @@ export function createInputControl(field, updateSubmitButtonState) {
       break;
 
     case 'select':
-      // Create a dropdown select element.
       control = document.createElement('select');
       control.className = 'form-control smartforms-select';
       if (!field.id) {
@@ -96,18 +87,18 @@ export function createInputControl(field, updateSubmitButtonState) {
       break;
 
     case 'checkbox':
-      // Create a container for checkbox inputs.
       control = document.createElement('div');
-      // Use layout value if available
-      const checkboxLayout = field.layout || 'horizontal';
-      control.className =
-        'sf-checkbox-group sf-checkbox-group-' + checkboxLayout;
-      control.setAttribute('data-layout', checkboxLayout);
+      {
+        const checkboxLayout = field.layout || 'horizontal';
+        control.className =
+          'sf-checkbox-group sf-checkbox-group-' + checkboxLayout;
+        control.setAttribute('data-layout', checkboxLayout);
+      }
       if (field.options && Array.isArray(field.options)) {
         field.options.forEach((opt) => {
           const optionWrapper = document.createElement('div');
           const inlineClass =
-            checkboxLayout === 'horizontal' ? ' form-check-inline' : '';
+            field.layout === 'horizontal' ? ' form-check-inline' : '';
           optionWrapper.className =
             'sf-checkbox-option form-check' + inlineClass;
           const checkbox = document.createElement('input');
@@ -123,7 +114,6 @@ export function createInputControl(field, updateSubmitButtonState) {
           optionWrapper.appendChild(label);
           control.appendChild(optionWrapper);
           checkbox.addEventListener('change', () => {
-            // Update the selected options when any checkbox changes.
             const selected = Array.from(
               control.querySelectorAll("input[type='checkbox']"),
             )
@@ -138,12 +128,13 @@ export function createInputControl(field, updateSubmitButtonState) {
     case 'buttons':
       // Create a container for a group of buttons.
       control = document.createElement('div');
-      // Check the layout attribute: if vertical, don't use flex classes.
+      // Use BEM-style class based on the layout.
       if (field.layout && field.layout === 'vertical') {
-        control.className = 'sf-buttons-group';
+        control.className = 'sf-buttons-group sf-buttons-group--vertical';
         control.setAttribute('data-layout', 'vertical');
       } else {
-        control.className = 'sf-buttons-group d-flex flex-wrap gap-2';
+        control.className =
+          'sf-buttons-group sf-buttons-group--horizontal d-flex flex-wrap gap-2';
         control.setAttribute('data-layout', 'horizontal');
       }
       if (field.options && Array.isArray(field.options)) {
@@ -155,9 +146,7 @@ export function createInputControl(field, updateSubmitButtonState) {
           btn.textContent = opt.label;
           btn.addEventListener('click', () => {
             if (field.multiple) {
-              // In multiple mode, toggle the "active" class.
               btn.classList.toggle('active');
-              // Gather all active button values.
               const activeButtons = Array.from(
                 control.querySelectorAll('button.active'),
               );
@@ -166,7 +155,6 @@ export function createInputControl(field, updateSubmitButtonState) {
               );
               updateSubmitButtonState(field, values);
             } else {
-              // In single mode, remove "active" from all buttons and toggle clicked one.
               Array.from(control.children).forEach((child) =>
                 child.classList.remove('active'),
               );
@@ -185,7 +173,6 @@ export function createInputControl(field, updateSubmitButtonState) {
       break;
 
     default:
-      // For unrecognized types, default to a textarea.
       control = document.createElement('textarea');
       control.className =
         'form-control smartforms-textarea smartforms-chat-input';
@@ -203,6 +190,7 @@ export function createInputControl(field, updateSubmitButtonState) {
 
 /**
  * Replaces the current input control within a container with the provided new control.
+ *
  * @param {HTMLElement} container - The container holding the input control.
  * @param {HTMLElement} newControl - The new input control element.
  */

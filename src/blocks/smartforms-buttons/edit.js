@@ -5,7 +5,7 @@
  * - Toggling required status.
  * - Enabling/disabling multiple selections.
  * - Managing the button options.
- * - Selecting the layout (horizontal or vertical).
+ * - Selecting the layout (vertical or horizontal).
  *
  * The field label and help text are editable inline using RichText.
  *
@@ -167,8 +167,9 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
         onChange={(value) => setAttributes({ label: value })}
         placeholder={placeholders.label}
       />
+      {/* Use BEM classes: "sf-buttons-group--vertical" or "--horizontal" */}
       <div
-        className={`sf-buttons-group sf-buttons-group-${layout}`}
+        className={`sf-buttons-group sf-buttons-group--${layout}`}
         data-group-id={groupId}
         data-layout={layout}
       >
