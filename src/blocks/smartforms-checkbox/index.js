@@ -1,6 +1,5 @@
 import { registerBlockType } from '@wordpress/blocks';
 import edit from './edit';
-import save from './save';
 import './editor.scss';
 import './style.scss';
 
@@ -28,8 +27,7 @@ const customIcon = (
 );
 
 registerBlockType('smartforms/checkbox', {
-  // Override the block.json icon with our custom React element.
   icon: customIcon,
   edit,
-  save,
+  save: () => null,
 });

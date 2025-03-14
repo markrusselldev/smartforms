@@ -26,6 +26,11 @@ import {
 } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { blockDefaults } from '../../config/blockDefaults';
+import {
+  updateOption as helperUpdateOption,
+  addOption as helperAddOption,
+  removeOption as helperRemoveOption,
+} from './buttonHelper';
 
 const { placeholders, defaultOptions } = blockDefaults;
 
@@ -66,15 +71,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
    * @param {string} newLabel - The new label.
    */
   const updateOption = (index, newLabel) => {
-    const newOptions = options.map((option, i) => {
-      if (i === index) {
-        return {
-          label: newLabel,
-          value: newLabel.toLowerCase().replace(/\s+/g, '-'),
-        };
-      }
-      return option;
-    });
+    const newOptions = helperUpdateOption(options, index, newLabel);
     setAttributes({ options: newOptions });
   };
 
@@ -82,19 +79,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
    * Adds a new button option.
    */
   const addOption = () => {
-    let maxNumber = 0;
-    options.forEach((option) => {
-      const match = option.label.match(/^Option (\d+)$/);
-      if (match) {
-        const num = parseInt(match[1], 10);
-        if (num > maxNumber) {
-          maxNumber = num;
-        }
-      }
-    });
-    const newLabel = `Option ${maxNumber + 1}`;
-    const newValue = newLabel.toLowerCase().replace(/\s+/g, '-');
-    const newOptions = [...options, { label: newLabel, value: newValue }];
+    const newOptions = helperAddOption(options);
     setAttributes({ options: newOptions });
   };
 
@@ -104,7 +89,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
    * @param {number} index - The index to remove.
    */
   const removeOption = (index) => {
-    const newOptions = options.filter((_, i) => i !== index);
+    const newOptions = helperRemoveOption(options, index);
     setAttributes({ options: newOptions });
   };
 

@@ -77,6 +77,7 @@ class BlockEditorLoader {
 			'smartforms-select',
 			'smartforms-slider',
 			'smartforms-textarea',
+			'smartforms-group',
 			'smartforms-progress',
 		);
 
@@ -88,10 +89,6 @@ class BlockEditorLoader {
 			// Ensure block.json exists before registration.
 			if ( file_exists( $block_path . '/block.json' ) ) {
 				$args = array();
-				// For the Button Group block, set the dynamic render callback.
-				if ( 'smartforms-buttons' === $block ) {
-					$args['render_callback'] = 'smartforms_render_button_group';
-				}
 				$result = register_block_type_from_metadata( $block_path, $args );
 				/**
 				 * Handles block registration errors.
@@ -187,4 +184,3 @@ class BlockEditorLoader {
 		return $categories;
 	}
 }
-

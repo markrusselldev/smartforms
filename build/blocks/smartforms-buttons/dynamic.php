@@ -14,19 +14,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 function smartforms_render_button_group( $attributes ) {
 	// Sanitize and assign attributes.
-	$label         = isset( $attributes['label'] ) ? sanitize_text_field( $attributes['label'] ) : '';
-	$required      = isset( $attributes['required'] ) ? (bool) $attributes['required'] : false;
-	$raw_help_text = isset( $attributes['helpText'] ) ? trim( $attributes['helpText'] ) : '';
+	$label             = isset( $attributes['label'] ) ? sanitize_text_field( $attributes['label'] ) : '';
+	$required          = isset( $attributes['required'] ) ? (bool) $attributes['required'] : false;
+	$raw_help_text     = isset( $attributes['helpText'] ) ? trim( $attributes['helpText'] ) : '';
 	$display_help_text = sanitize_text_field( $raw_help_text );
-	$options       = isset( $attributes['options'] ) && is_array( $attributes['options'] ) ? $attributes['options'] : array();
-	$group_id      = isset( $attributes['groupId'] ) ? sanitize_text_field( $attributes['groupId'] ) : '';
-	$multiple      = isset( $attributes['multiple'] ) ? (bool) $attributes['multiple'] : false;
+	$options           = isset( $attributes['options'] ) && is_array( $attributes['options'] ) ? $attributes['options'] : array();
+	$group_id          = isset( $attributes['groupId'] ) ? sanitize_text_field( $attributes['groupId'] ) : '';
+	$multiple          = isset( $attributes['multiple'] ) ? (bool) $attributes['multiple'] : false;
 	// Read layout strictly from attributes (default "horizontal")
-	$layout = isset( $attributes['layout'] ) && ! empty( $attributes['layout'] )
+	$layout    = isset( $attributes['layout'] ) && ! empty( $attributes['layout'] )
 		? sanitize_text_field( $attributes['layout'] )
 		: 'horizontal';
 	$bem_class = 'sf-buttons-group--' . $layout;
-  
+
 	ob_start();
 	?>
 	<div class="wp-block-smartforms-buttons">
