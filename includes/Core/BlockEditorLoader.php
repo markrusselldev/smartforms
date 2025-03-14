@@ -77,7 +77,6 @@ class BlockEditorLoader {
 			'smartforms-select',
 			'smartforms-slider',
 			'smartforms-textarea',
-			'smartforms-group',
 			'smartforms-progress',
 		);
 
