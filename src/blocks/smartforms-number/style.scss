@@ -1,6 +1,24 @@
-.wp-block-smartforms-number input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+@use '../_theme.scss' as *;
+
+.sf-number-block {
+  /* Container styling that wraps the number field */
+  border: 1px solid #ddd;
+  padding: 10px;
+
+  /* Constrain the number input by targeting it within the dedicated container */
+  .sf-number-container {
+    width: auto;
+    max-width: 80px;
+  }
+
+  /* Increase specificity for the number input */
+  .sf-number-block .sf-number-container input.sf-number-input {
+    width: auto;
+    max-width: 80px;
+    /* Inherit padding from container or adjust as needed */
+    padding: 0;
+    border: 1px solid #ddd;
+    /* Remove border-radius to match other blocks */
+    border-radius: 0;
+  }
 }

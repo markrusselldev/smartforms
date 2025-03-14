@@ -24,7 +24,7 @@
   "attributes": {
     "label": {
       "type": "string",
-      "default": "Number Input"
+      "default": ""
     },
     "required": {
       "type": "boolean",
@@ -35,7 +35,7 @@
     },
     "placeholder": {
       "type": "string",
-      "default": "Enter number input..."
+      "default": ""
     },
     "min": {
       "type": "number",
@@ -48,9 +48,19 @@
     "step": {
       "type": "number",
       "default": 1
+    },
+    "defaultValue": {
+      "type": "number",
+      "default": 0
+    },
+    "helpText": {
+      "type": "string",
+      "default": ""
     }
   },
   "editorScript": "file:./index.js",
-  "editorStyle": "file:./index.css",
-  "style": "file:./style-index.css"
+  "editorStyle": "file:./editor.scss",
+  "style": "file:./style.scss",
+  "save": null,
+  "renderCallback": "smartforms_render_number"
 }
