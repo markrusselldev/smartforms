@@ -5,6 +5,9 @@
  * to add, remove, and modify options, and implements inline editing (via RichText)
  * for the field label and help text.
  *
+ * Now the rendered output is wrapped with the FieldWrapper component to
+ * standardize the HTML structure.
+ *
  * @package SmartForms
  */
 import { __ } from '@wordpress/i18n';
@@ -22,6 +25,7 @@ import {
 } from '@wordpress/components';
 import { Fragment, useEffect } from '@wordpress/element';
 import { blockDefaults } from '../../config/blockDefaults';
+import FieldWrapper from '../components/FieldWrapper';
 
 const { placeholders, defaultOptions } = blockDefaults;
 
@@ -94,7 +98,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
   };
 
   return (
-    <div {...useBlockProps()}>
+    <div {...blockProps}>
       <InspectorControls>
         <PanelBody title={__('Checkbox Settings', 'smartforms')}>
           {/* Required toggle appears first */}
@@ -135,54 +139,49 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
                 </Button>
               </Fragment>
             ))}
-          {/* Consistent placement: Add Option button appears at the bottom */}
+          {/* Add Option button appears at the bottom */}
           <Button variant="primary" onClick={addOption}>
             {__('Add Option', 'smartforms')}
           </Button>
         </PanelBody>
       </InspectorControls>
-      {/* Editable main field label */}
-      <RichText
-        tagName="label"
-        className="sf-field-label"
-        value={label}
-        onChange={(value) => setAttributes({ label: value })}
-        placeholder={placeholders.label}
-      />
-      <div
-        className={`sf-checkbox-group sf-checkbox-group-${layout || 'horizontal'}`}
-        data-layout={layout || 'horizontal'}
+      <FieldWrapper
+        label={label}
+        helpText={helpText}
+        setLabel={(val) => setAttributes({ label: val })}
+        setHelpText={(val) => setAttributes({ helpText: val })}
+        labelPlaceholder={placeholders.label}
+        helpPlaceholder={placeholders.helpText}
       >
-        {options &&
-          options.map((option, index) => (
-            <div
-              key={index}
-              className={`sf-checkbox-option form-check${layout === 'horizontal' ? ' form-check-inline' : ''}`}
-            >
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id={`${groupId}-${index}`}
-                name={groupId}
-                required={required}
-              />
-              <label
-                className="form-check-label"
-                htmlFor={`${groupId}-${index}`}
+        <div
+          className={`sf-checkbox-group sf-checkbox-group-${layout || 'horizontal'}`}
+          data-layout={layout || 'horizontal'}
+        >
+          {options &&
+            options.map((option, index) => (
+              <div
+                key={index}
+                className={`sf-checkbox-option form-check${
+                  layout === 'horizontal' ? ' form-check-inline' : ''
+                }`}
               >
-                {option.label}
-              </label>
-            </div>
-          ))}
-      </div>
-      {/* Editable help text displayed within the block (not in settings) */}
-      <RichText
-        tagName="p"
-        className="sf-field-help"
-        value={helpText}
-        onChange={(value) => setAttributes({ helpText: value })}
-        placeholder={placeholders.helpText}
-      />
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id={`${groupId}-${index}`}
+                  name={groupId}
+                  required={required}
+                />
+                <label
+                  className="form-check-label"
+                  htmlFor={`${groupId}-${index}`}
+                >
+                  {option.label}
+                </label>
+              </div>
+            ))}
+        </div>
+      </FieldWrapper>
     </div>
   );
 };

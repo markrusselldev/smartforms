@@ -40,6 +40,10 @@ $font-size-base: 16px;
 /* Unified help text styling (used by all field blocks in both editor and frontend) */
 .sf-field-help {
   margin: 10px 0 0 0 !important;
-  color: #999;
+  color: #666;
   font-size: 0.75rem;
+}
+
+.sf-checkbox-option .form-check-label {
+  color: #333;
 }
