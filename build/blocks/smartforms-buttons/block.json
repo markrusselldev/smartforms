@@ -24,7 +24,7 @@
   "attributes": {
     "label": {
       "type": "string",
-      "default": "Type your question here..."
+      "default": ""
     },
     "required": {
       "type": "boolean",

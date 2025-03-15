@@ -7,7 +7,8 @@
  * - Managing the button options.
  * - Selecting the layout (vertical or horizontal).
  *
- * The field label and help text are editable inline using RichText.
+ * Now the entire output is wrapped with the FieldWrapper component (imported from ../components/FieldWrapper)
+ * so that the label, input container, and help text use the same RichText behavior as the Checkbox block.
  *
  * @package SmartForms
  */
@@ -31,6 +32,7 @@ import {
   addOption as helperAddOption,
   removeOption as helperRemoveOption,
 } from './buttonHelper';
+import FieldWrapper from '../components/FieldWrapper';
 
 const { placeholders, defaultOptions } = blockDefaults;
 
@@ -45,11 +47,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     currentAnswer,
     layout,
   } = attributes;
-  const blockProps = useBlockProps({
-    'data-required': required ? 'true' : 'false',
-    'data-multiple': multiple ? 'true' : 'false',
-    'data-help-text': helpText,
-  });
+  const blockProps = useBlockProps();
 
   // Initialize groupId, default options, and layout if not already set.
   useEffect(() => {
@@ -144,66 +142,58 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
           </Button>
         </PanelBody>
       </InspectorControls>
-      {/* Editable main field label */}
-      <RichText
-        tagName="label"
-        className="sf-field-label"
-        value={label}
-        onChange={(value) => setAttributes({ label: value })}
-        placeholder={placeholders.label}
-      />
-      {/* Use BEM classes: "sf-buttons-group--vertical" or "--horizontal" */}
-      <div
-        className={`sf-buttons-group sf-buttons-group--${layout}`}
-        data-group-id={groupId}
-        data-layout={layout}
+      {/* Wrap the field's label, input container, and help text in FieldWrapper for consistency */}
+      <FieldWrapper
+        label={label}
+        helpText={helpText}
+        setLabel={(value) => setAttributes({ label: value })}
+        setHelpText={(value) => setAttributes({ helpText: value })}
+        labelPlaceholder={placeholders.label}
+        helpPlaceholder={placeholders.helpText}
       >
-        {options.map((option, index) => (
-          <button
-            key={index}
-            type="button"
-            className={
-              `btn btn-primary ` +
-              (multiple
-                ? Array.isArray(currentAnswer) &&
-                  currentAnswer.includes(option.value)
-                  ? 'active'
-                  : ''
-                : currentAnswer === option.value
-                  ? 'active'
-                  : '')
-            }
-            data-value={option.value}
-            onClick={() => {
-              if (multiple) {
-                let newSelection = Array.isArray(currentAnswer)
-                  ? [...currentAnswer]
-                  : [];
-                if (newSelection.includes(option.value)) {
-                  newSelection = newSelection.filter(
-                    (val) => val !== option.value,
-                  );
+        <div
+          className={`sf-buttons-group sf-buttons-group--${layout}`}
+          data-group-id={groupId}
+          data-layout={layout}
+        >
+          {options.map((option, index) => (
+            <button
+              key={index}
+              type="button"
+              className={`btn btn-primary ${
+                multiple
+                  ? Array.isArray(currentAnswer) &&
+                    currentAnswer.includes(option.value)
+                    ? 'active'
+                    : ''
+                  : currentAnswer === option.value
+                    ? 'active'
+                    : ''
+              }`}
+              data-value={option.value}
+              onClick={() => {
+                if (multiple) {
+                  let newSelection = Array.isArray(currentAnswer)
+                    ? [...currentAnswer]
+                    : [];
+                  if (newSelection.includes(option.value)) {
+                    newSelection = newSelection.filter(
+                      (val) => val !== option.value,
+                    );
+                  } else {
+                    newSelection.push(option.value);
+                  }
+                  setAttributes({ currentAnswer: newSelection });
                 } else {
-                  newSelection.push(option.value);
+                  setAttributes({ currentAnswer: option.value });
                 }
-                setAttributes({ currentAnswer: newSelection });
-              } else {
-                setAttributes({ currentAnswer: option.value });
-              }
-            }}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-      {/* Editable help text inserted inline */}
-      <RichText
-        tagName="p"
-        className="sf-field-help"
-        value={helpText}
-        onChange={(value) => setAttributes({ helpText: value })}
-        placeholder={placeholders.helpText}
-      />
+              }}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </FieldWrapper>
     </div>
   );
 };
