@@ -1,12 +1,22 @@
 @use '../_theme.scss' as *;
 
-.editor-styles-wrapper .sf-number-block {
-  /* Editor container styling for the number block */
+/**
+ * Editor styles for the SmartForms Number block.
+ *
+ * Mirrors how Checkbox and Buttons blocks apply border/padding
+ * in the editor preview using the .wp-block-smartforms-* selector.
+ *
+ * @package SmartForms
+ */
+
+.wp-block-smartforms-number {
   border: 1px solid #ddd;
   padding: 10px;
-}
 
-.editor-styles-wrapper .sf-number-block .sf-number-container {
-  width: auto;
-  max-width: 80px;
+  /* Constrain the .sf-number-container in the editor, similar to the front end. */
+  .sf-number-container {
+    min-width: 20px;
+    max-width: 80px;
+    width: 80px;
+  }
 }

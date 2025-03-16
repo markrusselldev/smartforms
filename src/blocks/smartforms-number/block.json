@@ -33,10 +33,6 @@
     "className": {
       "type": "string"
     },
-    "placeholder": {
-      "type": "string",
-      "default": ""
-    },
     "min": {
       "type": "number",
       "default": 0
@@ -59,8 +55,8 @@
     }
   },
   "editorScript": "file:./index.js",
-  "editorStyle": "file:./editor.scss",
-  "style": "file:./style.scss",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
   "save": null,
   "renderCallback": "smartforms_render_number"
 }

@@ -1,24 +1,35 @@
 @use '../_theme.scss' as *;
 
-.sf-number-block {
-  /* Container styling that wraps the number field */
+/**
+ * style.scss for the SmartForms Number block (front-end).
+ * 
+ * - .wp-block-smartforms-number:
+ *   Optional block-level wrapper (if you want a border/padding like your other blocks).
+ * 
+ * - .sf-field-wrapper .sf-input-container .sf-number-container:
+ *   Constrains the width around the number input, matching your desired min/max dimensions.
+ * 
+ * @package SmartForms
+ */
+
+/* Optional wrapper for front-end styling (uncomment or adjust as desired). */
+.wp-block-smartforms-number {
   border: 1px solid #ddd;
   padding: 10px;
+}
 
-  /* Constrain the number input by targeting it within the dedicated container */
-  .sf-number-container {
-    width: auto;
-    max-width: 80px;
-  }
+/* Constrain the container around the number input. */
+.sf-field-wrapper .sf-input-container .sf-number-container {
+  min-width: 20px;
+  max-width: 80px;
+  width: 80px; /* fixed container width */
+}
 
-  /* Increase specificity for the number input */
-  .sf-number-block .sf-number-container input.sf-number-input {
-    width: auto;
-    max-width: 80px;
-    /* Inherit padding from container or adjust as needed */
-    padding: 0;
-    border: 1px solid #ddd;
-    /* Remove border-radius to match other blocks */
-    border-radius: 0;
-  }
+/* Ensure the number input fills that container. */
+.sf-field-wrapper .sf-input-container .sf-number-container .sf-number-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+  border: 1px solid #ddd;
+  border-radius: 0;
 }

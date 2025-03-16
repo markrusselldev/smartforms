@@ -1,35 +1,33 @@
+/**
+ * Edit component for the SmartForms Number Input block.
+ *
+ * Renders the number input field in the editor with InspectorControls for adjusting:
+ * - Required status, minimum, maximum, step, and default values.
+ *
+ * The entire field output (label, input container, and help text) is wrapped with the
+ * FieldWrapper component so that its RichText behavior is consistent with the Checkbox block.
+ *
+ * Note: The placeholder is managed by FieldWrapper (via blockDefaults) when the label is empty.
+ *
+ * @package SmartForms
+ */
 import { __ } from '@wordpress/i18n';
-import {
-  useBlockProps,
-  InspectorControls,
-  RichText,
-} from '@wordpress/block-editor';
+import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
 import { blockDefaults } from '../../config/blockDefaults';
+import FieldWrapper from '../components/FieldWrapper';
 
 const Edit = ({ attributes, setAttributes }) => {
-  const {
-    label,
-    placeholder,
-    required,
-    min,
-    max,
-    step,
-    defaultValue,
-    helpText,
-  } = attributes;
+  const { label, required, min, max, step, defaultValue, helpText } =
+    attributes;
+
+  // Use normal blockProps (no extra class) for consistency
   const blockProps = useBlockProps();
 
   return (
-    <div {...blockProps} className="wp-block-smartforms-number sf-number-block">
+    <div {...blockProps}>
       <InspectorControls>
         <PanelBody title={__('Number Input Settings', 'smartforms')}>
-          <TextControl
-            label={__('Placeholder', 'smartforms')}
-            value={placeholder}
-            onChange={(value) => setAttributes({ placeholder: value })}
-            help={__('Leave blank to use the default value', 'smartforms')}
-          />
           <ToggleControl
             label={__('Required', 'smartforms')}
             checked={required}
@@ -65,19 +63,18 @@ const Edit = ({ attributes, setAttributes }) => {
           />
         </PanelBody>
       </InspectorControls>
-      <div className="smartforms-number-preview">
-        <RichText
-          tagName="label"
-          className="sf-field-label"
-          value={label}
-          onChange={(value) => setAttributes({ label: value })}
-          placeholder={blockDefaults.placeholders.label}
-        />
+      <FieldWrapper
+        label={label}
+        helpText={helpText}
+        setLabel={(value) => setAttributes({ label: value })}
+        setHelpText={(value) => setAttributes({ helpText: value })}
+        labelPlaceholder={blockDefaults.placeholders.label}
+        helpPlaceholder={blockDefaults.placeholders.helpText}
+      >
         <div className="sf-number-container">
           <input
             type="number"
             className="form-control sf-number-input"
-            placeholder={placeholder || String(defaultValue)}
             required={required}
             min={min}
             max={max}
@@ -87,14 +84,7 @@ const Edit = ({ attributes, setAttributes }) => {
             pattern="[0-9]+([.,][0-9]+)?"
           />
         </div>
-        <RichText
-          tagName="p"
-          className="sf-field-help"
-          value={helpText}
-          onChange={(value) => setAttributes({ helpText: value })}
-          placeholder={blockDefaults.placeholders.helpText}
-        />
-      </div>
+      </FieldWrapper>
     </div>
   );
 };

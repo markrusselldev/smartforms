@@ -36,7 +36,7 @@ class BlockFrontendAssets {
 	 * Hooks into the frontend assets enqueue action.
 	 */
 	private function __construct() {
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ), 999 );
 	}
 
 	/**
