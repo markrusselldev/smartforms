@@ -179,8 +179,8 @@ class ChatUISettings {
 				<h2><?php esc_html_e( 'Live Preview', 'smartforms' ); ?></h2>
 				<div class="smartforms-preview">
 					<?php
-					// Output the demo chat UI preview.
-					echo ChatUI::render_demo();
+					// Display the fallback chat UI with no form ID
+					echo ChatUI::render( 0 );
 					?>
 				</div>
 			</div>
