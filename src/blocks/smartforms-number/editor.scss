@@ -3,8 +3,10 @@
 /**
  * Editor styles for the SmartForms Number block.
  *
- * Mirrors how Checkbox and Buttons blocks apply border/padding
- * in the editor preview using the .wp-block-smartforms-* selector.
+ * Matches how your other blocks do alignment:
+ * - A border + padding around the block in the editor
+ * - .sf-number-container is sized so that alignment changes are noticeable
+ * - .sf-number-align-left|center|right actually shift the input
  *
  * @package SmartForms
  */
@@ -13,10 +15,41 @@
   border: 1px solid #ddd;
   padding: 10px;
 
-  /* Constrain the .sf-number-container in the editor, similar to the front end. */
   .sf-number-container {
-    min-width: 20px;
-    max-width: 80px;
-    width: 80px;
+    /* Make it shrink to fit the input, letting alignment move it */
+    display: inline-block;
+  }
+
+  /* Alignment classes from your block's edit.js */
+  .sf-number-align-left {
+    text-align: left;
+
+    /* If you want the input flush-left, we can ensure it doesn't stretch */
+    .sf-number-input {
+      margin: 0;
+    }
+  }
+
+  .sf-number-align-center {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center; /* center the container's contents */
+
+    .sf-number-input {
+      margin: 0 auto;
+      display: block;
+    }
+  }
+
+  .sf-number-align-right {
+    margin-left: auto;
+    margin-right: 0;
+    text-align: right;
+
+    .sf-number-input {
+      margin-left: auto;
+      margin-right: 0;
+      display: block;
+    }
   }
 }

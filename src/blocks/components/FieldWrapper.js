@@ -13,6 +13,7 @@ import { blockDefaults } from '../../config/blockDefaults';
  * @param {React.Node} props.children The field-specific input element.
  * @param {string} [props.labelPlaceholder] Placeholder for the label.
  * @param {string} [props.helpPlaceholder] Placeholder for the help text.
+ * @param {string} [props.alignment] Optional. Field alignment: "left", "center", or "right". Defaults to "left".
  * @returns {React.Element} The FieldWrapper component.
  */
 const FieldWrapper = ({
@@ -23,7 +24,15 @@ const FieldWrapper = ({
   children,
   labelPlaceholder = blockDefaults.placeholders.label,
   helpPlaceholder = blockDefaults.placeholders.helpText,
+  alignment = 'left',
 }) => {
+  const alignmentClass =
+    alignment === 'center'
+      ? 'text-center'
+      : alignment === 'right'
+        ? 'text-end'
+        : 'text-start';
+
   return (
     <div className="sf-field-wrapper">
       <RichText
@@ -33,7 +42,7 @@ const FieldWrapper = ({
         onChange={setLabel}
         placeholder={labelPlaceholder}
       />
-      <div className="sf-input-container">{children}</div>
+      <div className={`sf-input-container ${alignmentClass}`}>{children}</div>
       <RichText
         tagName="p"
         className="sf-field-help"

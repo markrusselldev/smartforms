@@ -1,35 +1,41 @@
 @use '../_theme.scss' as *;
 
 /**
- * style.scss for the SmartForms Number block (front-end).
- * 
- * - .wp-block-smartforms-number:
- *   Optional block-level wrapper (if you want a border/padding like your other blocks).
- * 
- * - .sf-field-wrapper .sf-input-container .sf-number-container:
- *   Constrains the width around the number input, matching your desired min/max dimensions.
- * 
+ * Final alignment & sizing SCSS for the SmartForms Number block.
+ * Applies to both block editor (editor.css) and front-end (style-index.css).
+ *
  * @package SmartForms
  */
 
-/* Optional wrapper for front-end styling (uncomment or adjust as desired). */
+/* If you want a border/padding on the block, uncomment:
 .wp-block-smartforms-number {
   border: 1px solid #ddd;
   padding: 10px;
 }
+*/
 
-/* Constrain the container around the number input. */
-.sf-field-wrapper .sf-input-container .sf-number-container {
-  min-width: 20px;
-  max-width: 80px;
-  width: 80px; /* fixed container width */
+/* By default, .sf-number-container can be inline-block for "left" alignment. */
+.sf-number-container {
+  display: inline-block !important;
 }
 
-/* Ensure the number input fills that container. */
-.sf-field-wrapper .sf-input-container .sf-number-container .sf-number-input {
-  width: 100%;
+/* .sf-align-center => override to block, margin: 0 auto to center. */
+.sf-align-center {
+  display: block !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* .sf-align-right => block, margin-left: auto, margin-right: 0. */
+.sf-align-right {
+  display: block !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}
+
+/* The input is typical .form-control. We ensure it doesn't force 100% width. */
+.sf-number-input {
+  width: auto !important;
   box-sizing: border-box;
-  padding: 0;
-  border: 1px solid #ddd;
-  border-radius: 0;
+  margin: 0;
 }

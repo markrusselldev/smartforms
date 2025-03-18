@@ -52,6 +52,14 @@
     "helpText": {
       "type": "string",
       "default": ""
+    },
+    "fieldSize": {
+      "type": "string",
+      "default": "medium"
+    },
+    "fieldAlignment": {
+      "type": "string",
+      "default": "left"
     }
   },
   "editorScript": "file:./index.js",

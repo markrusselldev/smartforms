@@ -1,27 +1,52 @@
 /**
- * Edit component for the SmartForms Number Input block.
+ * Edit component for SmartForms Number block.
  *
- * Renders the number input field in the editor with InspectorControls for adjusting:
- * - Required status, minimum, maximum, step, and default values.
- *
- * The entire field output (label, input container, and help text) is wrapped with the
- * FieldWrapper component so that its RichText behavior is consistent with the Checkbox block.
- *
- * Note: The placeholder is managed by FieldWrapper (via blockDefaults) when the label is empty.
+ * 1. Uses the "fieldAlignment" attribute.
+ * 2. Applies alignment using Bootstrap’s utility classes (text‑start, text‑center, text‑end).
+ * 3. Applies size classes (form-control-sm or form-control-lg) based on the fieldSize attribute.
  *
  * @package SmartForms
  */
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
-import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
+import {
+  PanelBody,
+  TextControl,
+  ToggleControl,
+  SelectControl,
+} from '@wordpress/components';
 import { blockDefaults } from '../../config/blockDefaults';
 import FieldWrapper from '../components/FieldWrapper';
 
 const Edit = ({ attributes, setAttributes }) => {
-  const { label, required, min, max, step, defaultValue, helpText } =
-    attributes;
+  const {
+    label,
+    required,
+    min,
+    max,
+    step,
+    defaultValue,
+    helpText,
+    fieldSize,
+    fieldAlignment,
+  } = attributes;
 
-  // Use normal blockProps (no extra class) for consistency
+  // Determine the Bootstrap size class.
+  let sizeClass = '';
+  if (fieldSize === 'small') {
+    sizeClass = 'form-control-sm';
+  } else if (fieldSize === 'large') {
+    sizeClass = 'form-control-lg';
+  }
+
+  // Compute Bootstrap alignment class using fieldAlignment.
+  const bootstrapAlignment =
+    fieldAlignment === 'center'
+      ? 'text-center'
+      : fieldAlignment === 'right'
+        ? 'text-end'
+        : 'text-start';
+
   const blockProps = useBlockProps();
 
   return (
@@ -62,7 +87,31 @@ const Edit = ({ attributes, setAttributes }) => {
             )}
           />
         </PanelBody>
+        <PanelBody title={__('Appearance', 'smartforms')} initialOpen={true}>
+          <SelectControl
+            label={__('Field Size', 'smartforms')}
+            value={fieldSize}
+            options={[
+              { label: __('Small', 'smartforms'), value: 'small' },
+              { label: __('Medium', 'smartforms'), value: 'medium' },
+              { label: __('Large', 'smartforms'), value: 'large' },
+            ]}
+            onChange={(value) => setAttributes({ fieldSize: value })}
+          />
+          <SelectControl
+            label={__('Alignment', 'smartforms')}
+            value={fieldAlignment}
+            options={[
+              { label: __('Left', 'smartforms'), value: 'left' },
+              { label: __('Center', 'smartforms'), value: 'center' },
+              { label: __('Right', 'smartforms'), value: 'right' },
+            ]}
+            onChange={(value) => setAttributes({ fieldAlignment: value })}
+          />
+        </PanelBody>
       </InspectorControls>
+
+      {/* Pass fieldAlignment to the FieldWrapper */}
       <FieldWrapper
         label={label}
         helpText={helpText}
@@ -70,20 +119,19 @@ const Edit = ({ attributes, setAttributes }) => {
         setHelpText={(value) => setAttributes({ helpText: value })}
         labelPlaceholder={blockDefaults.placeholders.label}
         helpPlaceholder={blockDefaults.placeholders.helpText}
+        alignment={fieldAlignment}
       >
-        <div className="sf-number-container">
-          <input
-            type="number"
-            className="form-control sf-number-input"
-            required={required}
-            min={min}
-            max={max}
-            step={step}
-            defaultValue={defaultValue}
-            inputMode="numeric"
-            pattern="[0-9]+([.,][0-9]+)?"
-          />
-        </div>
+        <input
+          type="number"
+          className={`form-control sf-number-input ${sizeClass}`}
+          required={required}
+          min={min}
+          max={max}
+          step={step}
+          defaultValue={defaultValue}
+          inputMode="numeric"
+          pattern="[0-9]+([.,][0-9]+)?"
+        />
       </FieldWrapper>
     </div>
   );

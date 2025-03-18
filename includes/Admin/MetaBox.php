@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use WP_Error;
-use SmartForms\Core\SmartForms; // Import the core SmartForms class for logging.
+use SmartForms\Core\SmartForms; // Import the core SmartForms class for logging;
 
 /**
  * MetaBox class for handling form JSON generation.
@@ -102,17 +102,23 @@ class MetaBox {
 				// Process block-type–specific attributes.
 				switch ( $type ) {
 					case 'number':
-						// Merge number field–specific settings.
+						// Merge number field–specific settings, plus fieldAlignment & fieldSize.
+						$field_alignment = isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left';
+						$field_size      = isset( $block['attrs']['fieldSize'] ) ? sanitize_text_field( $block['attrs']['fieldSize'] ) : 'medium';
+
 						$form_field = array_merge(
 							$form_field,
 							array(
-								'min'          => isset( $block['attrs']['min'] ) ? floatval( $block['attrs']['min'] ) : 0,
-								'max'          => isset( $block['attrs']['max'] ) ? floatval( $block['attrs']['max'] ) : 100,
-								'step'         => isset( $block['attrs']['step'] ) ? floatval( $block['attrs']['step'] ) : 1,
-								'defaultValue' => isset( $block['attrs']['defaultValue'] ) ? floatval( $block['attrs']['defaultValue'] ) : 0,
+								'min'            => isset( $block['attrs']['min'] ) ? floatval( $block['attrs']['min'] ) : 0,
+								'max'            => isset( $block['attrs']['max'] ) ? floatval( $block['attrs']['max'] ) : 100,
+								'step'           => isset( $block['attrs']['step'] ) ? floatval( $block['attrs']['step'] ) : 1,
+								'defaultValue'   => isset( $block['attrs']['defaultValue'] ) ? floatval( $block['attrs']['defaultValue'] ) : 0,
+								'fieldAlignment' => $field_alignment,
+								'fieldSize'      => $field_size,
 							)
 						);
 						break;
+
 					case 'checkbox':
 						// Process checkbox-specific settings.
 						if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
@@ -150,6 +156,7 @@ class MetaBox {
 							)
 						);
 						break;
+
 					case 'buttons':
 						// Process buttons-specific settings.
 						if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
@@ -189,30 +196,31 @@ class MetaBox {
 							)
 						);
 						break;
+
 					case 'text':
 						// Text field: no additional processing required.
-						// TODO: Add custom processing if needed.
 						break;
+
 					case 'radio':
 						// Radio buttons: no additional processing required.
-						// TODO: Add custom processing if needed.
 						break;
+
 					case 'select':
 						// Dropdown select: no additional processing required.
-						// TODO: Add custom processing if needed.
 						break;
+
 					case 'slider':
 						// Slider field: no additional processing required.
-						// TODO: Add custom processing if needed.
 						break;
-					case 'progress':
-						// Progress indicator: no additional processing required.
-						// TODO: Add custom processing if needed.
-						break;
+
 					case 'textarea':
 						// Textarea field: no additional processing required.
-						// TODO: Add custom processing if needed.
 						break;
+
+					case 'progress':
+						// Progress indicator: no additional processing required.
+						break;
+
 					default:
 						// For any other block types, no additional processing is done.
 						break;
