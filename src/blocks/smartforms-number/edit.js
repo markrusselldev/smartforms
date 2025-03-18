@@ -5,6 +5,9 @@
  * 2. Applies alignment using Bootstrap’s utility classes (text‑start, text‑center, text‑end).
  * 3. Applies size classes (form-control-sm or form-control-lg) based on the fieldSize attribute.
  *
+ * The component wraps the input with FieldWrapper so that the label,
+ * input container, and help text display consistently in the editor.
+ *
  * @package SmartForms
  */
 import { __ } from '@wordpress/i18n';
@@ -32,12 +35,12 @@ const Edit = ({ attributes, setAttributes }) => {
   } = attributes;
 
   // Determine the Bootstrap size class.
-  let sizeClass = '';
-  if (fieldSize === 'small') {
-    sizeClass = 'form-control-sm';
-  } else if (fieldSize === 'large') {
-    sizeClass = 'form-control-lg';
-  }
+  const sizeClass =
+    fieldSize === 'small'
+      ? 'form-control-sm'
+      : fieldSize === 'large'
+        ? 'form-control-lg'
+        : '';
 
   // Compute Bootstrap alignment class using fieldAlignment.
   const bootstrapAlignment =
@@ -111,7 +114,7 @@ const Edit = ({ attributes, setAttributes }) => {
         </PanelBody>
       </InspectorControls>
 
-      {/* Pass fieldAlignment to the FieldWrapper */}
+      {/* Use FieldWrapper for consistent layout */}
       <FieldWrapper
         label={label}
         helpText={helpText}

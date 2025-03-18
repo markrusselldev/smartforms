@@ -1,5 +1,5 @@
 /**
- * Edit component for the SmartForms Button Group dynamic block.
+ * Edit component for the SmartForms Button Group block.
  *
  * Renders the block in the editor with InspectorControls for:
  * - Toggling required status.
@@ -7,8 +7,8 @@
  * - Managing the button options.
  * - Selecting the layout (vertical or horizontal).
  *
- * Now the entire output is wrapped with the FieldWrapper component (imported from ../components/FieldWrapper)
- * so that the label, input container, and help text use the same RichText behavior as the Checkbox block.
+ * The entire output is wrapped with the FieldWrapper component so that the label,
+ * input container, and help text use consistent RichText behavior.
  *
  * @package SmartForms
  */
@@ -27,11 +27,6 @@ import {
 } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { blockDefaults } from '../../config/blockDefaults';
-import {
-  updateOption as helperUpdateOption,
-  addOption as helperAddOption,
-  removeOption as helperRemoveOption,
-} from './buttonHelper';
 import FieldWrapper from '../components/FieldWrapper';
 
 const { placeholders, defaultOptions } = blockDefaults;
@@ -63,31 +58,47 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
   }, [groupId, options, layout, clientId, setAttributes]);
 
   /**
-   * Update an option’s label and corresponding value.
+   * Updates an option's label and corresponding value.
    *
    * @param {number} index - The option index.
    * @param {string} newLabel - The new label.
    */
   const updateOption = (index, newLabel) => {
-    const newOptions = helperUpdateOption(options, index, newLabel);
+    const newOptions = options.map((option, i) => {
+      if (i === index) {
+        return {
+          label: newLabel,
+          value: newLabel.toLowerCase().replace(/\s+/g, '-'),
+        };
+      }
+      return option;
+    });
     setAttributes({ options: newOptions });
   };
 
   /**
    * Adds a new button option.
+   * Uses Array.reduce to determine the current maximum option number.
    */
   const addOption = () => {
-    const newOptions = helperAddOption(options);
-    setAttributes({ options: newOptions });
+    const maxNumber = options.reduce((acc, option) => {
+      const match = option.label.match(/^Option (\d+)$/);
+      return match ? Math.max(acc, parseInt(match[1], 10)) : acc;
+    }, 0);
+    const newLabel = `Option ${maxNumber + 1}`;
+    const newValue = newLabel.toLowerCase().replace(/\s+/g, '-');
+    setAttributes({
+      options: [...options, { label: newLabel, value: newValue }],
+    });
   };
 
   /**
-   * Removes a button option.
+   * Removes a button option by index.
    *
    * @param {number} index - The index to remove.
    */
   const removeOption = (index) => {
-    const newOptions = helperRemoveOption(options, index);
+    const newOptions = options.filter((_, i) => i !== index);
     setAttributes({ options: newOptions });
   };
 
@@ -142,7 +153,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
           </Button>
         </PanelBody>
       </InspectorControls>
-      {/* Wrap the field's label, input container, and help text in FieldWrapper for consistency */}
+      {/* Wrap the field's label, input container, and help text in FieldWrapper */}
       <FieldWrapper
         label={label}
         helpText={helpText}
@@ -173,17 +184,15 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
               data-value={option.value}
               onClick={() => {
                 if (multiple) {
-                  let newSelection = Array.isArray(currentAnswer)
+                  const currentSelection = Array.isArray(currentAnswer)
                     ? [...currentAnswer]
                     : [];
-                  if (newSelection.includes(option.value)) {
-                    newSelection = newSelection.filter(
-                      (val) => val !== option.value,
-                    );
-                  } else {
-                    newSelection.push(option.value);
-                  }
-                  setAttributes({ currentAnswer: newSelection });
+                  const updatedSelection = currentSelection.includes(
+                    option.value,
+                  )
+                    ? currentSelection.filter((val) => val !== option.value)
+                    : [...currentSelection, option.value];
+                  setAttributes({ currentAnswer: updatedSelection });
                 } else {
                   setAttributes({ currentAnswer: option.value });
                 }

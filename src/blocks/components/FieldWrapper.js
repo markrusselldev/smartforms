@@ -1,9 +1,8 @@
-import { RichText } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
-import { blockDefaults } from '../../config/blockDefaults';
-
 /**
  * FieldWrapper component renders the common structure for a form field.
+ * It wraps a label, an input container, and a help text element.
+ * The component supports customization of alignment via the "alignment" prop,
+ * and a custom label class via the "labelClass" prop.
  *
  * @param {Object} props Component props.
  * @param {string} props.label The field label.
@@ -13,9 +12,13 @@ import { blockDefaults } from '../../config/blockDefaults';
  * @param {React.Node} props.children The field-specific input element.
  * @param {string} [props.labelPlaceholder] Placeholder for the label.
  * @param {string} [props.helpPlaceholder] Placeholder for the help text.
- * @param {string} [props.alignment] Optional. Field alignment: "left", "center", or "right". Defaults to "left".
+ * @param {string} [props.alignment="left"] Field alignment: "left", "center", or "right".
+ * @param {string} [props.labelClass="sf-field-label"] CSS class for the label element.
  * @returns {React.Element} The FieldWrapper component.
  */
+import { RichText } from '@wordpress/block-editor';
+import { blockDefaults } from '../../config/blockDefaults';
+
 const FieldWrapper = ({
   label,
   helpText,
@@ -25,6 +28,7 @@ const FieldWrapper = ({
   labelPlaceholder = blockDefaults.placeholders.label,
   helpPlaceholder = blockDefaults.placeholders.helpText,
   alignment = 'left',
+  labelClass = 'sf-field-label',
 }) => {
   const alignmentClass =
     alignment === 'center'
@@ -37,7 +41,7 @@ const FieldWrapper = ({
     <div className="sf-field-wrapper">
       <RichText
         tagName="label"
-        className="sf-field-label"
+        className={labelClass}
         value={label}
         onChange={setLabel}
         placeholder={labelPlaceholder}

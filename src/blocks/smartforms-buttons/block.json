@@ -61,6 +61,5 @@
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
   "style": "file:./style-index.css",
-  "renderCallback": "smartforms_render_button_group",
   "save": null
 }

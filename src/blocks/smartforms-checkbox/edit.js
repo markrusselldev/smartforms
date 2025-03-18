@@ -2,20 +2,15 @@
  * Edit component for the SmartForms Checkbox block.
  *
  * Renders a checkbox field group for the editor with InspectorControls
- * to add, remove, and modify options, and implements inline editing (via RichText)
- * for the field label and help text.
+ * to add, remove, and modify options and inline editing for the field label and help text.
  *
- * Now the rendered output is wrapped with the FieldWrapper component to
- * standardize the HTML structure.
+ * With static blocks, the label is stored directly in JSON. To avoid extra formatting markup,
+ * we set the FieldWrapper’s plainText prop to true.
  *
  * @package SmartForms
  */
 import { __ } from '@wordpress/i18n';
-import {
-  useBlockProps,
-  InspectorControls,
-  RichText,
-} from '@wordpress/block-editor';
+import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import {
   PanelBody,
   TextControl,
@@ -33,7 +28,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
   const { label, helpText, required, options, groupId, layout } = attributes;
   const blockProps = useBlockProps();
 
-  // Initialize attributes if not set.
+  // Initialize attributes if not already set.
   useEffect(() => {
     if (!groupId) {
       setAttributes({ groupId: `sf-checkbox-${clientId}` });
@@ -101,13 +96,11 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     <div {...blockProps}>
       <InspectorControls>
         <PanelBody title={__('Checkbox Settings', 'smartforms')}>
-          {/* Required toggle appears first */}
           <ToggleControl
             label={__('Required', 'smartforms')}
             checked={required}
             onChange={(value) => setAttributes({ required: value })}
           />
-          {/* Layout selection appears next */}
           <SelectControl
             label={__('Layout', 'smartforms')}
             value={layout}
@@ -139,12 +132,12 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
                 </Button>
               </Fragment>
             ))}
-          {/* Add Option button appears at the bottom */}
           <Button variant="primary" onClick={addOption}>
             {__('Add Option', 'smartforms')}
           </Button>
         </PanelBody>
       </InspectorControls>
+      {/* FieldWrapper now uses plainText mode to ensure the label is stored as plain text */}
       <FieldWrapper
         label={label}
         helpText={helpText}
@@ -152,6 +145,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
         setHelpText={(val) => setAttributes({ helpText: val })}
         labelPlaceholder={placeholders.label}
         helpPlaceholder={placeholders.helpText}
+        plainText={true}
       >
         <div
           className={`sf-checkbox-group sf-checkbox-group-${layout || 'horizontal'}`}
@@ -159,26 +153,27 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
         >
           {options &&
             options.map((option, index) => (
-              <div
-                key={index}
-                className={`sf-checkbox-option form-check${
-                  layout === 'horizontal' ? ' form-check-inline' : ''
-                }`}
-              >
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id={`${groupId}-${index}`}
-                  name={groupId}
-                  required={required}
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor={`${groupId}-${index}`}
+              <Fragment key={index}>
+                <div
+                  className={`sf-checkbox-option form-check${
+                    layout === 'horizontal' ? ' form-check-inline' : ''
+                  }`}
                 >
-                  {option.label}
-                </label>
-              </div>
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id={`${groupId}-${index}`}
+                    name={groupId}
+                    required={required}
+                  />
+                  <label
+                    className="form-check-label"
+                    htmlFor={`${groupId}-${index}`}
+                  >
+                    {option.label}
+                  </label>
+                </div>
+              </Fragment>
             ))}
         </div>
       </FieldWrapper>

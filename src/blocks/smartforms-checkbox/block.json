@@ -24,9 +24,7 @@
   "attributes": {
     "label": {
       "type": "string",
-      "source": "html",
-      "selector": "label.sf-checkbox-main-label",
-      "default": "Type your question here..."
+      "default": ""
     },
     "required": {
       "type": "boolean",
@@ -55,6 +53,5 @@
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
   "style": "file:./style-index.css",
-  "renderCallback": "smartforms_render_checkbox",
   "save": null
 }
