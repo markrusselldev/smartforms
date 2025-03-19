@@ -1,31 +1,16 @@
 @use '../_theme.scss' as *;
 
-/**
- * Final alignment and sizing styles for the SmartForms Number block.
+/*
+ * Frontend stylesheet for the Number block.
  *
- * Ensures the container and input have appropriate sizing and alignment,
- * and prevents the input from stretching to 100% width.
+ * We want the number field to appear exactly as it does when styled by Bootstrap.
+ * Therefore, we remove any extra styling that might override Bootstrap’s defaults.
  *
- * @package SmartForms
+ * The markup produced by our block gives the input the "form-control" class,
+ * so Bootstrap will handle the border color, border radius, padding, etc.
  */
-.sf-number-container {
-  display: inline-block !important;
-}
-
-.sf-align-center {
-  display: block !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-.sf-align-right {
-  display: block !important;
-  margin-left: auto !important;
-  margin-right: 0 !important;
-}
-
-.sf-number-input {
-  width: auto !important;
-  box-sizing: border-box;
-  margin: 0;
+.wp-block-smartforms-number {
+  .sf-number-container {
+    display: block; // Ensure the container displays as a block-level element.
+  }
 }

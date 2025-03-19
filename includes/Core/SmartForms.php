@@ -61,8 +61,12 @@ class SmartForms {
 	 * and register page templates.
 	 */
 	private function __construct() {
+		/**
+		 * For front-end, we load all needed assets (including Bootstrap).
+		 * For admin, we conditionally load Bootstrap only on the "Styles" page.
+		 */
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ), 10, 1 );
 		$this->initialize_classes();
 		add_filter( 'theme_page_templates', array( $this, 'register_template' ) );
 		add_filter( 'template_include', array( $this, 'load_template' ) );
@@ -106,34 +110,112 @@ class SmartForms {
 	/**
 	 * Enqueues CSS and JS assets.
 	 *
-	 * Now enqueues JustValidate (a vanilla JS validation library) and our custom chat UI script.
+	 * @param string $hook_suffix Optional. The current admin page hook. Front end calls won't pass a parameter.
 	 *
 	 * @return void
 	 */
-	public function enqueue_assets() {
-		// Enqueue Bootstrap CSS.
-		wp_enqueue_style(
-			'bootstrap-css',
-			'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
-			array(),
-			'5.3.3'
-		);
-		// Enqueue Bootstrap JavaScript.
-		wp_enqueue_script(
-			'bootstrap-js',
-			'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
-			array(),
-			'5.3.3',
-			true
-		);
-		// Enqueue Font Awesome.
-		wp_enqueue_style(
-			'fontawesome',
-			'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-			array(),
-			'6.4.0'
-		);
-		// Enqueue JustValidate for form validation (vanilla JS, no jQuery).
+	public function enqueue_assets( $hook_suffix = '' ) {
+
+		/*
+		 * 1. FRONT END:
+		 *    - Always load Bootstrap + Font Awesome + everything else
+		 *      for the forms, as required by your codebase.
+		 */
+		if ( ! is_admin() ) {
+			// Enqueue Bootstrap CSS (front end).
+			wp_enqueue_style(
+				'bootstrap-css',
+				'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
+				array(),
+				'5.3.3'
+			);
+
+			// Enqueue Bootstrap JS (front end).
+			wp_enqueue_script(
+				'bootstrap-js',
+				'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
+				array(),
+				'5.3.3',
+				true
+			);
+
+			// Enqueue Font Awesome (front end).
+			wp_enqueue_style(
+				'fontawesome',
+				'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+				array(),
+				'6.4.0'
+			);
+
+			// Enqueue JustValidate for form validation (front end).
+			wp_enqueue_script(
+				'just-validate',
+				'https://cdn.jsdelivr.net/npm/just-validate@2.2.0/dist/just-validate.production.min.js',
+				array(),
+				'2.2.0',
+				true
+			);
+
+			// Enqueue our Chat UI script (front end).
+			wp_enqueue_script(
+				'smartforms-chatui',
+				plugins_url( 'build/js/smartforms-chat.js', SMARTFORMS_PLUGIN_FILE ),
+				array( 'wp-element', 'just-validate' ),
+				'1.0.0',
+				true
+			);
+
+			// Enqueue the generated Chat UI CSS file (front end).
+			wp_enqueue_style(
+				'smartforms-chat',
+				plugins_url( 'build/css/smartforms-chat.css', SMARTFORMS_PLUGIN_FILE ),
+				array( 'bootstrap-css', 'fontawesome' ),
+				'1.0.0'
+			);
+
+			// Localize the Chat UI script (front end).
+			wp_localize_script(
+				'smartforms-chatui',
+				'smartformsData',
+				array(
+					'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+					'nonce'   => wp_create_nonce( 'smartform_submit' ),
+				)
+			);
+			return;
+		}
+
+		/*
+		 * 2. ADMIN:
+		 *    - Only load Bootstrap & Font Awesome on the "Styles" page.
+		 *    - Still load JustValidate, Chat UI, etc. if relevant to admin usage.
+		 */
+		if ( 'smartforms_page_smartforms-chat-styles' === $hook_suffix ) {
+			// Bootstrap CSS + JS.
+			wp_enqueue_style(
+				'bootstrap-css',
+				'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
+				array(),
+				'5.3.3'
+			);
+			wp_enqueue_script(
+				'bootstrap-js',
+				'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
+				array(),
+				'5.3.3',
+				true
+			);
+
+			// Font Awesome (Styles page).
+			wp_enqueue_style(
+				'fontawesome',
+				'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+				array(),
+				'6.4.0'
+			);
+		}
+
+		// For the admin (including the Styles page), enqueue JustValidate + Chat UI:
 		wp_enqueue_script(
 			'just-validate',
 			'https://cdn.jsdelivr.net/npm/just-validate@2.2.0/dist/just-validate.production.min.js',
@@ -141,7 +223,7 @@ class SmartForms {
 			'2.2.0',
 			true
 		);
-		// Enqueue our Chat UI script.
+
 		wp_enqueue_script(
 			'smartforms-chatui',
 			plugins_url( 'build/js/smartforms-chat.js', SMARTFORMS_PLUGIN_FILE ),
@@ -149,14 +231,16 @@ class SmartForms {
 			'1.0.0',
 			true
 		);
-		// Enqueue the generated Chat UI CSS file.
+
+		// Admin Chat UI CSS (not including Bootstrap unless on the Styles page).
 		wp_enqueue_style(
 			'smartforms-chat',
 			plugins_url( 'build/css/smartforms-chat.css', SMARTFORMS_PLUGIN_FILE ),
-			array( 'bootstrap-css', 'fontawesome' ),
+			array(),
 			'1.0.0'
 		);
-		// Localize the Chat UI script.
+
+		// Localize the Chat UI script (admin side).
 		wp_localize_script(
 			'smartforms-chatui',
 			'smartformsData',
@@ -235,3 +319,4 @@ register_deactivation_hook(
 	dirname( __DIR__, 2 ) . '/smartforms.php',
 	array( '\SmartForms\Core\SmartForms', 'deactivate' )
 );
+

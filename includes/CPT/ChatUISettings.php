@@ -72,10 +72,10 @@ class ChatUISettings {
 	public function add_submenu_page() {
 		add_submenu_page(
 			'smartforms',
-			__( 'Chat Themes', 'smartforms' ),
-			__( 'Themes', 'smartforms' ),
+			__( 'Chat Window Styles', 'smartforms' ),
+			__( 'Styles', 'smartforms' ),
 			'manage_options',
-			'smartforms-chat-themes',
+			'smartforms-chat-styles',
 			array( $this, 'render_settings_page' )
 		);
 	}
@@ -96,14 +96,14 @@ class ChatUISettings {
 			'smartforms_chat_theme_section',
 			__( 'Chat Theme Presets', 'smartforms' ),
 			null,
-			'smartforms-chat-themes'
+			'smartforms-chat-styles'
 		);
 
 		add_settings_field(
 			'theme_preset',
 			__( 'Select Chat Theme', 'smartforms' ),
 			array( $this, 'render_theme_field' ),
-			'smartforms-chat-themes',
+			'smartforms-chat-styles',
 			'smartforms_chat_theme_section'
 		);
 	}
@@ -164,13 +164,14 @@ class ChatUISettings {
 	 */
 	public function render_settings_page() {
 		?>
-		<div class="wrap" style="display: flex; gap: 20px;">
+		<!-- Add a special wrapper so Bootstrap CSS can be scoped/overridden if needed. -->
+		<div class="wrap smartforms-admin-styles-page" style="display: flex; gap: 20px;">
 			<div class="smartforms-settings-left" style="flex: 1;">
-				<h1><?php esc_html_e( 'SmartForms Chat Themes', 'smartforms' ); ?></h1>
+				<h1><?php esc_html_e( 'SmartForms Chat Window Styles', 'smartforms' ); ?></h1>
 				<form method="post" action="options.php">
 					<?php
 					settings_fields( 'smartforms_chat_theme_settings_group' );
-					do_settings_sections( 'smartforms-chat-themes' );
+					do_settings_sections( 'smartforms-chat-styles' );
 					submit_button();
 					?>
 				</form>
@@ -190,3 +191,4 @@ class ChatUISettings {
 }
 
 ChatUISettings::get_instance();
+

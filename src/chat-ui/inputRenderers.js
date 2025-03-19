@@ -48,15 +48,31 @@ export function createInputControl(field, updateSubmitButtonState) {
     }
 
     case 'number': {
-      // For number fields, we do <div class="sf-number-container"><input type="number" ...></div>
-      specificContainer = document.createElement('div');
-      specificContainer.className = 'sf-number-container';
+      // For number fields, we want to move only the field.
+      // In the frontend, the Chat UI creates the field using this helper.
+      // Instead of applying alignment classes to the inner container, we make the input container a flex container.
+      // Determine the appropriate justify-content class based on field.fieldAlignment.
+      const justifyClass =
+        field.fieldAlignment === 'center'
+          ? 'justify-content-center'
+          : field.fieldAlignment === 'right'
+            ? 'justify-content-end'
+            : 'justify-content-start';
+      // Add flex display and justification classes to the input container.
+      inputContainer.classList.add('d-flex', justifyClass);
 
+      // Create a container for the number input (without applying alignment here).
+      specificContainer = document.createElement('div');
+      // Determine the size class based on field.fieldSize.
+      const sizeClass =
+        field.fieldSize === 'small'
+          ? 'form-control-sm'
+          : field.fieldSize === 'large'
+            ? 'form-control-lg'
+            : '';
       const inputEl = document.createElement('input');
       inputEl.type = 'number';
-      inputEl.className = 'form-control sf-number-input';
-
-      // If the block JSON includes min, max, step, etc.
+      inputEl.className = `form-control sf-number-input ${sizeClass}`;
       if (typeof field.min !== 'undefined') {
         inputEl.min = field.min;
       }
@@ -66,7 +82,6 @@ export function createInputControl(field, updateSubmitButtonState) {
       if (typeof field.step !== 'undefined') {
         inputEl.step = field.step;
       }
-
       inputEl.addEventListener('input', (e) => {
         updateSubmitButtonState(field, e.target.value);
       });
@@ -179,7 +194,6 @@ export function createInputControl(field, updateSubmitButtonState) {
       slider.type = 'range';
       slider.className = 'sf-slider-input';
 
-      // If min, max, step are present in your saved block JSON
       if (typeof field.min !== 'undefined') {
         slider.min = field.min;
       }
@@ -278,7 +292,7 @@ export function createInputControl(field, updateSubmitButtonState) {
     }
 
     default: {
-      // For unrecognized types, fallback to <textarea>.
+      // For any other block types, fallback to <textarea>.
       specificContainer = document.createElement('div');
       specificContainer.className = 'sf-default-container';
 
