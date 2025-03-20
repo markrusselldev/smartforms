@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use WP_Error;
-use SmartForms\Core\SmartForms; // Import the core SmartForms class for logging;
+use SmartForms\Core\SmartForms; // Import the core SmartForms class for logging.
 
 /**
  * MetaBox class for handling form JSON generation.
@@ -146,8 +146,7 @@ class MetaBox {
 								),
 							);
 						}
-						$layout = array_key_exists( 'layout', $block['attrs'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal';
-						// Append options last.
+						$layout     = array_key_exists( 'layout', $block['attrs'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal';
 						$form_field = array_merge(
 							$form_field,
 							array(
@@ -184,15 +183,21 @@ class MetaBox {
 								),
 							);
 						}
-						$multiple = isset( $block['attrs']['multiple'] ) ? (bool) $block['attrs']['multiple'] : false;
-						$layout   = array_key_exists( 'layout', $block['attrs'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal';
-						// Append options last.
+						$multiple        = isset( $block['attrs']['multiple'] ) ? (bool) $block['attrs']['multiple'] : false;
+						$layout          = array_key_exists( 'layout', $block['attrs'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal';
+						$field_alignment = isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left';
+
+						// Remove any pre-existing keys so we can append in a controlled order.
+						unset( $form_field['multiple'], $form_field['layout'], $form_field['fieldAlignment'], $form_field['options'] );
+
+						// Append new attributes in the desired order, ensuring that 'options' is the last key.
 						$form_field = array_merge(
 							$form_field,
 							array(
-								'multiple' => $multiple,
-								'layout'   => $layout,
-								'options'  => $options,
+								'multiple'       => $multiple,
+								'layout'         => $layout,
+								'fieldAlignment' => $field_alignment,
+								'options'        => $options,
 							)
 						);
 						break;

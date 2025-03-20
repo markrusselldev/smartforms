@@ -58,10 +58,8 @@ export function createInputControl(field, updateSubmitButtonState) {
           : field.fieldAlignment === 'right'
             ? 'justify-content-end'
             : 'justify-content-start';
-      // Add flex display and justification classes to the input container.
       inputContainer.classList.add('d-flex', justifyClass);
 
-      // Create a container for the number input (without applying alignment here).
       specificContainer = document.createElement('div');
       // Determine the size class based on field.fieldSize.
       const sizeClass =
@@ -142,17 +140,33 @@ export function createInputControl(field, updateSubmitButtonState) {
         specificContainer.className =
           'sf-buttons-group sf-buttons-group--vertical';
         specificContainer.setAttribute('data-layout', 'vertical');
+        // No inline alignment; FieldWrapper handles overall alignment.
       } else {
         specificContainer.className =
           'sf-buttons-group sf-buttons-group--horizontal d-flex flex-wrap gap-2';
         specificContainer.setAttribute('data-layout', 'horizontal');
+        // Instead of adding alignment to this container, we add it to the input container.
       }
+      // Add flexbox-based alignment to the input container for buttons, similar to number block.
+      const justifyClass =
+        field.fieldAlignment === 'center'
+          ? 'justify-content-center'
+          : field.fieldAlignment === 'right'
+            ? 'justify-content-end'
+            : 'justify-content-start';
+      inputContainer.classList.add('d-flex', justifyClass);
 
       if (field.options && Array.isArray(field.options)) {
         field.options.forEach((opt) => {
           const btn = document.createElement('button');
           btn.type = 'button';
-          btn.className = 'btn btn-primary';
+          let btnClass = 'btn btn-primary';
+          if (field.buttonSize === 'small') {
+            btnClass += ' btn-sm';
+          } else if (field.buttonSize === 'large') {
+            btnClass += ' btn-lg';
+          }
+          btn.className = btnClass;
           btn.setAttribute('data-value', opt.value);
           btn.textContent = opt.label;
 
@@ -222,7 +236,6 @@ export function createInputControl(field, updateSubmitButtonState) {
 
       if (field.options && Array.isArray(field.options)) {
         field.options.forEach((opt) => {
-          // In your dynamic block you might have { label, value } objects
           const option = document.createElement('option');
           option.value = opt.value || opt;
           option.textContent = opt.label || opt;

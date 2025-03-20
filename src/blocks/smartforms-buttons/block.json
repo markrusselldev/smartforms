@@ -56,6 +56,10 @@
     "currentAnswer": {
       "type": "string",
       "default": ""
+    },
+    "fieldAlignment": {
+      "type": "string",
+      "default": "left"
     }
   },
   "editorScript": "file:./index.js",

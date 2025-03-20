@@ -8,8 +8,7 @@
  * For vertical layout, the buttons stack with auto width, a minimum width of 80px,
  * and a 10px bottom margin.
  *
- * This file targets both our intended BEM classes (with double dashes)
- * and a fallback in case the class is rendered with a single dash.
+ * Additionally, custom styling is added to mimic Bootstrap's button appearance.
  *
  * @package SmartForms
  */
@@ -18,12 +17,43 @@
   border: 1px solid #ddd;
   padding: 10px;
 
+  /* Base button styling */
+  button.btn {
+    background-color: #007bff;
+    color: #fff;
+    border: 1px solid #007bff;
+    border-radius: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    cursor: pointer;
+    font-size: 1rem; /* default medium */
+  }
+  button.btn:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+  }
+  button.btn.active {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
+
+  /* Increase specificity for Bootstrap size overrides in the editor */
+  .wp-block-smartforms-buttons button.btn.btn-sm {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.875rem !important; /* small */
+    border-radius: 0.2rem !important;
+  }
+  .wp-block-smartforms-buttons button.btn.btn-lg {
+    padding: 0.5rem 1rem !important;
+    font-size: 1.25rem !important; /* large */
+    border-radius: 0.3rem !important;
+  }
+
   /* Vertical layout: target both BEM formats */
   .sf-buttons-group--vertical,
   .sf-buttons-group-vertical {
     display: block !important;
 
-    .btn {
+    button.btn {
       display: block !important;
       width: auto !important;
       min-width: 80px;
@@ -38,7 +68,7 @@
     gap: 10px;
     flex-wrap: wrap !important;
 
-    .btn {
+    button.btn {
       min-width: 80px;
     }
   }

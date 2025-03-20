@@ -5,7 +5,8 @@
  * - Toggling required status.
  * - Enabling/disabling multiple selections.
  * - Managing the button options.
- * - Selecting the layout (vertical or horizontal).
+ * - Selecting the layout (horizontal or vertical).
+ * - Selecting field alignment.
  *
  * The entire output is wrapped with the FieldWrapper component so that the label,
  * input container, and help text use consistent RichText behavior.
@@ -13,11 +14,7 @@
  * @package SmartForms
  */
 import { __ } from '@wordpress/i18n';
-import {
-  useBlockProps,
-  InspectorControls,
-  RichText,
-} from '@wordpress/block-editor';
+import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import {
   PanelBody,
   TextControl,
@@ -41,10 +38,11 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     multiple,
     currentAnswer,
     layout,
+    fieldAlignment,
   } = attributes;
   const blockProps = useBlockProps();
 
-  // Initialize groupId, default options, and layout if not already set.
+  // Initialize attributes if not already set.
   useEffect(() => {
     if (!groupId) {
       setAttributes({ groupId: `sf-buttons-${clientId}` });
@@ -55,7 +53,10 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     if (!layout) {
       setAttributes({ layout: 'horizontal' });
     }
-  }, [groupId, options, layout, clientId, setAttributes]);
+    if (!fieldAlignment) {
+      setAttributes({ fieldAlignment: 'left' });
+    }
+  }, [groupId, options, layout, fieldAlignment, clientId, setAttributes]);
 
   /**
    * Updates an option's label and corresponding value.
@@ -78,7 +79,6 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 
   /**
    * Adds a new button option.
-   * Uses Array.reduce to determine the current maximum option number.
    */
   const addOption = () => {
     const maxNumber = options.reduce((acc, option) => {
@@ -127,6 +127,16 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
             ]}
             onChange={(value) => setAttributes({ layout: value })}
           />
+          <SelectControl
+            label={__('Alignment', 'smartforms')}
+            value={fieldAlignment}
+            options={[
+              { label: __('Left', 'smartforms'), value: 'left' },
+              { label: __('Center', 'smartforms'), value: 'center' },
+              { label: __('Right', 'smartforms'), value: 'right' },
+            ]}
+            onChange={(value) => setAttributes({ fieldAlignment: value })}
+          />
         </PanelBody>
         <PanelBody
           title={__('Button Options', 'smartforms')}
@@ -148,12 +158,13 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
               </Button>
             </div>
           ))}
-          <Button variant="primary" onClick={addOption}>
-            {__('Add Option', 'smartforms')}
-          </Button>
+          <div style={{ textAlign: 'center', paddingTop: '10px' }}>
+            <Button variant="primary" onClick={addOption}>
+              {__('Add Option', 'smartforms')}
+            </Button>
+          </div>
         </PanelBody>
       </InspectorControls>
-      {/* Wrap the field's label, input container, and help text in FieldWrapper */}
       <FieldWrapper
         label={label}
         helpText={helpText}
@@ -161,15 +172,17 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
         setHelpText={(value) => setAttributes({ helpText: value })}
         labelPlaceholder={placeholders.label}
         helpPlaceholder={placeholders.helpText}
+        alignment={fieldAlignment}
       >
         <div
           className={`sf-buttons-group sf-buttons-group--${layout}`}
           data-group-id={groupId}
           data-layout={layout}
+          style={{ textAlign: fieldAlignment }}
         >
           {options.map((option, index) => (
             <button
-              key={index}
+              key={`${index}`}
               type="button"
               className={`btn btn-primary ${
                 multiple

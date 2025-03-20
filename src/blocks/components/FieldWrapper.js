@@ -18,6 +18,7 @@
  * @param {string} [props.alignment="left"] Field alignment: "left", "center", or "right".
  * @param {string} [props.labelClass="sf-field-label"] CSS class for the label element.
  * @param {boolean} [props.plainText=false] When true, disables RichText formatting (ensuring plain text).
+ * @param {number} [props.forceUpdate] A dummy value to force re-rendering.
  * @returns {React.Element} The FieldWrapper component.
  */
 import { RichText } from '@wordpress/block-editor';
@@ -34,6 +35,7 @@ const FieldWrapper = ({
   alignment = 'left',
   labelClass = 'sf-field-label',
   plainText = false,
+  forceUpdate,
 }) => {
   // Compute flexbox justification value for the input container.
   const justifyContent =
@@ -56,6 +58,7 @@ const FieldWrapper = ({
       <div
         className="sf-input-container"
         style={{ display: 'flex', justifyContent }}
+        key={forceUpdate}
       >
         {children}
       </div>
