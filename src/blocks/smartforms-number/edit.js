@@ -1,12 +1,12 @@
 /**
- * Edit component for SmartForms Number block.
+ * Edit component for the SmartForms Number block.
  *
- * 1. Uses the "fieldAlignment" attribute.
- * 2. Applies alignment using Bootstrap’s utility classes (text‑start, text‑center, text‑end).
- * 3. Applies size classes (form-control-sm or form-control-lg) based on the fieldSize attribute.
+ * Renders the block in the editor with InspectorControls for:
+ * - Toggling required status.
+ * - Setting min, max, step, and defaultValue.
+ * - Selecting field alignment.
  *
- * The component wraps the input with FieldWrapper so that the label,
- * input container, and help text display consistently in the editor.
+ * The entire output is wrapped with a FieldWrapper for consistent styling.
  *
  * @package SmartForms
  */
@@ -18,10 +18,13 @@ import {
   ToggleControl,
   SelectControl,
 } from '@wordpress/components';
+import { useEffect } from '@wordpress/element';
 import { blockDefaults } from '../../config/blockDefaults';
 import FieldWrapper from '../components/FieldWrapper';
 
-const Edit = ({ attributes, setAttributes }) => {
+const { placeholders } = blockDefaults;
+
+const Edit = ({ attributes, setAttributes, clientId }) => {
   const {
     label,
     required,
@@ -30,27 +33,15 @@ const Edit = ({ attributes, setAttributes }) => {
     step,
     defaultValue,
     helpText,
-    fieldSize,
     fieldAlignment,
   } = attributes;
-
-  // Determine the Bootstrap size class.
-  const sizeClass =
-    fieldSize === 'small'
-      ? 'form-control-sm'
-      : fieldSize === 'large'
-        ? 'form-control-lg'
-        : '';
-
-  // Compute Bootstrap alignment class using fieldAlignment.
-  const bootstrapAlignment =
-    fieldAlignment === 'center'
-      ? 'text-center'
-      : fieldAlignment === 'right'
-        ? 'text-end'
-        : 'text-start';
-
   const blockProps = useBlockProps();
+
+  useEffect(() => {
+    if (typeof fieldAlignment === 'undefined' || fieldAlignment === '') {
+      setAttributes({ fieldAlignment: 'left' });
+    }
+  }, [fieldAlignment, setAttributes]);
 
   return (
     <div {...blockProps}>
@@ -89,18 +80,6 @@ const Edit = ({ attributes, setAttributes }) => {
               'smartforms',
             )}
           />
-        </PanelBody>
-        <PanelBody title={__('Appearance', 'smartforms')} initialOpen={true}>
-          <SelectControl
-            label={__('Field Size', 'smartforms')}
-            value={fieldSize}
-            options={[
-              { label: __('Small', 'smartforms'), value: 'small' },
-              { label: __('Medium', 'smartforms'), value: 'medium' },
-              { label: __('Large', 'smartforms'), value: 'large' },
-            ]}
-            onChange={(value) => setAttributes({ fieldSize: value })}
-          />
           <SelectControl
             label={__('Alignment', 'smartforms')}
             value={fieldAlignment}
@@ -113,20 +92,18 @@ const Edit = ({ attributes, setAttributes }) => {
           />
         </PanelBody>
       </InspectorControls>
-
-      {/* Use FieldWrapper for consistent layout */}
       <FieldWrapper
         label={label}
         helpText={helpText}
         setLabel={(value) => setAttributes({ label: value })}
         setHelpText={(value) => setAttributes({ helpText: value })}
-        labelPlaceholder={blockDefaults.placeholders.label}
-        helpPlaceholder={blockDefaults.placeholders.helpText}
+        labelPlaceholder={placeholders.label}
+        helpPlaceholder={placeholders.helpText}
         alignment={fieldAlignment}
       >
         <input
           type="number"
-          className={`form-control sf-number-input ${sizeClass}`}
+          className="form-control sf-number-input"
           required={required}
           min={min}
           max={max}

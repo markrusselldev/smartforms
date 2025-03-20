@@ -1,33 +1,9 @@
 /**
  * Editor styles for the SmartForms Number block.
  *
- *
  * @package SmartForms
  */
 .wp-block-smartforms-number {
   border: 1px solid #ddd;
   padding: 10px;
-
-  .sf-number-input {
-    /* Default (medium) Bootstrap 5 styles */
-    font-size: 1rem; /* 16px */
-    padding: 0.375rem 0.75rem; /* 6px 12px */
-    border: 1px solid #ced4da;
-    border-radius: 0.25rem;
-    line-height: 1.5;
-  }
-
-  .form-control-sm {
-    /* Bootstrap 5 small input */
-    font-size: 0.875rem; /* 14px */
-    padding: 0.25rem 0.5rem; /* 4px 8px */
-    border-radius: 0.2rem;
-  }
-
-  .form-control-lg {
-    /* Bootstrap 5 large input */
-    font-size: 1.25rem; /* 20px */
-    padding: 0.5rem 1rem; /* 8px 16px */
-    border-radius: 0.3rem;
-  }
 }

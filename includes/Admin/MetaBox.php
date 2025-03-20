@@ -102,9 +102,8 @@ class MetaBox {
 				// Process block-type–specific attributes.
 				switch ( $type ) {
 					case 'number':
-						// Merge number field–specific settings, plus fieldAlignment & fieldSize.
+						// Merge number field–specific settings, plus fieldAlignment.
 						$field_alignment = isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left';
-						$field_size      = isset( $block['attrs']['fieldSize'] ) ? sanitize_text_field( $block['attrs']['fieldSize'] ) : 'medium';
 
 						$form_field = array_merge(
 							$form_field,
@@ -114,7 +113,6 @@ class MetaBox {
 								'step'           => isset( $block['attrs']['step'] ) ? floatval( $block['attrs']['step'] ) : 1,
 								'defaultValue'   => isset( $block['attrs']['defaultValue'] ) ? floatval( $block['attrs']['defaultValue'] ) : 0,
 								'fieldAlignment' => $field_alignment,
-								'fieldSize'      => $field_size,
 							)
 						);
 						break;
@@ -146,7 +144,7 @@ class MetaBox {
 								),
 							);
 						}
-						$layout     = array_key_exists( 'layout', $block['attrs'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal';
+						$layout = array_key_exists( 'layout', $block['attrs'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal';
 						$form_field = array_merge(
 							$form_field,
 							array(
@@ -183,8 +181,8 @@ class MetaBox {
 								),
 							);
 						}
-						$multiple        = isset( $block['attrs']['multiple'] ) ? (bool) $block['attrs']['multiple'] : false;
-						$layout          = array_key_exists( 'layout', $block['attrs'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal';
+						$multiple = isset( $block['attrs']['multiple'] ) ? (bool) $block['attrs']['multiple'] : false;
+						$layout   = array_key_exists( 'layout', $block['attrs'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal';
 						$field_alignment = isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left';
 
 						// Remove any pre-existing keys so we can append in a controlled order.

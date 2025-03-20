@@ -4,8 +4,6 @@
  * Frontend stylesheet for the Number block.
  *
  * We want the number field to appear exactly as it does when styled by Bootstrap.
- * Therefore, we remove any extra styling that might override Bootstrap’s defaults.
- *
  * The markup produced by our block gives the input the "form-control" class,
  * so Bootstrap will handle the border color, border radius, padding, etc.
  */
@@ -13,4 +11,19 @@
   .sf-number-container {
     display: block; // Ensure the container displays as a block-level element.
   }
+}
+
+.sf-number-input {
+  /* Let Bootstrap's .form-control styling apply */
+}
+
+/*
+ * Note: We no longer remove native spin buttons.
+ * This allows Bootstrap's default styles to render the spin buttons as intended.
+ */
+.wp-block-smartforms-number .sf-number-input::-webkit-inner-spin-button,
+.wp-block-smartforms-number .sf-number-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+  height: 100%;
 }
