@@ -25,7 +25,15 @@ import FieldWrapper from '../components/FieldWrapper';
 const { placeholders, defaultOptions } = blockDefaults;
 
 const Edit = ({ attributes, setAttributes, clientId }) => {
-  const { label, helpText, required, options, groupId, layout } = attributes;
+  const {
+    label,
+    helpText,
+    required,
+    options,
+    groupId,
+    layout,
+    fieldAlignment,
+  } = attributes;
   const blockProps = useBlockProps();
 
   // Initialize attributes if not already set.
@@ -39,7 +47,10 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     if (!options || !Array.isArray(options) || options.length === 0) {
       setAttributes({ options: defaultOptions });
     }
-  }, [groupId, layout, options, clientId, setAttributes]);
+    if (!fieldAlignment) {
+      setAttributes({ fieldAlignment: 'left' });
+    }
+  }, [groupId, layout, options, fieldAlignment, clientId, setAttributes]);
 
   /**
    * Updates an option's label and corresponding value.
@@ -110,6 +121,16 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
             ]}
             onChange={(value) => setAttributes({ layout: value })}
           />
+          <SelectControl
+            label={__('Field Alignment', 'smartforms')}
+            value={fieldAlignment}
+            options={[
+              { label: __('Left', 'smartforms'), value: 'left' },
+              { label: __('Center', 'smartforms'), value: 'center' },
+              { label: __('Right', 'smartforms'), value: 'right' },
+            ]}
+            onChange={(value) => setAttributes({ fieldAlignment: value })}
+          />
         </PanelBody>
         <PanelBody
           title={__('Checkbox Options', 'smartforms')}
@@ -137,7 +158,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
           </Button>
         </PanelBody>
       </InspectorControls>
-      {/* FieldWrapper now uses plainText mode to ensure the label is stored as plain text */}
+      {/* FieldWrapper now uses plainText mode and passes alignment for consistent layout */}
       <FieldWrapper
         label={label}
         helpText={helpText}
@@ -146,6 +167,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
         labelPlaceholder={placeholders.label}
         helpPlaceholder={placeholders.helpText}
         plainText={true}
+        alignment={fieldAlignment}
       >
         <div
           className={`sf-checkbox-group sf-checkbox-group-${layout || 'horizontal'}`}

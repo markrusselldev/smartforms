@@ -18,7 +18,6 @@
  * @returns {HTMLElement} The outer .sf-field-wrapper element containing the actual input(s).
  */
 export function createInputControl(field, updateSubmitButtonState) {
-  // We'll build everything into an outer wrapper and return it.
   const wrapper = document.createElement('div');
   wrapper.className = 'sf-field-wrapper';
 
@@ -30,7 +29,6 @@ export function createInputControl(field, updateSubmitButtonState) {
 
   switch (field.type) {
     case 'text': {
-      // For text fields, we'll do <div class="sf-text-container"><input type="text" ...></div>
       specificContainer = document.createElement('div');
       specificContainer.className = 'sf-text-container';
 
@@ -48,10 +46,7 @@ export function createInputControl(field, updateSubmitButtonState) {
     }
 
     case 'number': {
-      // For number fields, we want to move only the field.
-      // In the frontend, the Chat UI creates the field using this helper.
-      // Instead of applying alignment classes to the inner container, we make the input container a flex container.
-      // Determine the appropriate justify-content class based on field.fieldAlignment.
+      // Determine alignment for number fields.
       const justifyClass =
         field.fieldAlignment === 'center'
           ? 'justify-content-center'
@@ -61,7 +56,7 @@ export function createInputControl(field, updateSubmitButtonState) {
       inputContainer.classList.add('d-flex', justifyClass);
 
       specificContainer = document.createElement('div');
-      // Determine the size class based on field.fieldSize.
+      // Determine the Bootstrap size class based on field.fieldSize.
       const sizeClass =
         field.fieldSize === 'small'
           ? 'form-control-sm'
@@ -89,7 +84,6 @@ export function createInputControl(field, updateSubmitButtonState) {
     }
 
     case 'checkbox': {
-      // <div class="sf-checkbox-group"> multiple <input type="checkbox" ...> </div>
       const checkboxLayout = field.layout || 'horizontal';
       specificContainer = document.createElement('div');
       specificContainer.className =
@@ -129,25 +123,7 @@ export function createInputControl(field, updateSubmitButtonState) {
           specificContainer.appendChild(optionWrapper);
         });
       }
-      break;
-    }
-
-    case 'buttons': {
-      // <div class="sf-buttons-group [horizontal or vertical]"> multiple <button ...> </div>
-      specificContainer = document.createElement('div');
-
-      if (field.layout === 'vertical') {
-        specificContainer.className =
-          'sf-buttons-group sf-buttons-group--vertical';
-        specificContainer.setAttribute('data-layout', 'vertical');
-        // No inline alignment; FieldWrapper handles overall alignment.
-      } else {
-        specificContainer.className =
-          'sf-buttons-group sf-buttons-group--horizontal d-flex flex-wrap gap-2';
-        specificContainer.setAttribute('data-layout', 'horizontal');
-        // Instead of adding alignment to this container, we add it to the input container.
-      }
-      // Add flexbox-based alignment to the input container for buttons, similar to number block.
+      // Add alignment classes to inputContainer based on field.fieldAlignment.
       const justifyClass =
         field.fieldAlignment === 'center'
           ? 'justify-content-center'
@@ -155,18 +131,27 @@ export function createInputControl(field, updateSubmitButtonState) {
             ? 'justify-content-end'
             : 'justify-content-start';
       inputContainer.classList.add('d-flex', justifyClass);
+      break;
+    }
+
+    case 'buttons': {
+      specificContainer = document.createElement('div');
+
+      if (field.layout === 'vertical') {
+        specificContainer.className =
+          'sf-buttons-group sf-buttons-group--vertical';
+        specificContainer.setAttribute('data-layout', 'vertical');
+      } else {
+        specificContainer.className =
+          'sf-buttons-group sf-buttons-group--horizontal d-flex flex-wrap gap-2';
+        specificContainer.setAttribute('data-layout', 'horizontal');
+      }
 
       if (field.options && Array.isArray(field.options)) {
         field.options.forEach((opt) => {
           const btn = document.createElement('button');
           btn.type = 'button';
-          let btnClass = 'btn btn-primary';
-          if (field.buttonSize === 'small') {
-            btnClass += ' btn-sm';
-          } else if (field.buttonSize === 'large') {
-            btnClass += ' btn-lg';
-          }
-          btn.className = btnClass;
+          btn.className = 'btn btn-primary';
           btn.setAttribute('data-value', opt.value);
           btn.textContent = opt.label;
 
@@ -200,7 +185,6 @@ export function createInputControl(field, updateSubmitButtonState) {
     }
 
     case 'slider': {
-      // <div class="sf-slider-container"><input type="range" ...></div>
       specificContainer = document.createElement('div');
       specificContainer.className = 'sf-slider-container';
 
@@ -227,7 +211,6 @@ export function createInputControl(field, updateSubmitButtonState) {
     }
 
     case 'select': {
-      // <div class="sf-select-container"><select ...> <option> ...</div>
       specificContainer = document.createElement('div');
       specificContainer.className = 'sf-select-container';
 
@@ -252,7 +235,6 @@ export function createInputControl(field, updateSubmitButtonState) {
     }
 
     case 'radio': {
-      // <div class="sf-radio-group"><input type="radio" ...> ...</div>
       specificContainer = document.createElement('div');
       specificContainer.className = 'sf-radio-group';
 
@@ -287,7 +269,6 @@ export function createInputControl(field, updateSubmitButtonState) {
     }
 
     case 'textarea': {
-      // <div class="sf-textarea-container"><textarea ...></div>
       specificContainer = document.createElement('div');
       specificContainer.className = 'sf-textarea-container';
 
@@ -305,7 +286,6 @@ export function createInputControl(field, updateSubmitButtonState) {
     }
 
     default: {
-      // For any other block types, fallback to <textarea>.
       specificContainer = document.createElement('div');
       specificContainer.className = 'sf-default-container';
 
@@ -323,12 +303,8 @@ export function createInputControl(field, updateSubmitButtonState) {
     }
   }
 
-  // Put the specific container inside .sf-input-container
   inputContainer.appendChild(specificContainer);
-
-  // Then add .sf-input-container into the outer .sf-field-wrapper
   wrapper.appendChild(inputContainer);
-
   return wrapper;
 }
 

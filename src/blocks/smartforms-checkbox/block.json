@@ -48,6 +48,10 @@
     "layout": {
       "type": "string",
       "default": "horizontal"
+    },
+    "fieldAlignment": {
+      "type": "string",
+      "default": "left"
     }
   },
   "editorScript": "file:./index.js",

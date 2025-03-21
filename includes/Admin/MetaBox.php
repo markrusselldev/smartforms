@@ -104,7 +104,6 @@ class MetaBox {
 					case 'number':
 						// Merge number field–specific settings, plus fieldAlignment.
 						$field_alignment = isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left';
-
 						$form_field = array_merge(
 							$form_field,
 							array(
@@ -145,11 +144,13 @@ class MetaBox {
 							);
 						}
 						$layout = array_key_exists( 'layout', $block['attrs'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal';
+						$field_alignment = isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left';
 						$form_field = array_merge(
 							$form_field,
 							array(
-								'layout'  => $layout,
-								'options' => $options,
+								'layout'         => $layout,
+								'fieldAlignment' => $field_alignment,
+								'options'        => $options,
 							)
 						);
 						break;
@@ -184,10 +185,8 @@ class MetaBox {
 						$multiple = isset( $block['attrs']['multiple'] ) ? (bool) $block['attrs']['multiple'] : false;
 						$layout   = array_key_exists( 'layout', $block['attrs'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal';
 						$field_alignment = isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left';
-
 						// Remove any pre-existing keys so we can append in a controlled order.
 						unset( $form_field['multiple'], $form_field['layout'], $form_field['fieldAlignment'], $form_field['options'] );
-
 						// Append new attributes in the desired order, ensuring that 'options' is the last key.
 						$form_field = array_merge(
 							$form_field,

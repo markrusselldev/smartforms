@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Form Control Icons – Updated Radio Icon</title>
+  <!-- Load Dashicons from WordPress (for the other icons) -->
+  <link rel="stylesheet" href="https://s.w.org/wp-includes/css/dashicons.css">
+  <style>
+    .icon-sample {
+      margin: 10px;
+      display: flex;
+      align-items: center;
+    }
+    /* Consistent sizing for both Dashicons and SVGs */
+    .icon-sample .dashicons,
+    .icon-sample svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+    .icon-label {
+      margin-left: 8px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 1. Text Input: using Dashicons (editor-textcolor) -->
+  <div class="icon-sample">
+    <span class="dashicons dashicons-editor-textcolor"></span>
+    <span class="icon-label">Text Input</span>
+  </div>
+  
+  <!-- 2. Number Input: custom SVG showing "123" with closer spacing -->
+  <div class="icon-sample">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <text x="12" y="16" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="currentColor" style="letter-spacing: -1px;">
+        123
+      </text>
+    </svg>
+    <span class="icon-label">Number Input</span>
+  </div>
+  
+  <!-- 3. Email Input: using Dashicons (email) -->
+  <div class="icon-sample">
+    <span class="dashicons dashicons-email"></span>
+    <span class="icon-label">Email Input</span>
+  </div>
+  
+  <!-- 4. Radio Buttons: custom SVG with outer circle and center dot -->
+  <div class="icon-sample">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <!-- Outer circle (radius 8, centered at 12,12) -->
+      <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
+      <!-- Center dot (radius 3) -->
+      <circle cx="12" cy="12" r="3" fill="currentColor"/>
+    </svg>
+    <span class="icon-label">Radio Buttons</span>
+  </div>
+  
+  <!-- 5. Checkboxes: custom SVG mimicking FontAwesome–style checkbox with checkmark shifted right -->
+  <div class="icon-sample">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="4" width="16" height="16" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="1"/>
+      <polyline points="7 12 11 16 17 8" fill="none" stroke="currentColor" stroke-width="2.5"/>
+    </svg>
+    <span class="icon-label">Checkboxes</span>
+  </div>
+  
+  <!-- 6. Select Dropdown: using Dashicons (arrow-down-alt2) -->
+  <div class="icon-sample">
+    <span class="dashicons dashicons-arrow-down-alt2"></span>
+    <span class="icon-label">Select Dropdown</span>
+  </div>
+  
+  <!-- 7. Range Slider: custom SVG with stroke-width=10 and larger thumb -->
+  <div class="icon-sample">
+    <svg viewBox="0 0 100 30" xmlns="http://www.w3.org/2000/svg">
+      <line x1="10" y1="15" x2="90" y2="15" stroke="currentColor" stroke-width="10"/>
+      <circle cx="50" cy="15" r="14" fill="currentColor"/>
+    </svg>
+    <span class="icon-label">Range Slider</span>
+  </div>
+  
+  <!-- 8. Custom Button Group: custom SVG with three rounded rectangles in one row -->
+  <div class="icon-sample">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2.5" y="8" width="5" height="8" rx="1" ry="1" fill="currentColor"/>
+      <rect x="9.5" y="8" width="5" height="8" rx="1" ry="1" fill="currentColor"/>
+      <rect x="16.5" y="8" width="5" height="8" rx="1" ry="1" fill="currentColor"/>
+    </svg>
+    <span class="icon-label">Custom Button Group</span>
+  </div>
+  
+  <!-- 9. Textarea: using Dashicons (editor-paragraph) -->
+  <div class="icon-sample">
+    <span class="dashicons dashicons-editor-paragraph"></span>
+    <span class="icon-label">Textarea</span>
+  </div>
+</body>
+</html>
