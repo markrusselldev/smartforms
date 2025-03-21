@@ -8,7 +8,7 @@
 import './smartforms-chat.scss';
 // Import configuration defaults (to be used if DOM config is missing)
 import { smartformsConfig as moduleConfig } from '../config/smartformsConfig.js';
-// Import helper functions from inputRenderers.js (no changes made here)
+// Import helper functions from inputRenderers.js
 import { createInputControl, replaceInputControl } from './inputRenderers.js';
 
 /**
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const formResponses = {}; // Object to store user responses keyed by field ID or index
   let currentAnswer = null; // Holds the current answer (used for button groups)
 
-  // Cache frequently accessed DOM elements
+  // Cache frequently accessed DOM elements.
   const chatDialog = document.getElementById('smartforms-chat-dialog');
   const submitButton = document.getElementById('smartforms-chat-submit-button');
   const inputContainer = document.getElementById('smartforms-chat-input-box');
@@ -82,17 +82,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // For non-required fields, always enable the button.
     if (!currentField.required) {
       submitButton.classList.remove('disabled');
-      // For buttons, also update the local variable.
       if (currentField.type === 'buttons') {
         currentAnswer = answer;
       }
       return;
     }
-    // For button fields, update the local currentAnswer.
     if (currentField.type === 'buttons') {
       currentAnswer = answer;
     }
-    // Disable if answer is null, an empty string, or an empty array.
     if (
       answer === null ||
       (typeof answer === 'string' && answer.trim() === '') ||
@@ -139,7 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
         (Array.isArray(answer) && answer.length === 0) ||
         answer === null)
     ) {
-      // Show validation error message if required field is empty.
       helpContainer.textContent =
         currentField.requiredMessage || `${currentField.label} is required.`;
       helpContainer.classList.add('smartforms-error-message');
@@ -150,15 +146,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 3000);
       return;
     }
-    // Append the user's answer as a message bubble.
     appendMessage(displayText, 'user');
     helpContainer.textContent = currentField.helpText || 'Enter your help text';
     helpContainer.classList.remove('smartforms-error-message');
-    // Save the answer keyed by the field's id or the current step index.
     formResponses[currentField.id || currentStep] = answer;
     currentAnswer = null;
 
-    // If there are more fields, advance; otherwise, submit responses via AJAX.
     if (currentStep < formData.fields.length - 1) {
       currentStep++;
       showCurrentQuestion();
@@ -170,7 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
       data.append('form_id', formId);
       data.append('form_data', JSON.stringify(formResponses));
 
-      // Submit the form data using fetch.
       fetch(ajaxUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -192,7 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
           chatDialog.appendChild(botMessage);
           chatDialog.scrollTop = chatDialog.scrollHeight;
 
-          // Disable further input by replacing the input area with a disabled textarea.
           const textarea = document.createElement('textarea');
           textarea.className = 'form-control smartforms-chat-input';
           textarea.rows = 4;
@@ -215,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
   submitButton.addEventListener('click', (e) => {
     e.preventDefault();
     const currentField = formData.fields[currentStep];
-    // If the field is required and the button is disabled, show the validation error.
+
     if (currentField.required && submitButton.classList.contains('disabled')) {
       helpContainer.textContent =
         currentField.requiredMessage || `${currentField.label} is required.`;
@@ -227,36 +218,50 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 3000);
       return;
     }
-    // Retrieve the answer based on the field type.
-    let answer;
-    if (currentField.type === 'buttons') {
-      answer = currentAnswer;
-    } else if (currentField.type === 'checkbox') {
-      const checkboxes = inputContainer.querySelectorAll(
-        "input[type='checkbox']",
-      );
-      answer = Array.from(checkboxes)
-        .filter((cb) => cb.checked)
-        .map((cb) => cb.value)
-        .join(', ');
-    } else if (currentField.type === 'radio') {
-      const checkedRadio = inputContainer.querySelector(
-        "input[type='radio']:checked",
-      );
-      answer = checkedRadio ? checkedRadio.value : '';
-    } else if (currentField.type === 'number') {
-      const inputElem = inputContainer.querySelector("input[type='number']");
-      if (!inputElem) return;
-      answer = inputElem.value;
-    } else if (currentField.type === 'text') {
-      const inputElem = inputContainer.querySelector('input');
-      if (!inputElem) return;
-      answer = inputElem.value;
-    } else {
-      const inputElem = inputContainer.firstElementChild;
-      if (!inputElem) return;
-      answer = inputElem.value;
+
+    let answer = '';
+    let displayText = '';
+
+    switch (currentField.type) {
+      case 'buttons': {
+        answer = currentAnswer;
+        displayText = answer;
+        break;
+      }
+      case 'checkbox': {
+        const checkboxes = inputContainer.querySelectorAll(
+          "input[type='checkbox']",
+        );
+        const selected = Array.from(checkboxes)
+          .filter((cb) => cb.checked)
+          .map((cb) => cb.value);
+        answer = selected.join(', ');
+        displayText = answer;
+        break;
+      }
+      case 'text': {
+        const inputElem = inputContainer.querySelector('input');
+        if (!inputElem) return;
+        answer = inputElem.value;
+        displayText = answer;
+        break;
+      }
+      case 'select': {
+        const selectElem = inputContainer.querySelector('select');
+        if (!selectElem) return;
+        answer = selectElem.value;
+        // Retrieve display text from the selected option.
+        displayText =
+          selectElem.options[selectElem.selectedIndex]?.text || answer;
+        break;
+      }
+      default: {
+        const inputElem = inputContainer.firstElementChild;
+        if (!inputElem) return;
+        answer = inputElem.value;
+        displayText = answer;
+      }
     }
-    processAnswer(answer);
+    processAnswer(answer, displayText);
   });
 });

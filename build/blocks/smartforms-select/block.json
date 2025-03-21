@@ -3,7 +3,7 @@
   "name": "smartforms/select",
   "title": "Dropdown",
   "category": "smartforms",
-  "icon": "arrow-down",
+  "icon": "arrow-down-alt2",
   "description": "A dropdown select field.",
   "supports": {
     "html": false,
@@ -24,28 +24,44 @@
   "attributes": {
     "label": {
       "type": "string",
-      "default": "Dropdown"
+      "default": ""
     },
     "required": {
       "type": "boolean",
       "default": false
     },
-    "className": {
-      "type": "string"
+    "helpText": {
+      "type": "string",
+      "default": ""
     },
     "placeholder": {
       "type": "string",
-      "default": "Enter dropdown..."
+      "default": "Select an option"
+    },
+    "groupId": {
+      "type": "string",
+      "default": ""
+    },
+    "fieldAlignment": {
+      "type": "string",
+      "default": "left"
     },
     "options": {
       "type": "array",
       "default": [
-        "Option 1",
-        "Option 2"
+        {
+          "label": "Option 1",
+          "value": "option-1"
+        },
+        {
+          "label": "Option 2",
+          "value": "option-2"
+        }
       ]
     }
   },
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
-  "style": "file:./style-index.css"
+  "style": "file:./style-index.css",
+  "save": null
 }

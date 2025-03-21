@@ -4,13 +4,12 @@
  * @param {string} alignment - The field alignment (left, center, right).
  * @returns {string} The corresponding Bootstrap class.
  */
-function getJustifyClass(alignment) {
-  return alignment === 'center'
+const getJustifyClass = (alignment) =>
+  alignment === 'center'
     ? 'justify-content-center'
     : alignment === 'right'
       ? 'justify-content-end'
       : 'justify-content-start';
-}
 
 /**
  * Creates an input control element based on the provided field configuration.
@@ -181,7 +180,6 @@ export function createInputControl(field, updateSubmitButtonState) {
           specificContainer.appendChild(btn);
         });
       }
-      // Added alignment for buttons block:
       const justifyClassButtons = getJustifyClass(field.fieldAlignment);
       inputContainer.classList.add('d-flex', justifyClassButtons);
       break;
@@ -220,6 +218,18 @@ export function createInputControl(field, updateSubmitButtonState) {
       const selectEl = document.createElement('select');
       selectEl.className = 'sf-select-input form-control';
 
+      // Determine the effective placeholder: fallback to "Select an option" if blank.
+      const effectivePlaceholder =
+        field.placeholder && field.placeholder.trim() !== ''
+          ? field.placeholder
+          : 'Select an option';
+
+      // Append the placeholder option if provided.
+      const placeholderOption = document.createElement('option');
+      placeholderOption.value = '';
+      placeholderOption.textContent = effectivePlaceholder;
+      selectEl.appendChild(placeholderOption);
+
       if (field.options && Array.isArray(field.options)) {
         field.options.forEach((opt) => {
           const option = document.createElement('option');
@@ -228,6 +238,9 @@ export function createInputControl(field, updateSubmitButtonState) {
           selectEl.appendChild(option);
         });
       }
+
+      // Force the select's value to be empty so the placeholder shows.
+      selectEl.value = '';
 
       selectEl.addEventListener('change', (e) => {
         updateSubmitButtonState(field, e.target.value);

@@ -103,7 +103,7 @@ class MetaBox {
 				switch ( $type ) {
 					case 'number':
 						$field_alignment = isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left';
-						$form_field = array_merge(
+						$form_field      = array_merge(
 							$form_field,
 							array(
 								'min'            => isset( $block['attrs']['min'] ) ? floatval( $block['attrs']['min'] ) : 0,
@@ -141,13 +141,11 @@ class MetaBox {
 								),
 							);
 						}
-						$layout = array_key_exists( 'layout', $block['attrs'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal';
-						$field_alignment = isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left';
 						$form_field = array_merge(
 							$form_field,
 							array(
-								'layout'         => $layout,
-								'fieldAlignment' => $field_alignment,
+								'groupId'        => isset( $block['attrs']['groupId'] ) ? sanitize_text_field( $block['attrs']['groupId'] ) : '',
+								'fieldAlignment' => isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left',
 								'options'        => $options,
 							)
 						);
@@ -179,16 +177,13 @@ class MetaBox {
 								),
 							);
 						}
-						$multiple = isset( $block['attrs']['multiple'] ) ? (bool) $block['attrs']['multiple'] : false;
-						$layout   = array_key_exists( 'layout', $block['attrs'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal';
-						$field_alignment = isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left';
-						unset( $form_field['multiple'], $form_field['layout'], $form_field['fieldAlignment'], $form_field['options'] );
+						$multiple   = isset( $block['attrs']['multiple'] ) ? (bool) $block['attrs']['multiple'] : false;
 						$form_field = array_merge(
 							$form_field,
 							array(
 								'multiple'       => $multiple,
-								'layout'         => $layout,
-								'fieldAlignment' => $field_alignment,
+								'groupId'        => isset( $block['attrs']['groupId'] ) ? sanitize_text_field( $block['attrs']['groupId'] ) : '',
+								'fieldAlignment' => isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left',
 								'options'        => $options,
 							)
 						);
@@ -224,20 +219,52 @@ class MetaBox {
 								),
 							);
 						}
-						$layout = array_key_exists( 'layout', $block['attrs'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal';
-						$field_alignment = isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left';
 						$form_field = array_merge(
 							$form_field,
 							array(
-								'layout'         => $layout,
-								'fieldAlignment' => $field_alignment,
+								'groupId'        => isset( $block['attrs']['groupId'] ) ? sanitize_text_field( $block['attrs']['groupId'] ) : '',
+								'fieldAlignment' => isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left',
 								'options'        => $options,
 							)
 						);
 						break;
 
 					case 'select':
-						// Dropdown select: no additional processing required.
+						if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
+							$options = array();
+							foreach ( $block['attrs']['options'] as $option ) {
+								if ( isset( $option['label'], $option['value'] ) ) {
+									$options[] = array(
+										'label' => sanitize_text_field( $option['label'] ),
+										'value' => sanitize_text_field( $option['value'] ),
+									);
+								} else {
+									SmartForms::log_error( "Select option missing label or value for post $post_id." );
+								}
+							}
+						} else {
+							SmartForms::log_error( "Select block missing options for post $post_id." );
+							$options = array(
+								array(
+									'label' => 'Option 1',
+									'value' => 'option-1',
+								),
+								array(
+									'label' => 'Option 2',
+									'value' => 'option-2',
+								),
+							);
+						}
+						// Merge attributes in the correct order.
+						$form_field = array_merge(
+							$form_field,
+							array(
+								'groupId'        => isset( $block['attrs']['groupId'] ) ? sanitize_text_field( $block['attrs']['groupId'] ) : '',
+								'fieldAlignment' => isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left',
+								'placeholder'    => isset( $block['attrs']['placeholder'] ) ? sanitize_text_field( $block['attrs']['placeholder'] ) : '',
+								'options'        => $options,
+							)
+						);
 						break;
 
 					case 'slider':
