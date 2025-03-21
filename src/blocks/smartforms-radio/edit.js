@@ -142,9 +142,11 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
                 </Button>
               </Fragment>
             ))}
-          <Button variant="primary" onClick={addOption}>
-            {__('Add Option', 'smartforms')}
-          </Button>
+          <div style={{ textAlign: 'center', paddingTop: '10px' }}>
+            <Button variant="primary" onClick={addOption}>
+              {__('Add Option', 'smartforms')}
+            </Button>
+          </div>
         </PanelBody>
       </InspectorControls>
       {/* Wrap the field with FieldWrapper for consistent label/help text rendering */}

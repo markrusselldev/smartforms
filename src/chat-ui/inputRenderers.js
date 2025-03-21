@@ -181,6 +181,9 @@ export function createInputControl(field, updateSubmitButtonState) {
           specificContainer.appendChild(btn);
         });
       }
+      // Added alignment for buttons block:
+      const justifyClassButtons = getJustifyClass(field.fieldAlignment);
+      inputContainer.classList.add('d-flex', justifyClassButtons);
       break;
     }
 
