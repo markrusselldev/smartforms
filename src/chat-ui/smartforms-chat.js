@@ -9,7 +9,7 @@ import './smartforms-chat.scss';
 // Import configuration defaults (to be used if DOM config is missing)
 import { smartformsConfig as moduleConfig } from '../config/smartformsConfig.js';
 // Import helper functions from inputRenderers.js
-import { createInputControl, replaceInputControl } from './inputRenderers.js';
+import { createInputControl, replaceInputControl } from './input-renderers.js';
 
 /**
  * Retrieves configuration from a JSON script element with the ID "smartforms-config".
