@@ -22,7 +22,7 @@ function getConfigFromDOM() {
     try {
       return JSON.parse(configEl.textContent);
     } catch (e) {
-      console.error("Error parsing smartforms configuration:", e);
+      console.error('Error parsing smartforms configuration:', e);
       return null;
     }
   }
@@ -33,12 +33,12 @@ function getConfigFromDOM() {
 const smartformsConfig = getConfigFromDOM() || moduleConfig;
 
 // Wait until the DOM is fully loaded
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
   const { formData, ajaxUrl, nonce, formId } = smartformsConfig;
 
   // Ensure we have valid form data with at least one field
   if (!formData || !formData.fields || formData.fields.length === 0) {
-    console.error("No form data available for SmartForms chat flow.");
+    console.error('No form data available for SmartForms chat flow.');
     return;
   }
 
@@ -47,10 +47,12 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentAnswer = null; // Holds the current answer (used for button groups)
 
   // Cache frequently accessed DOM elements
-  const chatDialog = document.getElementById("smartforms-chat-dialog");
-  const submitButton = document.getElementById("smartforms-chat-submit-button");
-  const inputContainer = document.getElementById("smartforms-chat-input-box");
-  const helpContainer = document.getElementById("smartforms-chat-help-container");
+  const chatDialog = document.getElementById('smartforms-chat-dialog');
+  const submitButton = document.getElementById('smartforms-chat-submit-button');
+  const inputContainer = document.getElementById('smartforms-chat-input-box');
+  const helpContainer = document.getElementById(
+    'smartforms-chat-help-container',
+  );
 
   /**
    * Appends a message bubble to the chat dialog.
@@ -58,9 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
    * @param {string} sender - "bot" or "user" (affects styling).
    */
   function appendMessage(message, sender) {
-    const msgDiv = document.createElement("div");
-    msgDiv.classList.add("smartforms-chat-message", sender);
-    const p = document.createElement("p");
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('smartforms-chat-message', sender);
+    const p = document.createElement('p');
     p.textContent = message;
     msgDiv.appendChild(p);
     chatDialog.appendChild(msgDiv);
@@ -79,26 +81,26 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateSubmitButtonState(currentField, answer) {
     // For non-required fields, always enable the button.
     if (!currentField.required) {
-      submitButton.classList.remove("disabled");
+      submitButton.classList.remove('disabled');
       // For buttons, also update the local variable.
-      if (currentField.type === "buttons") {
+      if (currentField.type === 'buttons') {
         currentAnswer = answer;
       }
       return;
     }
     // For button fields, update the local currentAnswer.
-    if (currentField.type === "buttons") {
+    if (currentField.type === 'buttons') {
       currentAnswer = answer;
     }
     // Disable if answer is null, an empty string, or an empty array.
     if (
       answer === null ||
-      (typeof answer === "string" && answer.trim() === "") ||
+      (typeof answer === 'string' && answer.trim() === '') ||
       (Array.isArray(answer) && answer.length === 0)
     ) {
-      submitButton.classList.add("disabled");
+      submitButton.classList.add('disabled');
     } else {
-      submitButton.classList.remove("disabled");
+      submitButton.classList.remove('disabled');
     }
   }
 
@@ -112,8 +114,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function showCurrentQuestion() {
     const currentField = formData.fields[currentStep];
     currentAnswer = null; // Reset current answer for the new field
-    appendMessage(currentField.label, "bot");
-    const inputControl = createInputControl(currentField, updateSubmitButtonState);
+    appendMessage(currentField.label, 'bot');
+    const inputControl = createInputControl(
+      currentField,
+      updateSubmitButtonState,
+    );
     replaceInputControl(inputContainer, inputControl);
     updateSubmitButtonState(currentField, currentAnswer);
   }
@@ -130,26 +135,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const currentField = formData.fields[currentStep];
     if (
       currentField.required &&
-      (
-        (typeof answer === "string" && answer.trim() === "") ||
+      ((typeof answer === 'string' && answer.trim() === '') ||
         (Array.isArray(answer) && answer.length === 0) ||
-        answer === null
-      )
+        answer === null)
     ) {
       // Show validation error message if required field is empty.
       helpContainer.textContent =
         currentField.requiredMessage || `${currentField.label} is required.`;
-      helpContainer.classList.add("smartforms-error-message");
+      helpContainer.classList.add('smartforms-error-message');
       setTimeout(() => {
-        helpContainer.textContent = currentField.helpText || "Enter your help text";
-        helpContainer.classList.remove("smartforms-error-message");
+        helpContainer.textContent =
+          currentField.helpText || 'Enter your help text';
+        helpContainer.classList.remove('smartforms-error-message');
       }, 3000);
       return;
     }
     // Append the user's answer as a message bubble.
-    appendMessage(displayText, "user");
-    helpContainer.textContent = currentField.helpText || "Enter your help text";
-    helpContainer.classList.remove("smartforms-error-message");
+    appendMessage(displayText, 'user');
+    helpContainer.textContent = currentField.helpText || 'Enter your help text';
+    helpContainer.classList.remove('smartforms-error-message');
     // Save the answer keyed by the field's id or the current step index.
     formResponses[currentField.id || currentStep] = answer;
     currentAnswer = null;
@@ -161,27 +165,27 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       // Build the POST payload.
       const data = new URLSearchParams();
-      data.append("action", "process_smartform");
-      data.append("smartform_nonce", nonce);
-      data.append("form_id", formId);
-      data.append("form_data", JSON.stringify(formResponses));
+      data.append('action', 'process_smartform');
+      data.append('smartform_nonce', nonce);
+      data.append('form_id', formId);
+      data.append('form_data', JSON.stringify(formResponses));
 
       // Submit the form data using fetch.
       fetch(ajaxUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: data.toString()
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: data.toString(),
       })
-        .then(response => response.json())
-        .then(result => {
-          chatDialog.innerHTML = ""; // Clear conversation
-          const botMessage = document.createElement("div");
-          botMessage.classList.add("smartforms-chat-message", "bot");
+        .then((response) => response.json())
+        .then((result) => {
+          chatDialog.innerHTML = ''; // Clear conversation
+          const botMessage = document.createElement('div');
+          botMessage.classList.add('smartforms-chat-message', 'bot');
           if (result.success) {
             botMessage.innerHTML = `<p>${result.data.message}</p>`;
           } else {
             const errorMsg = Array.isArray(result.data)
-              ? result.data.join(" ")
+              ? result.data.join(' ')
               : result.data;
             botMessage.innerHTML = `<p class="error">${errorMsg}</p>`;
           }
@@ -189,16 +193,16 @@ document.addEventListener("DOMContentLoaded", () => {
           chatDialog.scrollTop = chatDialog.scrollHeight;
 
           // Disable further input by replacing the input area with a disabled textarea.
-          const textarea = document.createElement("textarea");
-          textarea.className = "form-control smartforms-chat-input";
+          const textarea = document.createElement('textarea');
+          textarea.className = 'form-control smartforms-chat-input';
           textarea.rows = 4;
-          textarea.placeholder = "Type your message here...";
+          textarea.placeholder = 'Type your message here...';
           textarea.disabled = true;
           replaceInputControl(inputContainer, textarea);
-          submitButton.classList.add("disabled");
+          submitButton.classList.add('disabled');
         })
-        .catch(error => {
-          console.error("AJAX submission error:", error);
+        .catch((error) => {
+          console.error('AJAX submission error:', error);
         });
     }
   }
@@ -208,32 +212,44 @@ document.addEventListener("DOMContentLoaded", () => {
   updateSubmitButtonState(formData.fields[currentStep], currentAnswer);
 
   // Set up the click event handler for the submit button.
-  submitButton.addEventListener("click", (e) => {
+  submitButton.addEventListener('click', (e) => {
     e.preventDefault();
     const currentField = formData.fields[currentStep];
     // If the field is required and the button is disabled, show the validation error.
-    if (currentField.required && submitButton.classList.contains("disabled")) {
+    if (currentField.required && submitButton.classList.contains('disabled')) {
       helpContainer.textContent =
         currentField.requiredMessage || `${currentField.label} is required.`;
-      helpContainer.classList.add("smartforms-error-message");
+      helpContainer.classList.add('smartforms-error-message');
       setTimeout(() => {
-        helpContainer.textContent = currentField.helpText || "Enter your help text";
-        helpContainer.classList.remove("smartforms-error-message");
+        helpContainer.textContent =
+          currentField.helpText || 'Enter your help text';
+        helpContainer.classList.remove('smartforms-error-message');
       }, 3000);
       return;
     }
     // Retrieve the answer based on the field type.
     let answer;
-    if (currentField.type === "buttons") {
+    if (currentField.type === 'buttons') {
       answer = currentAnswer;
-    } else if (currentField.type === "checkbox") {
-      const checkboxes = inputContainer.querySelectorAll("input[type='checkbox']");
+    } else if (currentField.type === 'checkbox') {
+      const checkboxes = inputContainer.querySelectorAll(
+        "input[type='checkbox']",
+      );
       answer = Array.from(checkboxes)
-        .filter(cb => cb.checked)
-        .map(cb => cb.value)
-        .join(", ");
-    } else if (currentField.type === "text") {
-      const inputElem = inputContainer.querySelector("input");
+        .filter((cb) => cb.checked)
+        .map((cb) => cb.value)
+        .join(', ');
+    } else if (currentField.type === 'radio') {
+      const checkedRadio = inputContainer.querySelector(
+        "input[type='radio']:checked",
+      );
+      answer = checkedRadio ? checkedRadio.value : '';
+    } else if (currentField.type === 'number') {
+      const inputElem = inputContainer.querySelector("input[type='number']");
+      if (!inputElem) return;
+      answer = inputElem.value;
+    } else if (currentField.type === 'text') {
+      const inputElem = inputContainer.querySelector('input');
       if (!inputElem) return;
       answer = inputElem.value;
     } else {

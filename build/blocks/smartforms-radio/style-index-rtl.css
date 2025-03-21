@@ -1,1 +1,1 @@
-.wp-block-smartforms-radio input{border:1px solid #ccc;border-radius:4px;padding:8px;width:100%}
+.wp-block-smartforms-radio .sf-radio-group{display:flex;flex-wrap:wrap;gap:10px}.wp-block-smartforms-radio .sf-radio-group.sf-radio-group-vertical{flex-direction:column}

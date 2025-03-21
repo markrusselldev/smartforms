@@ -1,6 +1,20 @@
-.wp-block-smartforms-radio input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+/**
+ * Frontend styles for the SmartForms Radio Buttons block.
+ *
+ * Ensures that the radio group displays consistently on the frontend.
+ *
+ * @package SmartForms
+ */
+.wp-block-smartforms-radio {
+  .sf-radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .sf-radio-group.sf-radio-group-vertical {
+    flex-direction: column;
+  }
+  .sf-radio-option {
+    /* Additional styling if required */
+  }
 }

@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use WP_Error;
-use SmartForms\Core\SmartForms; // Import the core SmartForms class for logging.
+use SmartForms\Core\SmartForms; // Import the core SmartForms class for logging;
 
 /**
  * MetaBox class for handling form JSON generation.
@@ -91,7 +91,7 @@ class MetaBox {
 				// Common field data.
 				$form_field = array(
 					'type'        => $type,
-					'label'       => ( isset( $block['attrs']['label'] ) && '' !== $block['attrs']['label'] )
+					'label'       => ( isset( $block['attrs']['label'] ) && '' !== trim( $block['attrs']['label'] ) )
 						? sanitize_text_field( $block['attrs']['label'] )
 						: self::get_default_label( $block['blockName'] ),
 					'placeholder' => isset( $block['attrs']['placeholder'] ) ? sanitize_text_field( $block['attrs']['placeholder'] ) : '',
@@ -102,7 +102,6 @@ class MetaBox {
 				// Process block-type–specific attributes.
 				switch ( $type ) {
 					case 'number':
-						// Merge number field–specific settings, plus fieldAlignment.
 						$field_alignment = isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left';
 						$form_field = array_merge(
 							$form_field,
@@ -117,7 +116,6 @@ class MetaBox {
 						break;
 
 					case 'checkbox':
-						// Process checkbox-specific settings.
 						if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
 							$options = array();
 							foreach ( $block['attrs']['options'] as $option ) {
@@ -156,7 +154,6 @@ class MetaBox {
 						break;
 
 					case 'buttons':
-						// Process buttons-specific settings.
 						if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
 							$options = array();
 							foreach ( $block['attrs']['options'] as $option ) {
@@ -185,9 +182,7 @@ class MetaBox {
 						$multiple = isset( $block['attrs']['multiple'] ) ? (bool) $block['attrs']['multiple'] : false;
 						$layout   = array_key_exists( 'layout', $block['attrs'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal';
 						$field_alignment = isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left';
-						// Remove any pre-existing keys so we can append in a controlled order.
 						unset( $form_field['multiple'], $form_field['layout'], $form_field['fieldAlignment'], $form_field['options'] );
-						// Append new attributes in the desired order, ensuring that 'options' is the last key.
 						$form_field = array_merge(
 							$form_field,
 							array(
@@ -204,7 +199,41 @@ class MetaBox {
 						break;
 
 					case 'radio':
-						// Radio buttons: no additional processing required.
+						if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
+							$options = array();
+							foreach ( $block['attrs']['options'] as $option ) {
+								if ( isset( $option['label'], $option['value'] ) ) {
+									$options[] = array(
+										'label' => sanitize_text_field( $option['label'] ),
+										'value' => sanitize_text_field( $option['value'] ),
+									);
+								} else {
+									SmartForms::log_error( "Radio option missing label or value for post $post_id." );
+								}
+							}
+						} else {
+							SmartForms::log_error( "Radio block missing options for post $post_id." );
+							$options = array(
+								array(
+									'label' => 'Option 1',
+									'value' => 'option-1',
+								),
+								array(
+									'label' => 'Option 2',
+									'value' => 'option-2',
+								),
+							);
+						}
+						$layout = array_key_exists( 'layout', $block['attrs'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal';
+						$field_alignment = isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left';
+						$form_field = array_merge(
+							$form_field,
+							array(
+								'layout'         => $layout,
+								'fieldAlignment' => $field_alignment,
+								'options'        => $options,
+							)
+						);
 						break;
 
 					case 'select':
@@ -249,8 +278,8 @@ class MetaBox {
 	 * @return string Default label based on the block type.
 	 */
 	private static function get_default_label( $block_name ) {
-		// For consistent UX, all default labels are now set to the same prompt.
-		return 'Type your question here...';
+		// Update the default prompt to match the placeholders used in the blocks.
+		return 'Error: Question missing';
 	}
 }
 

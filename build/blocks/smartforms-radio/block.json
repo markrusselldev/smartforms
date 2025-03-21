@@ -3,8 +3,8 @@
   "name": "smartforms/radio",
   "title": "Radio Buttons",
   "category": "smartforms",
-  "icon": "button",
-  "description": "A set of radio buttons for selecting an option.",
+  "icon": null,
+  "description": "A set of radio buttons for selecting a single option.",
   "supports": {
     "html": false,
     "color": {
@@ -24,28 +24,44 @@
   "attributes": {
     "label": {
       "type": "string",
-      "default": "Radio Buttons"
+      "default": ""
     },
     "required": {
       "type": "boolean",
       "default": false
     },
-    "className": {
-      "type": "string"
-    },
-    "placeholder": {
+    "helpText": {
       "type": "string",
-      "default": "Enter radio buttons..."
+      "default": ""
     },
     "options": {
       "type": "array",
       "default": [
-        "Option 1",
-        "Option 2"
+        {
+          "label": "Option 1",
+          "value": "option-1"
+        },
+        {
+          "label": "Option 2",
+          "value": "option-2"
+        }
       ]
+    },
+    "groupId": {
+      "type": "string",
+      "default": ""
+    },
+    "layout": {
+      "type": "string",
+      "default": "horizontal"
+    },
+    "fieldAlignment": {
+      "type": "string",
+      "default": "left"
     }
   },
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
-  "style": "file:./style-index.css"
+  "style": "file:./style-index.css",
+  "save": null
 }

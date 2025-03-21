@@ -1,4 +1,18 @@
 /**
+ * Returns the appropriate Bootstrap justification class based on the provided alignment.
+ *
+ * @param {string} alignment - The field alignment (left, center, right).
+ * @returns {string} The corresponding Bootstrap class.
+ */
+function getJustifyClass(alignment) {
+  return alignment === 'center'
+    ? 'justify-content-center'
+    : alignment === 'right'
+      ? 'justify-content-end'
+      : 'justify-content-start';
+}
+
+/**
  * Creates an input control element based on the provided field configuration.
  * For each field type, we produce a structure that matches your block classes:
  *
@@ -46,17 +60,10 @@ export function createInputControl(field, updateSubmitButtonState) {
     }
 
     case 'number': {
-      // Determine alignment for number fields.
-      const justifyClass =
-        field.fieldAlignment === 'center'
-          ? 'justify-content-center'
-          : field.fieldAlignment === 'right'
-            ? 'justify-content-end'
-            : 'justify-content-start';
+      const justifyClass = getJustifyClass(field.fieldAlignment);
       inputContainer.classList.add('d-flex', justifyClass);
 
       specificContainer = document.createElement('div');
-      // Determine the Bootstrap size class based on field.fieldSize.
       const sizeClass =
         field.fieldSize === 'small'
           ? 'form-control-sm'
@@ -123,20 +130,13 @@ export function createInputControl(field, updateSubmitButtonState) {
           specificContainer.appendChild(optionWrapper);
         });
       }
-      // Add alignment classes to inputContainer based on field.fieldAlignment.
-      const justifyClass =
-        field.fieldAlignment === 'center'
-          ? 'justify-content-center'
-          : field.fieldAlignment === 'right'
-            ? 'justify-content-end'
-            : 'justify-content-start';
-      inputContainer.classList.add('d-flex', justifyClass);
+      const justifyClassCheckbox = getJustifyClass(field.fieldAlignment);
+      inputContainer.classList.add('d-flex', justifyClassCheckbox);
       break;
     }
 
     case 'buttons': {
       specificContainer = document.createElement('div');
-
       if (field.layout === 'vertical') {
         specificContainer.className =
           'sf-buttons-group sf-buttons-group--vertical';
@@ -250,6 +250,7 @@ export function createInputControl(field, updateSubmitButtonState) {
           radioEl.value = opt.value || opt;
           radioEl.id = `radio-${index}-${(opt.value || '').replace(/\s+/g, '-')}`;
           radioEl.name = field.groupName || 'sf-radio-group';
+          radioEl.required = field.required;
 
           const labelEl = document.createElement('label');
           labelEl.className = 'form-check-label';
@@ -265,6 +266,8 @@ export function createInputControl(field, updateSubmitButtonState) {
           specificContainer.appendChild(radioWrapper);
         });
       }
+      const justifyClassRadio = getJustifyClass(field.fieldAlignment);
+      inputContainer.classList.add('d-flex', justifyClassRadio);
       break;
     }
 
