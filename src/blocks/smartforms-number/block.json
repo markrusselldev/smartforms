@@ -3,7 +3,7 @@
   "name": "smartforms/number",
   "title": "Number Input",
   "category": "smartforms",
-  "icon": "editor-table",
+  "icon": null,
   "description": "A number input field for SmartForms.",
   "supports": {
     "html": false,
