@@ -1,26 +1,21 @@
 /**
  * Edit component for the SmartForms Checkbox block.
  *
- * Renders a checkbox field group for the editor with InspectorControls
- * to add, remove, and modify options and inline editing for the field label and help text.
- *
- * With static blocks, the label is stored directly in JSON. To avoid extra formatting markup,
- * we set the FieldWrapper’s plainText prop to true.
+ * Renders a checkbox field group for the editor with InspectorControls for:
+ * - Checkbox Group Settings: Containing layout control.
+ * - Input Settings: Using CommonFieldSettings for "Required" and "Field Alignment".
+ * - Checkbox Options: For adding, editing, and removing individual checkbox options.
  *
  * @package SmartForms
  */
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
-import {
-  PanelBody,
-  TextControl,
-  ToggleControl,
-  Button,
-  SelectControl,
-} from '@wordpress/components';
+import { PanelBody, SelectControl, Button } from '@wordpress/components';
 import { Fragment, useEffect } from '@wordpress/element';
 import { blockDefaults } from '../../config/blockDefaults';
 import FieldWrapper from '../components/FieldWrapper';
+import OptionRow from '../components/OptionRow';
+import CommonFieldSettings from '../components/CommonFieldSettings';
 
 const { placeholders, defaultOptions } = blockDefaults;
 
@@ -89,8 +84,9 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     });
     const newLabel = `Option ${maxNumber + 1}`;
     const newValue = newLabel.toLowerCase().replace(/\s+/g, '-');
-    const newOptions = [...options, { label: newLabel, value: newValue }];
-    setAttributes({ options: newOptions });
+    setAttributes({
+      options: [...options, { label: newLabel, value: newValue }],
+    });
   };
 
   /**
@@ -106,12 +102,8 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
   return (
     <div {...blockProps}>
       <InspectorControls>
-        <PanelBody title={__('Checkbox Settings', 'smartforms')}>
-          <ToggleControl
-            label={__('Required', 'smartforms')}
-            checked={required}
-            onChange={(value) => setAttributes({ required: value })}
-          />
+        {/* Panel for Checkbox Group Settings (layout control) */}
+        <PanelBody title={__('Checkbox Group Settings', 'smartforms')}>
           <SelectControl
             label={__('Layout', 'smartforms')}
             value={layout}
@@ -121,38 +113,31 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
             ]}
             onChange={(value) => setAttributes({ layout: value })}
           />
-          <SelectControl
-            label={__('Field Alignment', 'smartforms')}
-            value={fieldAlignment}
-            options={[
-              { label: __('Left', 'smartforms'), value: 'left' },
-              { label: __('Center', 'smartforms'), value: 'center' },
-              { label: __('Right', 'smartforms'), value: 'right' },
-            ]}
-            onChange={(value) => setAttributes({ fieldAlignment: value })}
-          />
         </PanelBody>
+        {/* Panel for Input Settings using CommonFieldSettings */}
+        <CommonFieldSettings
+          required={required}
+          alignment={fieldAlignment}
+          onChangeRequired={(value) => setAttributes({ required: value })}
+          onChangeAlignment={(value) =>
+            setAttributes({ fieldAlignment: value })
+          }
+        />
+        {/* Panel for Checkbox Options using OptionRow */}
         <PanelBody
           title={__('Checkbox Options', 'smartforms')}
           initialOpen={true}
         >
-          {options &&
-            options.map((option, index) => (
-              <Fragment key={index}>
-                <TextControl
-                  label={`${__('Option', 'smartforms')} ${index + 1}`}
-                  value={option.label}
-                  onChange={(value) => updateOption(index, value)}
-                />
-                <Button
-                  variant="secondary"
-                  onClick={() => removeOption(index)}
-                  size="small"
-                >
-                  {__('Remove Option', 'smartforms')}
-                </Button>
-              </Fragment>
-            ))}
+          {options.map((option, index) => (
+            <Fragment key={index}>
+              <OptionRow
+                index={index}
+                value={option.label}
+                onChange={(value) => updateOption(index, value)}
+                onRemove={() => removeOption(index)}
+              />
+            </Fragment>
+          ))}
           <div style={{ textAlign: 'center', paddingTop: '10px' }}>
             <Button variant="primary" onClick={addOption}>
               {__('Add Option', 'smartforms')}
@@ -160,7 +145,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
           </div>
         </PanelBody>
       </InspectorControls>
-      {/* FieldWrapper now uses plainText mode and passes alignment for consistent layout */}
+      {/* Render the checkbox field using FieldWrapper */}
       <FieldWrapper
         label={label}
         helpText={helpText}
@@ -168,37 +153,36 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
         setHelpText={(val) => setAttributes({ helpText: val })}
         labelPlaceholder={placeholders.label}
         helpPlaceholder={placeholders.helpText}
-        plainText={true}
         alignment={fieldAlignment}
+        plainText={true}
       >
         <div
           className={`sf-checkbox-group sf-checkbox-group-${layout || 'horizontal'}`}
           data-layout={layout || 'horizontal'}
         >
-          {options &&
-            options.map((option, index) => (
-              <Fragment key={index}>
-                <div
-                  className={`sf-checkbox-option form-check${
-                    layout === 'horizontal' ? ' form-check-inline' : ''
-                  }`}
+          {options.map((option, index) => (
+            <Fragment key={index}>
+              <div
+                className={`sf-checkbox-option form-check${
+                  layout === 'horizontal' ? ' form-check-inline' : ''
+                }`}
+              >
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id={`${groupId}-${index}`}
+                  name={groupId}
+                  required={required}
+                />
+                <label
+                  className="form-check-label"
+                  htmlFor={`${groupId}-${index}`}
                 >
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id={`${groupId}-${index}`}
-                    name={groupId}
-                    required={required}
-                  />
-                  <label
-                    className="form-check-label"
-                    htmlFor={`${groupId}-${index}`}
-                  >
-                    {option.label}
-                  </label>
-                </div>
-              </Fragment>
-            ))}
+                  {option.label}
+                </label>
+              </div>
+            </Fragment>
+          ))}
         </div>
       </FieldWrapper>
     </div>
