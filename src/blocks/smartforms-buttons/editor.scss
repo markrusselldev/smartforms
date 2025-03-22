@@ -3,12 +3,14 @@
  *
  * These styles are applied only in the block editor.
  *
- * The container is given a border and padding to match other blocks.
- * For horizontal layout, the buttons are arranged in a flex container with a 10px gap.
- * For vertical layout, the buttons stack with auto width, a minimum width of 80px,
- * and a 10px bottom margin.
+ * - The .wp-block-smartforms-buttons container is given a border and padding to match other blocks.
+ * - For horizontal layout, the buttons are arranged in a flex container with a 10px gap.
+ * - For vertical layout, the buttons stack with a minimum width of 80px and a 10px bottom margin.
+ * - Base button styling mimics Bootstrap's appearance.
  *
- * Additionally, custom styling is added to mimic Bootstrap's button appearance.
+ * Additionally, the block header is styled via .sf-block-header and .sf-block-title.
+ * Instead of taking up vertical space with an inline description, an info tooltip is attached
+ * to the title. The header styling is defined here to avoid inline CSS and ensure consistency.
  *
  * @package SmartForms
  */

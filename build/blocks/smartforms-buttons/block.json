@@ -6,20 +6,7 @@
   "icon": null,
   "description": "A button group for rapid selection among options.",
   "supports": {
-    "html": false,
-    "color": {
-      "background": true,
-      "text": true,
-      "gradients": true
-    },
-    "spacing": {
-      "margin": true,
-      "padding": true
-    },
-    "typography": {
-      "fontSize": true,
-      "lineHeight": true
-    }
+    "html": false
   },
   "attributes": {
     "label": {

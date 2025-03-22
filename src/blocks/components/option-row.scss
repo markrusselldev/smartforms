@@ -1,0 +1,30 @@
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Override default button styling for the trash icon button */
+.option-row button.components-button.is-secondary.is-small {
+  background-color: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 4px !important;
+}
+
+/* Style the trash icon inside the button */
+.option-row .dashicons {
+  font-size: 16px;
+  color: #aaa;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+  display: inline-block;
+}
+
+/* On hover, darken the icon and add a subtle background change */
+.option-row button.components-button.is-secondary.is-small:hover .dashicons {
+  color: #666;
+  background-color: #f0f0f0;
+}

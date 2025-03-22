@@ -17,14 +17,15 @@ import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import {
   PanelBody,
-  TextControl,
   ToggleControl,
   Button,
   SelectControl,
 } from '@wordpress/components';
-import { useEffect } from '@wordpress/element';
+import { useEffect, Fragment } from '@wordpress/element';
 import { blockDefaults } from '../../config/blockDefaults';
 import FieldWrapper from '../components/FieldWrapper';
+import OptionRow from '../components/OptionRow';
+import CommonFieldSettings from '../components/CommonFieldSettings';
 
 const { placeholders, defaultOptions } = blockDefaults;
 
@@ -107,11 +108,6 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
       <InspectorControls>
         <PanelBody title={__('Button Group Settings', 'smartforms')}>
           <ToggleControl
-            label={__('Required', 'smartforms')}
-            checked={required}
-            onChange={(value) => setAttributes({ required: value })}
-          />
-          <ToggleControl
             label={__('Allow Multiple Selections', 'smartforms')}
             checked={multiple}
             onChange={(value) =>
@@ -127,36 +123,29 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
             ]}
             onChange={(value) => setAttributes({ layout: value })}
           />
-          <SelectControl
-            label={__('Alignment', 'smartforms')}
-            value={fieldAlignment}
-            options={[
-              { label: __('Left', 'smartforms'), value: 'left' },
-              { label: __('Center', 'smartforms'), value: 'center' },
-              { label: __('Right', 'smartforms'), value: 'right' },
-            ]}
-            onChange={(value) => setAttributes({ fieldAlignment: value })}
-          />
+          {/* Note: Style options have been removed here to avoid redundancy with our dedicated Styles page. */}
         </PanelBody>
+        <CommonFieldSettings
+          required={required}
+          alignment={fieldAlignment}
+          onChangeRequired={(value) => setAttributes({ required: value })}
+          onChangeAlignment={(value) =>
+            setAttributes({ fieldAlignment: value })
+          }
+        />
         <PanelBody
           title={__('Button Options', 'smartforms')}
           initialOpen={true}
         >
           {options.map((option, index) => (
-            <div key={index} style={{ marginBottom: '8px' }}>
-              <TextControl
-                label={`${__('Option', 'smartforms')} ${index + 1}`}
+            <Fragment key={index}>
+              <OptionRow
+                index={index}
                 value={option.label}
                 onChange={(value) => updateOption(index, value)}
+                onRemove={() => removeOption(index)}
               />
-              <Button
-                variant="secondary"
-                onClick={() => removeOption(index)}
-                size="small"
-              >
-                {__('Remove Option', 'smartforms')}
-              </Button>
-            </div>
+            </Fragment>
           ))}
           <div style={{ textAlign: 'center', paddingTop: '10px' }}>
             <Button variant="primary" onClick={addOption}>
