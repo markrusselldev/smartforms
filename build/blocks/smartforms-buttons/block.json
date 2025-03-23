@@ -1,10 +1,10 @@
 {
   "apiVersion": 2,
   "name": "smartforms/buttons",
-  "title": "Button Group",
+  "title": "Button",
   "category": "smartforms",
   "icon": null,
-  "description": "A button group for rapid selection among options.",
+  "description": "Select one or more options",
   "supports": {
     "html": false
   },

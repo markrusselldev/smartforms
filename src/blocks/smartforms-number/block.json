@@ -1,25 +1,12 @@
 {
   "apiVersion": 2,
   "name": "smartforms/number",
-  "title": "Number Input",
+  "title": "Number",
   "category": "smartforms",
   "icon": null,
-  "description": "A number input field for SmartForms.",
+  "description": "Select a single number",
   "supports": {
-    "html": false,
-    "color": {
-      "background": true,
-      "text": true,
-      "gradients": true
-    },
-    "spacing": {
-      "margin": true,
-      "padding": true
-    },
-    "typography": {
-      "fontSize": true,
-      "lineHeight": true
-    }
+    "html": false
   },
   "attributes": {
     "label": {

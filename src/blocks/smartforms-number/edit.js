@@ -2,41 +2,37 @@
  * Edit component for the SmartForms Number block.
  *
  * Renders the block in the editor with InspectorControls for:
- * - Toggling required status.
- * - Setting min, max, step, and defaultValue.
- * - Selecting field alignment.
+ * - Number Input Settings: Minimum, Maximum, Step, and Default Value.
+ * - Input Settings: Using CommonFieldSettings for Required and Alignment.
  *
- * The entire output is wrapped with a FieldWrapper for consistent styling.
+ * The entire output is wrapped with the FieldWrapper for consistent styling.
  *
  * @package SmartForms
  */
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
-import {
-  PanelBody,
-  TextControl,
-  ToggleControl,
-  SelectControl,
-} from '@wordpress/components';
+import { PanelBody, TextControl } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { blockDefaults } from '../../config/blockDefaults';
 import FieldWrapper from '../components/FieldWrapper';
+import CommonFieldSettings from '../components/CommonFieldSettings';
 
 const { placeholders } = blockDefaults;
 
 const Edit = ({ attributes, setAttributes, clientId }) => {
   const {
     label,
-    required,
     min,
     max,
     step,
     defaultValue,
     helpText,
     fieldAlignment,
+    required,
   } = attributes;
   const blockProps = useBlockProps();
 
+  // Ensure fieldAlignment is initialized.
   useEffect(() => {
     if (typeof fieldAlignment === 'undefined' || fieldAlignment === '') {
       setAttributes({ fieldAlignment: 'left' });
@@ -46,12 +42,8 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
   return (
     <div {...blockProps}>
       <InspectorControls>
-        <PanelBody title={__('Number Input Settings', 'smartforms')}>
-          <ToggleControl
-            label={__('Required', 'smartforms')}
-            checked={required}
-            onChange={(value) => setAttributes({ required: value })}
-          />
+        {/* Panel for number-specific parameters */}
+        <PanelBody title={__('Main Settings', 'smartforms')}>
           <TextControl
             type="number"
             label={__('Minimum Value', 'smartforms')}
@@ -80,17 +72,16 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
               'smartforms',
             )}
           />
-          <SelectControl
-            label={__('Alignment', 'smartforms')}
-            value={fieldAlignment}
-            options={[
-              { label: __('Left', 'smartforms'), value: 'left' },
-              { label: __('Center', 'smartforms'), value: 'center' },
-              { label: __('Right', 'smartforms'), value: 'right' },
-            ]}
-            onChange={(value) => setAttributes({ fieldAlignment: value })}
-          />
         </PanelBody>
+        {/* Panel for common input settings */}
+        <CommonFieldSettings
+          required={required}
+          alignment={fieldAlignment}
+          onChangeRequired={(value) => setAttributes({ required: value })}
+          onChangeAlignment={(value) =>
+            setAttributes({ fieldAlignment: value })
+          }
+        />
       </InspectorControls>
       <FieldWrapper
         label={label}

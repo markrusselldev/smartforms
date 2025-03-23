@@ -106,7 +106,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
   return (
     <div {...blockProps}>
       <InspectorControls>
-        <PanelBody title={__('Button Group Settings', 'smartforms')}>
+        <PanelBody title={__('Main Settings', 'smartforms')}>
           <ToggleControl
             label={__('Allow Multiple Selections', 'smartforms')}
             checked={multiple}

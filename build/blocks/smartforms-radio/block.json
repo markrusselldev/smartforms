@@ -1,10 +1,10 @@
 {
   "apiVersion": 2,
   "name": "smartforms/radio",
-  "title": "Radio Buttons",
+  "title": "Radio",
   "category": "smartforms",
   "icon": null,
-  "description": "A set of radio buttons for selecting a single option.",
+  "description": "Select a single option",
   "supports": {
     "html": false,
     "color": {

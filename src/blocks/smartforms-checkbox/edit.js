@@ -2,7 +2,7 @@
  * Edit component for the SmartForms Checkbox block.
  *
  * Renders a checkbox field group for the editor with InspectorControls for:
- * - Checkbox Group Settings: Containing layout control.
+ * - Checkbox Settings: Containing layout control.
  * - Input Settings: Using CommonFieldSettings for "Required" and "Field Alignment".
  * - Checkbox Options: For adding, editing, and removing individual checkbox options.
  *
@@ -102,8 +102,8 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
   return (
     <div {...blockProps}>
       <InspectorControls>
-        {/* Panel for Checkbox Group Settings (layout control) */}
-        <PanelBody title={__('Checkbox Group Settings', 'smartforms')}>
+        {/* Panel for field specific settings (layout control) */}
+        <PanelBody title={__('Main Settings', 'smartforms')}>
           <SelectControl
             label={__('Layout', 'smartforms')}
             value={layout}

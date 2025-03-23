@@ -3,7 +3,7 @@
   "name": "smartforms/checkbox",
   "title": "Checkbox",
   "category": "smartforms",
-  "description": "A checkbox field for selecting options.",
+  "description": "Select one or more options",
   "icon": null,
   "supports": {
     "html": false
