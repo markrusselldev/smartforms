@@ -1,30 +1,64 @@
+/**
+ * OptionRow.scss
+ *
+ * Minimal overrides for the OptionRow component in SmartForms to ensure:
+ * - Each row fills 100% of the available width.
+ * - The text input expands to fill the row.
+ * - The trash icon button remains on the same line, flush with the right edge.
+ * 
+ * These rules rely on the default WordPress admin (block editor) styles for inputs.
+ */
+
 .option-row {
   display: flex;
-  align-items: center;
+  width: 100%;
   gap: 8px;
 }
 
-/* Override default button styling for the trash icon button */
+/* Make sure the base control wrapper expands to fill available space */
+.option-row > .components-base-control {
+  flex: 1;
+}
+
+/* Ensure the field container (which wraps the input) is 100% wide */
+.option-row .components-base-control__field {
+  width: 100%;
+}
+
+/* Force the input element itself to use full width */
+.option-row .components-text-control__input {
+  width: 100%;
+}
+
+/* Adjust the trash button:
+	 - Remove any extra margins.
+	 - Align it vertically with the input.
+	 - Use secondary button styling.
+  */
 .option-row button.components-button.is-secondary.is-small {
+  margin: 0;
+  align-self: center;
+  padding: 0 4px !important; // Remove vertical padding so height is determined by the row
   background-color: #fff !important;
   border: none !important;
   box-shadow: none !important;
   border-radius: 0 !important;
-  padding: 4px !important;
 }
 
-/* Style the trash icon inside the button */
+/* On hover, change the button background and icon color.
+	 The icon (dashicons) turns to a muted red (#d9534f) */
+.option-row button.components-button.is-secondary.is-small:hover {
+}
+
+.option-row button.components-button.is-secondary.is-small:hover .dashicons {
+  color: #d9534f;
+}
+
+/* Default trash icon color is light gray */
 .option-row .dashicons {
   font-size: 16px;
   color: #aaa;
-  transition:
-    color 0.2s ease,
-    background-color 0.2s ease;
+  transition: color 0.2s ease;
   display: inline-block;
-}
-
-/* On hover, darken the icon and add a subtle background change */
-.option-row button.components-button.is-secondary.is-small:hover .dashicons {
-  color: #666;
-  background-color: #f0f0f0;
+  padding: 3px 0;
 }

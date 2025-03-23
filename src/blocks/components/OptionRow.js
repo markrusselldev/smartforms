@@ -11,7 +11,12 @@ const OptionRow = ({ index, value, onChange, onRemove }) => {
         value={value}
         onChange={onChange}
       />
-      <Button variant="secondary" onClick={onRemove} size="small">
+      <Button
+        variant="secondary"
+        onClick={onRemove}
+        size="small"
+        title={__('Remove Option', 'smartforms')}
+      >
         <span className="dashicons dashicons-trash" aria-hidden="true"></span>
       </Button>
     </div>
