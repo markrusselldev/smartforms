@@ -14,7 +14,11 @@ const Edit = ({ attributes, setAttributes }) => {
             value={attributes.label}
             onChange={(value) => setAttributes({ label: value })}
           />
-          <TextControl label={__('Placeholder', 'smartforms')} value={attributes.placeholder} onChange={(value) => setAttributes({ placeholder: value })} />
+          <TextControl
+            label={__('Placeholder', 'smartforms')}
+            value={attributes.placeholder}
+            onChange={(value) => setAttributes({ placeholder: value })}
+          />
           <ToggleControl
             label={__('Required', 'smartforms')}
             checked={attributes.required}
@@ -23,7 +27,11 @@ const Edit = ({ attributes, setAttributes }) => {
         </PanelBody>
       </InspectorControls>
       <label>{attributes.label}</label>
-      <input type="range" placeholder={attributes.placeholder} required={attributes.required} />
+      <input
+        type="range"
+        placeholder={attributes.placeholder}
+        required={attributes.required}
+      />
     </div>
   );
 };

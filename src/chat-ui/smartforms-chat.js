@@ -8,7 +8,7 @@
 import './smartforms-chat.scss';
 // Import configuration defaults (to be used if DOM config is missing)
 import { smartformsConfig as moduleConfig } from '../config/smartformsConfig.js';
-// Import helper functions from inputRenderers.js
+// Import helper functions from input-renderers.js
 import { createInputControl, replaceInputControl } from './input-renderers.js';
 
 /**
@@ -240,19 +240,34 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
       }
       case 'text': {
-        const inputElem = inputContainer.querySelector('input');
+        const inputElem = inputContainer.querySelector('input[type="text"]');
         if (!inputElem) return;
         answer = inputElem.value;
         displayText = answer;
         break;
       }
-      case 'select': {
+      case 'number': {
+        const inputElem = inputContainer.querySelector('input[type="number"]');
+        if (!inputElem) return;
+        answer = inputElem.value;
+        displayText = answer;
+        break;
+      }
+      case 'dropdown': {
         const selectElem = inputContainer.querySelector('select');
         if (!selectElem) return;
         answer = selectElem.value;
-        // Retrieve display text from the selected option.
-        displayText =
-          selectElem.options[selectElem.selectedIndex]?.text || answer;
+        // For consistency, use the value (e.g. "option-2") for display.
+        displayText = answer;
+        break;
+      }
+      case 'radio': {
+        const radioElem = inputContainer.querySelector(
+          'input[type="radio"]:checked',
+        );
+        if (!radioElem) return;
+        answer = radioElem.value;
+        displayText = answer;
         break;
       }
       default: {

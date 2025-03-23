@@ -136,11 +136,13 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
               />
             </Fragment>
           ))}
-          <div style={{ textAlign: 'center', paddingTop: '10px' }}>
-            <Button variant="primary" onClick={addOption}>
-              {__('Add Option', 'smartforms')}
-            </Button>
-          </div>
+          <Button
+            variant="secondary"
+            onClick={addOption}
+            className="sf-add-option-btn"
+          >
+            {__('Add Option', 'smartforms')}
+          </Button>
         </PanelBody>
       </InspectorControls>
       <FieldWrapper

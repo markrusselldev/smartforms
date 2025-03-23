@@ -230,7 +230,7 @@ class MetaBox {
 						);
 						break;
 
-					case 'select':
+					case 'dropdown':
 						if ( isset( $block['attrs']['options'] ) && is_array( $block['attrs']['options'] ) && ! empty( $block['attrs']['options'] ) ) {
 							$options = array();
 							foreach ( $block['attrs']['options'] as $option ) {
@@ -240,11 +240,11 @@ class MetaBox {
 										'value' => sanitize_text_field( $option['value'] ),
 									);
 								} else {
-									SmartForms::log_error( "Select option missing label or value for post $post_id." );
+									SmartForms::log_error( "Dropdown option missing label or value for post $post_id." );
 								}
 							}
 						} else {
-							SmartForms::log_error( "Select block missing options for post $post_id." );
+							SmartForms::log_error( "Dropdown block missing options for post $post_id." );
 							$options = array(
 								array(
 									'label' => 'Option 1',

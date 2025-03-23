@@ -1,6 +1,6 @@
 {
   "apiVersion": 2,
-  "name": "smartforms/select",
+  "name": "smartforms/dropdown",
   "title": "Dropdown",
   "category": "smartforms",
   "icon": "arrow-down-alt2",
@@ -36,14 +36,8 @@
     "options": {
       "type": "array",
       "default": [
-        {
-          "label": "Option 1",
-          "value": "option-1"
-        },
-        {
-          "label": "Option 2",
-          "value": "option-2"
-        }
+        { "label": "Option 1", "value": "option-1" },
+        { "label": "Option 2", "value": "option-2" }
       ]
     },
     "layout": {

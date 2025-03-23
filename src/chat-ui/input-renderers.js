@@ -17,7 +17,7 @@ const getJustifyClass = (alignment) =>
  *
  * <div class="sf-field-wrapper">
  *   <div class="sf-input-container">
- *     <div class="sf-...-container OR sf-...-group"> <!-- actual input(s) -->
+ *     <div class="sf-[field-type]-container"> <!-- actual input(s) -->
  *       ...
  *     </div>
  *   </div>
@@ -38,7 +38,7 @@ export function createInputControl(field, updateSubmitButtonState) {
   const inputContainer = document.createElement('div');
   inputContainer.className = 'sf-input-container';
 
-  let specificContainer; // This will be a .sf-*-container or .sf-*-group, etc.
+  let specificContainer; // This will be a .sf-*-container
 
   switch (field.type) {
     case 'text': {
@@ -211,12 +211,14 @@ export function createInputControl(field, updateSubmitButtonState) {
       break;
     }
 
-    case 'select': {
+    case 'dropdown': {
+      const justifyClass = getJustifyClass(field.fieldAlignment);
+      inputContainer.classList.add('d-flex', justifyClass);
       specificContainer = document.createElement('div');
-      specificContainer.className = 'sf-select-container';
+      specificContainer.className = 'sf-dropdown-container';
 
       const selectEl = document.createElement('select');
-      selectEl.className = 'sf-select-input form-control';
+      selectEl.className = 'sf-dropdown-input form-select';
 
       // Determine the effective placeholder: fallback to "Select an option" if blank.
       const effectivePlaceholder =
@@ -224,7 +226,7 @@ export function createInputControl(field, updateSubmitButtonState) {
           ? field.placeholder
           : 'Select an option';
 
-      // Append the placeholder option if provided.
+      // Append the placeholder option.
       const placeholderOption = document.createElement('option');
       placeholderOption.value = '';
       placeholderOption.textContent = effectivePlaceholder;

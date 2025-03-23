@@ -4,7 +4,7 @@
  * Renders a dropdown field for selecting a single option with InspectorControls for:
  * 1. Main Settings Panel – Contains unique parameters (the placeholder).
  * 2. Input Settings Panel – Uses CommonFieldSettings for Required and Field Alignment.
- * 3. Options Panel – For managing the dropdown options using individual option controls.
+ * 3. Options Panel – For managing the dropdown options using OptionRow for consistency.
  *
  * The output is wrapped with FieldWrapper for consistent label, input container, and help text styling.
  *
@@ -12,19 +12,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
-import {
-  PanelBody,
-  ToggleControl,
-  SelectControl,
-  TextControl,
-  Button,
-} from '@wordpress/components';
+import { PanelBody, TextControl, Button } from '@wordpress/components';
 import { useEffect, Fragment } from '@wordpress/element';
 import FieldWrapper from '../components/FieldWrapper';
 import CommonFieldSettings from '../components/CommonFieldSettings';
+import OptionRow from '../components/OptionRow';
 import { blockDefaults } from '../../config/blockDefaults';
 
-const { placeholders } = blockDefaults;
+const { placeholders, options: defaultOptions } = blockDefaults;
 
 const Edit = ({ attributes, setAttributes, clientId }) => {
   const {
@@ -42,7 +37,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
   // Initialize groupId and default attributes.
   useEffect(() => {
     if (!groupId) {
-      setAttributes({ groupId: `sf-select-${clientId}` });
+      setAttributes({ groupId: `sf-dropdown-${clientId}` });
     }
     if (!layout) {
       setAttributes({ layout: 'horizontal' });
@@ -50,7 +45,10 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     if (!fieldAlignment) {
       setAttributes({ fieldAlignment: 'left' });
     }
-  }, [groupId, layout, fieldAlignment, clientId, setAttributes]);
+    if (!options || !Array.isArray(options) || options.length === 0) {
+      setAttributes({ options: defaultOptions });
+    }
+  }, [groupId, layout, fieldAlignment, options, clientId, setAttributes]);
 
   /**
    * Updates an option's label and corresponding value.
@@ -87,7 +85,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
   };
 
   /**
-   * Removes an option by its index.
+   * Removes a dropdown option by its index.
    *
    * @param {number} index - The index to remove.
    */
@@ -116,32 +114,28 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
             setAttributes({ fieldAlignment: value })
           }
         />
-        {/* Options Panel: Manage dropdown options */}
+        {/* Options Panel: Manage dropdown options using OptionRow */}
         <PanelBody
           title={__('Dropdown Options', 'smartforms')}
           initialOpen={true}
         >
           {options.map((option, index) => (
             <Fragment key={index}>
-              <TextControl
-                label={`${__('Option', 'smartforms')} ${index + 1}`}
+              <OptionRow
+                index={index}
                 value={option.label}
                 onChange={(value) => updateOption(index, value)}
+                onRemove={() => removeOption(index)}
               />
-              <Button
-                variant="secondary"
-                onClick={() => removeOption(index)}
-                size="small"
-              >
-                {__('Remove Option', 'smartforms')}
-              </Button>
             </Fragment>
           ))}
-          <div style={{ textAlign: 'center', paddingTop: '10px' }}>
-            <Button variant="primary" onClick={addOption}>
-              {__('Add Option', 'smartforms')}
-            </Button>
-          </div>
+          <Button
+            variant="secondary"
+            onClick={addOption}
+            className="sf-add-option-btn"
+          >
+            {__('Add Option', 'smartforms')}
+          </Button>
         </PanelBody>
       </InspectorControls>
       <FieldWrapper
@@ -153,7 +147,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
         helpPlaceholder={placeholders.helpText}
         alignment={fieldAlignment}
       >
-        <select className="sf-select-input form-control" required={required}>
+        <select className="sf-dropdown-input form-select" required={required}>
           {placeholder && (
             <option value="" disabled selected>
               {placeholder}

@@ -1,0 +1,20 @@
+/* Minimal override for editor dropdown to mimic Bootstrap 5 select */
+.sf-dropdown-input {
+  display: inline-block;
+  width: auto;
+  min-width: 150px;
+  padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #212529;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%236c757d' d='M3.204 5.318a.5.5 0 0 1 .63-.062L8 8.293l4.166-3.037a.5.5 0 0 1 .634.53l-4.5 4a.5.5 0 0 1-.634 0l-4.5-4a.5.5 0 0 1-.062-.67z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 0.25rem;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
