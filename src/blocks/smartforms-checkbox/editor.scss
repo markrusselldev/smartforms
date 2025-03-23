@@ -1,4 +1,4 @@
-@use "../_theme.scss" as *;
+@use '../_theme.scss' as *;
 
 /**
  * Editor styles for the SmartForms Checkbox block.
@@ -15,9 +15,6 @@
  */
 
 .wp-block-smartforms-checkbox {
-  border: 1px solid #ddd;
-  padding: 10px;
-
   .sf-checkbox-group {
     // Default to horizontal (flex row) layout.
     display: flex;
@@ -26,7 +23,7 @@
     justify-content: flex-start;
 
     // If the saved layout is vertical, force a block (column) layout.
-    &[data-layout="vertical"] {
+    &[data-layout='vertical'] {
       display: block;
     }
   }

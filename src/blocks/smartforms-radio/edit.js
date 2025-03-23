@@ -104,7 +104,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     <div {...blockProps}>
       <InspectorControls>
         {/* Main Settings Panel */}
-        <PanelBody title={__('Main Settings', 'smartforms')}>
+        <PanelBody title={__('Radio Settings', 'smartforms')}>
           <SelectControl
             label={__('Layout', 'smartforms')}
             value={layout}

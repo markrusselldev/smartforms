@@ -1,35 +1,63 @@
+/**
+ * Edit component for the SmartForms Dropdown block.
+ *
+ * Renders a dropdown field for selecting a single option with InspectorControls for:
+ * 1. Main Settings Panel – Contains unique parameters (the placeholder).
+ * 2. Input Settings Panel – Uses CommonFieldSettings for Required and Field Alignment.
+ * 3. Options Panel – For managing the dropdown options using individual option controls.
+ *
+ * The output is wrapped with FieldWrapper for consistent label, input container, and help text styling.
+ *
+ * @package SmartForms
+ */
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import {
   PanelBody,
   ToggleControl,
   SelectControl,
-  Button,
   TextControl,
+  Button,
 } from '@wordpress/components';
-import { Fragment, useEffect } from '@wordpress/element';
+import { useEffect, Fragment } from '@wordpress/element';
 import FieldWrapper from '../components/FieldWrapper';
+import CommonFieldSettings from '../components/CommonFieldSettings';
+import { blockDefaults } from '../../config/blockDefaults';
+
+const { placeholders } = blockDefaults;
 
 const Edit = ({ attributes, setAttributes, clientId }) => {
   const {
     label,
     helpText,
-    placeholder,
     required,
+    placeholder,
     options,
     groupId,
     fieldAlignment,
+    layout,
   } = attributes;
   const blockProps = useBlockProps();
 
-  // Initialize groupId if not set.
+  // Initialize groupId and default attributes.
   useEffect(() => {
     if (!groupId) {
       setAttributes({ groupId: `sf-select-${clientId}` });
     }
-  }, [groupId, clientId, setAttributes]);
+    if (!layout) {
+      setAttributes({ layout: 'horizontal' });
+    }
+    if (!fieldAlignment) {
+      setAttributes({ fieldAlignment: 'left' });
+    }
+  }, [groupId, layout, fieldAlignment, clientId, setAttributes]);
 
-  // Update an option's label and corresponding value.
+  /**
+   * Updates an option's label and corresponding value.
+   *
+   * @param {number} index - The option index.
+   * @param {string} newLabel - The new label.
+   */
   const updateOption = (index, newLabel) => {
     const newOptions = options.map((option, i) => {
       if (i === index) {
@@ -43,7 +71,9 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     setAttributes({ options: newOptions });
   };
 
-  // Add a new option.
+  /**
+   * Adds a new dropdown option.
+   */
   const addOption = () => {
     const maxNumber = options.reduce((acc, option) => {
       const match = option.label.match(/^Option (\d+)$/);
@@ -56,7 +86,11 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     });
   };
 
-  // Remove an option.
+  /**
+   * Removes an option by its index.
+   *
+   * @param {number} index - The index to remove.
+   */
   const removeOption = (index) => {
     const newOptions = options.filter((_, i) => i !== index);
     setAttributes({ options: newOptions });
@@ -65,32 +99,24 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
   return (
     <div {...blockProps}>
       <InspectorControls>
+        {/* Main Settings Panel: Unique settings */}
         <PanelBody title={__('Dropdown Settings', 'smartforms')}>
-          <ToggleControl
-            label={__('Required', 'smartforms')}
-            checked={required}
-            onChange={(value) => setAttributes({ required: value })}
-          />
-          <SelectControl
-            label={__('Alignment', 'smartforms')}
-            value={fieldAlignment}
-            options={[
-              { label: __('Left', 'smartforms'), value: 'left' },
-              { label: __('Center', 'smartforms'), value: 'center' },
-              { label: __('Right', 'smartforms'), value: 'right' },
-            ]}
-            onChange={(value) => setAttributes({ fieldAlignment: value })}
-          />
           <TextControl
             label={__('Placeholder', 'smartforms')}
             value={placeholder}
-            onChange={(value) =>
-              setAttributes({
-                placeholder: value.trim() === '' ? 'Select an option' : value,
-              })
-            }
+            onChange={(value) => setAttributes({ placeholder: value })}
           />
         </PanelBody>
+        {/* Input Settings Panel: Common controls */}
+        <CommonFieldSettings
+          required={required}
+          alignment={fieldAlignment}
+          onChangeRequired={(value) => setAttributes({ required: value })}
+          onChangeAlignment={(value) =>
+            setAttributes({ fieldAlignment: value })
+          }
+        />
+        {/* Options Panel: Manage dropdown options */}
         <PanelBody
           title={__('Dropdown Options', 'smartforms')}
           initialOpen={true}
@@ -111,9 +137,11 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
               </Button>
             </Fragment>
           ))}
-          <Button variant="primary" onClick={addOption}>
-            {__('Add Option', 'smartforms')}
-          </Button>
+          <div style={{ textAlign: 'center', paddingTop: '10px' }}>
+            <Button variant="primary" onClick={addOption}>
+              {__('Add Option', 'smartforms')}
+            </Button>
+          </div>
         </PanelBody>
       </InspectorControls>
       <FieldWrapper
@@ -121,8 +149,8 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
         helpText={helpText}
         setLabel={(value) => setAttributes({ label: value })}
         setHelpText={(value) => setAttributes({ helpText: value })}
-        labelPlaceholder="Enter your question here"
-        helpPlaceholder="Enter help text here"
+        labelPlaceholder={placeholders.label}
+        helpPlaceholder={placeholders.helpText}
         alignment={fieldAlignment}
       >
         <select className="sf-select-input form-control" required={required}>

@@ -4,22 +4,9 @@
   "title": "Dropdown",
   "category": "smartforms",
   "icon": "arrow-down-alt2",
-  "description": "Select a single option",
+  "description": "Select an option",
   "supports": {
-    "html": false,
-    "color": {
-      "background": true,
-      "text": true,
-      "gradients": true
-    },
-    "spacing": {
-      "margin": true,
-      "padding": true
-    },
-    "typography": {
-      "fontSize": true,
-      "lineHeight": true
-    }
+    "html": false
   },
   "attributes": {
     "label": {
@@ -52,6 +39,10 @@
         { "label": "Option 1", "value": "option-1" },
         { "label": "Option 2", "value": "option-2" }
       ]
+    },
+    "layout": {
+      "type": "string",
+      "default": "horizontal"
     }
   },
   "editorScript": "file:./index.js",

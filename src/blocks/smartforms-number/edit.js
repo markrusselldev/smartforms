@@ -43,7 +43,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     <div {...blockProps}>
       <InspectorControls>
         {/* Panel for number-specific parameters */}
-        <PanelBody title={__('Main Settings', 'smartforms')}>
+        <PanelBody title={__('Number Settings', 'smartforms')}>
           <TextControl
             type="number"
             label={__('Minimum Value', 'smartforms')}

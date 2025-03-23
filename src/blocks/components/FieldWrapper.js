@@ -23,6 +23,7 @@
  */
 import { RichText } from '@wordpress/block-editor';
 import { blockDefaults } from '../../config/blockDefaults';
+import './field-wrapper.scss';
 
 const FieldWrapper = ({
   label,

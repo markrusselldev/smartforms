@@ -103,7 +103,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     <div {...blockProps}>
       <InspectorControls>
         {/* Panel for field specific settings (layout control) */}
-        <PanelBody title={__('Main Settings', 'smartforms')}>
+        <PanelBody title={__('Checkbox Settings', 'smartforms')}>
           <SelectControl
             label={__('Layout', 'smartforms')}
             value={layout}

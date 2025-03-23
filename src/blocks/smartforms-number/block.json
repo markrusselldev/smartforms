@@ -4,7 +4,7 @@
   "title": "Number",
   "category": "smartforms",
   "icon": null,
-  "description": "Select a single number",
+  "description": "Select a number",
   "supports": {
     "html": false
   },
