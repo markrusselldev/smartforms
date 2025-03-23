@@ -252,13 +252,15 @@ export function createInputControl(field, updateSubmitButtonState) {
 
     case 'radio': {
       specificContainer = document.createElement('div');
-      specificContainer.className = 'sf-radio-group';
+      // Determine layout: if vertical, do not add the inline class.
+      const isHorizontal = !field.layout || field.layout === 'horizontal';
 
       if (field.options && Array.isArray(field.options)) {
         field.options.forEach((opt, index) => {
           const radioWrapper = document.createElement('div');
           radioWrapper.className =
-            'sf-radio-option form-check form-check-inline';
+            'sf-radio-option form-check' +
+            (isHorizontal ? ' form-check-inline' : '');
 
           const radioEl = document.createElement('input');
           radioEl.type = 'radio';

@@ -1,24 +1,24 @@
 /**
- * Edit component for the SmartForms Radio Buttons block.
+ * Edit component for the SmartForms Radio block.
  *
- * Renders a radio buttons field for selecting a single option with InspectorControls
- * to manage options and settings such as required, layout, and field alignment.
- * Uses FieldWrapper for consistent label and help text display.
+ * Renders a radio field for selecting a single option with InspectorControls for:
+ * - Main Settings: Contains a SelectControl for Layout.
+ * - Input Settings: Uses CommonFieldSettings for Required and Field Alignment.
+ * - Radio Options: Uses OptionRow for managing individual radio options.
+ *
+ * The entire output is wrapped with FieldWrapper for consistent label, input container,
+ * and help text styling.
  *
  * @package SmartForms
  */
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
-import {
-  PanelBody,
-  TextControl,
-  ToggleControl,
-  Button,
-  SelectControl,
-} from '@wordpress/components';
-import { Fragment, useEffect } from '@wordpress/element';
+import { PanelBody, SelectControl, Button } from '@wordpress/components';
+import { useEffect, Fragment } from '@wordpress/element';
 import { blockDefaults } from '../../config/blockDefaults';
 import FieldWrapper from '../components/FieldWrapper';
+import OptionRow from '../components/OptionRow';
+import CommonFieldSettings from '../components/CommonFieldSettings';
 
 const { placeholders, defaultOptions } = blockDefaults;
 
@@ -52,6 +52,9 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
 
   /**
    * Updates an option's label and corresponding value.
+   *
+   * @param {number} index - The index of the option.
+   * @param {string} newLabel - The new label.
    */
   const updateOption = (index, newLabel) => {
     const newOptions = options.map((option, i) => {
@@ -88,7 +91,9 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
   };
 
   /**
-   * Removes an option by its index.
+   * Removes a radio option by its index.
+   *
+   * @param {number} index - The index to remove.
    */
   const removeOption = (index) => {
     const newOptions = options.filter((_, i) => i !== index);
@@ -98,12 +103,8 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
   return (
     <div {...blockProps}>
       <InspectorControls>
-        <PanelBody title={__('Radio Buttons Settings', 'smartforms')}>
-          <ToggleControl
-            label={__('Required', 'smartforms')}
-            checked={required}
-            onChange={(value) => setAttributes({ required: value })}
-          />
+        {/* Main Settings Panel */}
+        <PanelBody title={__('Main Settings', 'smartforms')}>
           <SelectControl
             label={__('Layout', 'smartforms')}
             value={layout}
@@ -113,35 +114,28 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
             ]}
             onChange={(value) => setAttributes({ layout: value })}
           />
-          <SelectControl
-            label={__('Field Alignment', 'smartforms')}
-            value={fieldAlignment}
-            options={[
-              { label: __('Left', 'smartforms'), value: 'left' },
-              { label: __('Center', 'smartforms'), value: 'center' },
-              { label: __('Right', 'smartforms'), value: 'right' },
-            ]}
-            onChange={(value) => setAttributes({ fieldAlignment: value })}
-          />
         </PanelBody>
+        {/* Input Settings Panel */}
+        <CommonFieldSettings
+          required={required}
+          alignment={fieldAlignment}
+          onChangeRequired={(value) => setAttributes({ required: value })}
+          onChangeAlignment={(value) =>
+            setAttributes({ fieldAlignment: value })
+          }
+        />
+        {/* Radio Options Panel */}
         <PanelBody title={__('Radio Options', 'smartforms')} initialOpen={true}>
-          {options &&
-            options.map((option, index) => (
-              <Fragment key={index}>
-                <TextControl
-                  label={`${__('Option', 'smartforms')} ${index + 1}`}
-                  value={option.label}
-                  onChange={(value) => updateOption(index, value)}
-                />
-                <Button
-                  variant="secondary"
-                  onClick={() => removeOption(index)}
-                  size="small"
-                >
-                  {__('Remove Option', 'smartforms')}
-                </Button>
-              </Fragment>
-            ))}
+          {options.map((option, index) => (
+            <Fragment key={index}>
+              <OptionRow
+                index={index}
+                value={option.label}
+                onChange={(value) => updateOption(index, value)}
+                onRemove={() => removeOption(index)}
+              />
+            </Fragment>
+          ))}
           <div style={{ textAlign: 'center', paddingTop: '10px' }}>
             <Button variant="primary" onClick={addOption}>
               {__('Add Option', 'smartforms')}
@@ -149,12 +143,11 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
           </div>
         </PanelBody>
       </InspectorControls>
-      {/* Wrap the field with FieldWrapper for consistent label/help text rendering */}
       <FieldWrapper
         label={label}
         helpText={helpText}
-        setLabel={(val) => setAttributes({ label: val })}
-        setHelpText={(val) => setAttributes({ helpText: val })}
+        setLabel={(value) => setAttributes({ label: value })}
+        setHelpText={(value) => setAttributes({ helpText: value })}
         labelPlaceholder={placeholders.label}
         helpPlaceholder={placeholders.helpText}
         alignment={fieldAlignment}
@@ -163,29 +156,28 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
           className={`sf-radio-group sf-radio-group-${layout || 'horizontal'}`}
           data-layout={layout || 'horizontal'}
         >
-          {options &&
-            options.map((option, index) => (
-              <Fragment key={index}>
-                <div
-                  className={`sf-radio-option form-check${layout === 'horizontal' ? ' form-check-inline' : ''}`}
+          {options.map((option, index) => (
+            <Fragment key={index}>
+              <div
+                className={`sf-radio-option form-check${layout === 'horizontal' ? ' form-check-inline' : ''}`}
+              >
+                <input
+                  type="radio"
+                  className="form-check-input"
+                  value={option.value}
+                  id={`${groupId}-${index}`}
+                  name={groupId}
+                  required={required}
+                />
+                <label
+                  className="form-check-label"
+                  htmlFor={`${groupId}-${index}`}
                 >
-                  <input
-                    type="radio"
-                    className="form-check-input"
-                    value={option.value}
-                    id={`${groupId}-${index}`}
-                    name={groupId}
-                    required={required}
-                  />
-                  <label
-                    className="form-check-label"
-                    htmlFor={`${groupId}-${index}`}
-                  >
-                    {option.label}
-                  </label>
-                </div>
-              </Fragment>
-            ))}
+                  {option.label}
+                </label>
+              </div>
+            </Fragment>
+          ))}
         </div>
       </FieldWrapper>
     </div>
