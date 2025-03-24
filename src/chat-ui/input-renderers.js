@@ -17,9 +17,7 @@ const getJustifyClass = (alignment) =>
  *
  * <div class="sf-field-wrapper">
  *   <div class="sf-input-container">
- *     <div class="sf-[field-type]-container"> <!-- actual input(s) -->
- *       ...
- *     </div>
+ *     <div class="sf-[field-type]-container">...</div>
  *   </div>
  * </div>
  *
@@ -63,15 +61,10 @@ export function createInputControl(field, updateSubmitButtonState) {
       inputContainer.classList.add('d-flex', justifyClass);
 
       specificContainer = document.createElement('div');
-      const sizeClass =
-        field.fieldSize === 'small'
-          ? 'form-control-sm'
-          : field.fieldSize === 'large'
-            ? 'form-control-lg'
-            : '';
+
       const inputEl = document.createElement('input');
       inputEl.type = 'number';
-      inputEl.className = `form-control sf-number-input ${sizeClass}`;
+      inputEl.className = 'form-control sf-number-input';
       if (typeof field.min !== 'undefined') {
         inputEl.min = field.min;
       }
@@ -186,28 +179,79 @@ export function createInputControl(field, updateSubmitButtonState) {
     }
 
     case 'slider': {
+      // Create a container for the entire slider UI
       specificContainer = document.createElement('div');
       specificContainer.className = 'sf-slider-container';
 
-      const slider = document.createElement('input');
-      slider.type = 'range';
-      slider.className = 'sf-slider-input';
+      // A row for min -> slider -> max
+      const row = document.createElement('div');
+      row.className = 'sf-slider-row d-flex align-items-center';
+      row.style.gap = '1rem';
 
-      if (typeof field.min !== 'undefined') {
-        slider.min = field.min;
-      }
-      if (typeof field.max !== 'undefined') {
-        slider.max = field.max;
-      }
-      if (typeof field.step !== 'undefined') {
-        slider.step = field.step;
+      const minEl = document.createElement('span');
+      minEl.className = 'sf-slider-min';
+      minEl.textContent = field.min ?? 0;
+
+      const sliderEl = document.createElement('input');
+      sliderEl.type = 'range';
+      sliderEl.className = 'form-range sf-slider-input';
+      sliderEl.min = field.min ?? 0;
+      sliderEl.max = field.max ?? 100;
+      sliderEl.step = field.step ?? 1;
+
+      // If defaultValue isn't set, pick midpoint
+      if (typeof field.defaultValue === 'number') {
+        sliderEl.value = field.defaultValue;
+      } else {
+        sliderEl.value = (Number(sliderEl.min) + Number(sliderEl.max)) / 2;
       }
 
-      slider.addEventListener('input', (e) => {
-        updateSubmitButtonState(field, e.target.value);
+      const maxEl = document.createElement('span');
+      maxEl.className = 'sf-slider-max';
+      maxEl.textContent = field.max ?? 100;
+
+      // Put min, slider, max into that row
+      row.appendChild(minEl);
+      row.appendChild(sliderEl);
+      row.appendChild(maxEl);
+
+      // An output area below the row
+      const outputEl = document.createElement('div');
+      outputEl.className = 'sf-slider-output';
+      outputEl.style.textAlign = 'center';
+
+      // Initialize the output text
+      if (field.unit) {
+        outputEl.textContent =
+          field.unitPosition === 'before'
+            ? `${field.unit} ${sliderEl.value}`
+            : `${sliderEl.value} ${field.unit}`;
+      } else {
+        outputEl.textContent = sliderEl.value;
+      }
+
+      // On slider input, update the text
+      sliderEl.addEventListener('input', (e) => {
+        const val = e.target.value;
+        if (field.unit) {
+          outputEl.textContent =
+            field.unitPosition === 'before'
+              ? `${field.unit} ${val}`
+              : `${val} ${field.unit}`;
+        } else {
+          outputEl.textContent = val;
+        }
+        // Let the form logic know the new value
+        updateSubmitButtonState(field, val);
       });
 
-      specificContainer.appendChild(slider);
+      specificContainer.appendChild(row);
+      specificContainer.appendChild(outputEl);
+
+      // Field alignment fix at the end
+      const justifyClassSlider = getJustifyClass(field.fieldAlignment);
+      inputContainer.classList.add('d-flex', justifyClassSlider);
+
       break;
     }
 
@@ -220,13 +264,11 @@ export function createInputControl(field, updateSubmitButtonState) {
       const selectEl = document.createElement('select');
       selectEl.className = 'sf-dropdown-input form-select';
 
-      // Determine the effective placeholder: fallback to "Select an option" if blank.
       const effectivePlaceholder =
         field.placeholder && field.placeholder.trim() !== ''
           ? field.placeholder
           : 'Select an option';
 
-      // Append the placeholder option.
       const placeholderOption = document.createElement('option');
       placeholderOption.value = '';
       placeholderOption.textContent = effectivePlaceholder;
@@ -241,9 +283,7 @@ export function createInputControl(field, updateSubmitButtonState) {
         });
       }
 
-      // Force the select's value to be empty so the placeholder shows.
       selectEl.value = '';
-
       selectEl.addEventListener('change', (e) => {
         updateSubmitButtonState(field, e.target.value);
       });
@@ -254,7 +294,6 @@ export function createInputControl(field, updateSubmitButtonState) {
 
     case 'radio': {
       specificContainer = document.createElement('div');
-      // Determine layout: if vertical, do not add the inline class.
       const isHorizontal = !field.layout || field.layout === 'horizontal';
 
       if (field.options && Array.isArray(field.options)) {
@@ -333,9 +372,9 @@ export function createInputControl(field, updateSubmitButtonState) {
 
 /**
  * Replaces the current input control within a container with the provided new control.
- * This is used in smartforms-chat.js to swap out the old input for the new field’s wrapper.
+ * This is used in smartforms-chat.js to swap out the old input for the next field’s wrapper.
  *
- * @param {HTMLElement} container - The container holding the input control.
+ * @param {HTMLElement} container - The container holding the existing input control.
  * @param {HTMLElement} newControl - The new input control element.
  */
 export function replaceInputControl(container, newControl) {

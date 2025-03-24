@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use WP_Error;
-use SmartForms\Core\SmartForms; // Import the core SmartForms class for logging.
+use SmartForms\Core\SmartForms; // Import the core SmartForms class for logging;
 
 /**
  * MetaBox class for handling form JSON generation.
@@ -256,7 +256,6 @@ class MetaBox {
 								),
 							);
 						}
-						// Merge attributes in the correct order.
 						$form_field = array_merge(
 							$form_field,
 							array(
@@ -269,7 +268,19 @@ class MetaBox {
 						break;
 
 					case 'slider':
-						// Slider field: no additional processing required.
+						// Updated slider processing: merge numeric attributes, alignment, and newly added unit fields.
+						$form_field = array_merge(
+							$form_field,
+							array(
+								'min'            => isset( $block['attrs']['min'] ) ? floatval( $block['attrs']['min'] ) : 0,
+								'max'            => isset( $block['attrs']['max'] ) ? floatval( $block['attrs']['max'] ) : 100,
+								'step'           => isset( $block['attrs']['step'] ) ? floatval( $block['attrs']['step'] ) : 1,
+								'defaultValue'   => isset( $block['attrs']['defaultValue'] ) ? floatval( $block['attrs']['defaultValue'] ) : 0,
+								'fieldAlignment' => isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left',
+								'unit'           => isset( $block['attrs']['unit'] ) ? sanitize_text_field( $block['attrs']['unit'] ) : '',
+								'unitPosition'   => isset( $block['attrs']['unitPosition'] ) ? sanitize_text_field( $block['attrs']['unitPosition'] ) : 'after',
+							)
+						);
 						break;
 
 					case 'textarea':

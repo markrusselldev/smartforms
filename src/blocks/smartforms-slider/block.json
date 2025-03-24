@@ -4,38 +4,26 @@
   "title": "Slider",
   "category": "smartforms",
   "icon": "slides",
-  "description": "A slider input for selecting a range.",
+  "description": "Select a numeric value with a draggable slider control.",
   "supports": {
-    "html": false,
-    "color": {
-      "background": true,
-      "text": true,
-      "gradients": true
-    },
-    "spacing": {
-      "margin": true,
-      "padding": true
-    },
-    "typography": {
-      "fontSize": true,
-      "lineHeight": true
-    }
+    "html": false
   },
   "attributes": {
     "label": {
       "type": "string",
-      "default": "Slider"
+      "default": ""
     },
     "required": {
       "type": "boolean",
       "default": false
     },
-    "className": {
-      "type": "string"
+    "helpText": {
+      "type": "string",
+      "default": ""
     },
     "placeholder": {
       "type": "string",
-      "default": "Enter slider..."
+      "default": "Slide to select a value"
     },
     "min": {
       "type": "number",
@@ -48,9 +36,26 @@
     "step": {
       "type": "number",
       "default": 1
+    },
+    "defaultValue": {
+      "type": "number",
+      "default": null
+    },
+    "fieldAlignment": {
+      "type": "string",
+      "default": "left"
+    },
+    "unit": {
+      "type": "string",
+      "default": ""
+    },
+    "unitPosition": {
+      "type": "string",
+      "default": "after"
     }
   },
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
-  "style": "file:./style-index.css"
+  "style": "file:./style-index.css",
+  "save": null
 }

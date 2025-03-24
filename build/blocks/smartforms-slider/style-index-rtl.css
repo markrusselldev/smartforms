@@ -1,1 +1,1 @@
-.wp-block-smartforms-slider input{border:1px solid #ccc;border-radius:4px;padding:8px;width:100%}
+.wp-block-smartforms-slider .sf-slider-row{align-items:center;display:flex;gap:1rem}.wp-block-smartforms-slider .sf-slider-row .sf-slider-max,.wp-block-smartforms-slider .sf-slider-row .sf-slider-min{color:#666;font-size:.9rem}.wp-block-smartforms-slider .sf-slider-row .sf-slider-input{flex:1}.wp-block-smartforms-slider .sf-slider-output{color:#333;font-size:.9rem;margin-top:4px;text-align:center}

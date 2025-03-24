@@ -1,6 +1,29 @@
-.wp-block-smartforms-slider input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+/**
+ * Frontend (public) styles for the SmartForms Slider block.
+ * Ensures the same layout and colors as in the editor.
+ */
+
+.wp-block-smartforms-slider {
+  .sf-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .sf-slider-min,
+    .sf-slider-max {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .sf-slider-input {
+      flex: 1;
+    }
+  }
+
+  .sf-slider-output {
+    margin-top: 4px;
+    text-align: center;
+    color: #333;
+    font-size: 0.9rem;
+  }
 }
