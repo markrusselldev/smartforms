@@ -30,6 +30,40 @@ export function getAlignmentClass(fieldAlignment) {
 }
 
 /**
+ * Helper function for multi-option fields (e.g., checkbox, radio).
+ * Returns a container class that adds Bootstrap‑like layout classes based on the layout attribute.
+ *
+ * @param {string} baseClass - The base class for the field (e.g., "sf-checkbox-group").
+ * @param {string} layout - The layout setting ("horizontal" or "vertical").
+ * @param {string} fieldAlignment - The field alignment.
+ * @returns {string} The combined class string.
+ */
+function getMultiOptionContainerClass(baseClass, layout, fieldAlignment) {
+  let containerClass = baseClass + ' ';
+  if (layout === 'vertical') {
+    containerClass += 'd-block';
+  } else {
+    containerClass += 'd-flex flex-wrap gap-2';
+  }
+  containerClass += ' ' + getAlignmentClass(fieldAlignment);
+  return containerClass;
+}
+
+/**
+ * Helper function for the ButtonGroup component.
+ * Returns a container class that appends a modifier for layout.
+ *
+ * @param {string} layout - The layout setting ("horizontal" or "vertical").
+ * @param {string} fieldAlignment - The field alignment.
+ * @returns {string} The combined class string.
+ */
+function getButtonGroupClass(layout, fieldAlignment) {
+  let base = 'sf-buttons-group';
+  base += layout === 'vertical' ? '--vertical' : '--horizontal';
+  return `${base} ${getAlignmentClass(fieldAlignment)}`;
+}
+
+/**
  * TextField component
  * Renders a single-line text input.
  */
@@ -85,7 +119,9 @@ export function NumberField({
 
 /**
  * CheckboxGroup component
- * Renders a group of checkboxes using computed alignment classes and Bootstrap 5 flexbox utilities.
+ * Renders a group of checkboxes using computed alignment classes and Bootstrap 5 flexbox utilities.
+ *
+ * Expects a "layout" prop (horizontal or vertical).
  */
 export function CheckboxGroup({
   options = [],
@@ -104,17 +140,18 @@ export function CheckboxGroup({
     }
     onChange(newSelected);
   };
-  // Use Bootstrap classes: d-block for vertical, d-flex flex-wrap gap-2 for horizontal.
-  const containerClass =
-    layout === 'vertical' ? 'd-block' : 'd-flex flex-wrap gap-2';
+
   return (
     <div
-      className={`sf-checkbox-group ${containerClass} ${getAlignmentClass(fieldAlignment)}`}
+      className={getMultiOptionContainerClass(
+        'sf-checkbox-group',
+        layout,
+        fieldAlignment,
+      )}
       data-layout={layout}
     >
       {options.map((opt, index) => {
-        const isChecked = selected.includes(opt.value);
-        // In horizontal layout, add form-check-inline
+        // In horizontal layout, add form-check-inline to each option.
         const inlineClass = layout === 'horizontal' ? ' form-check-inline' : '';
         return (
           <div
@@ -126,7 +163,7 @@ export function CheckboxGroup({
               className="form-check-input"
               id={`checkbox-${index}`}
               value={opt.value}
-              checked={isChecked}
+              checked={selected.includes(opt.value)}
               required={required && index === 0}
               onChange={(e) => handleCheckbox(opt.value, e.target.checked)}
             />
@@ -143,6 +180,8 @@ export function CheckboxGroup({
 /**
  * ButtonGroup component
  * Renders a group of buttons for selection.
+ *
+ * Expects a "layout" prop (horizontal or vertical).
  */
 export function ButtonGroup({
   options = [],
@@ -166,13 +205,15 @@ export function ButtonGroup({
       onChange(arr);
     }
   };
+
   const isActive = (val) => {
     if (!multiple) return val === current;
     return Array.isArray(current) && current.includes(val);
   };
+
   return (
     <div
-      className={`sf-buttons-group ${getAlignmentClass(fieldAlignment)}`}
+      className={getButtonGroupClass(layout, fieldAlignment)}
       data-layout={layout}
     >
       {options.map((opt, index) => (
@@ -191,9 +232,95 @@ export function ButtonGroup({
 }
 
 /**
+ * RadioGroup component
+ * Renders a set of radio buttons.
+ *
+ * Expects a "layout" prop (horizontal or vertical).
+ */
+export function RadioGroup({
+  value,
+  onChange,
+  options = [],
+  layout = 'horizontal',
+  fieldAlignment = 'left',
+  required = false,
+}) {
+  return (
+    <div
+      className={getMultiOptionContainerClass(
+        'sf-radio-group',
+        layout,
+        fieldAlignment,
+      )}
+      data-layout={layout}
+    >
+      {options.map((opt, index) => (
+        <div
+          key={index}
+          className={`sf-radio-option form-check${layout === 'horizontal' ? ' form-check-inline' : ''}`}
+        >
+          <input
+            type="radio"
+            className="form-check-input"
+            id={`radio-${index}`}
+            required={required && index === 0}
+            checked={value === opt.value}
+            onChange={() => onChange(opt.value)}
+          />
+          <label className="form-check-label" htmlFor={`radio-${index}`}>
+            {opt.label}
+          </label>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * DropdownField component
+ * Renders a select dropdown. If a placeholder is provided, it is rendered as a disabled option.
+ *
+ * (Dropdowns do not use a "layout" attribute.)
+ */
+export function DropdownField({
+  value,
+  onChange,
+  options = [],
+  placeholder = '',
+  required = false,
+  fieldAlignment = 'left',
+}) {
+  return (
+    <div
+      className={`sf-dropdown-container ${getAlignmentClass(fieldAlignment)}`}
+    >
+      <select
+        className="sf-dropdown-input form-select"
+        required={required}
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        {placeholder && (
+          <option value="" disabled>
+            {placeholder}
+          </option>
+        )}
+        {options.map((opt, index) => (
+          <option key={index} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+/**
  * SliderField component
  * Renders a slider with min, max, step, and an output showing the current value.
  * Optionally displays a unit before or after the number.
+ *
+ * (Slider uses only fieldAlignment.)
  */
 export function SliderField({
   value,
@@ -242,85 +369,10 @@ export function SliderField({
 }
 
 /**
- * DropdownField component
- * Renders a select dropdown. If a placeholder is provided, it is rendered as a disabled option.
- */
-export function DropdownField({
-  value,
-  onChange,
-  options = [],
-  placeholder = '',
-  required = false,
-  fieldAlignment = 'left',
-}) {
-  return (
-    <div
-      className={`sf-dropdown-container ${getAlignmentClass(fieldAlignment)}`}
-    >
-      <select
-        className="sf-dropdown-input form-select"
-        required={required}
-        value={value || ''}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        {placeholder && (
-          <option value="" disabled>
-            {placeholder}
-          </option>
-        )}
-        {options.map((opt, index) => (
-          <option key={index} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-/**
- * RadioGroup component
- * Renders a set of radio buttons.
- */
-export function RadioGroup({
-  value,
-  onChange,
-  options = [],
-  layout = 'horizontal',
-  fieldAlignment = 'left',
-  required = false,
-}) {
-  const isHorizontal = layout === 'horizontal';
-  return (
-    <div
-      className={`sf-radio-group ${getAlignmentClass(fieldAlignment)}`}
-      data-layout={layout}
-    >
-      {options.map((opt, index) => (
-        <div
-          key={index}
-          className={`sf-radio-option form-check${isHorizontal ? ' form-check-inline' : ''}`}
-        >
-          <input
-            type="radio"
-            className="form-check-input"
-            id={`radio-${index}`}
-            required={required && index === 0}
-            checked={value === opt.value}
-            onChange={() => onChange(opt.value)}
-          />
-          <label className="form-check-label" htmlFor={`radio-${index}`}>
-            {opt.label}
-          </label>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/**
  * TextareaField component
  * Renders a multi-line textarea.
+ *
+ * (Textarea uses only fieldAlignment.)
  */
 export function TextareaField({
   value,

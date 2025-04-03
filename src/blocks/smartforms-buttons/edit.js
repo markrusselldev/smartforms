@@ -2,30 +2,29 @@
  * Edit component for the SmartForms Button Group block.
  *
  * Renders the block in the editor with InspectorControls for:
- * - Toggling required status.
- * - Enabling/disabling multiple selections.
- * - Managing the button options.
- * - Selecting the layout (horizontal or vertical).
- * - Selecting field alignment.
+ * 1. Main Settings Panel: Button-specific settings (toggle for multiple selections and layout selection).
+ * 2. Input Settings Panel: Using CommonFieldSettings for "Required" and "Field Alignment."
+ * 3. Options Panel: For managing button options using OptionRow.
  *
- * The entire output is wrapped with the FieldWrapper component so that the label,
- * input container, and help text use consistent RichText behavior.
+ * The output is wrapped with FieldWrapper so that the main label, field area, and help text are rendered consistently.
  *
  * @package SmartForms
  */
+
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import {
   PanelBody,
   ToggleControl,
-  Button,
   SelectControl,
+  Button,
 } from '@wordpress/components';
-import { useEffect, Fragment } from '@wordpress/element';
+import { Fragment, useEffect } from '@wordpress/element';
 import { blockDefaults } from '../../config/blockDefaults';
 import FieldWrapper from '../components/FieldWrapper';
 import OptionRow from '../components/OptionRow';
 import CommonFieldSettings from '../components/CommonFieldSettings';
+import { ButtonGroup } from '../components/shared/FieldRenderers';
 
 const { placeholders, defaultOptions } = blockDefaults;
 
@@ -37,9 +36,9 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     options,
     groupId,
     multiple,
-    currentAnswer,
     layout,
     fieldAlignment,
+    currentAnswer,
   } = attributes;
   const blockProps = useBlockProps();
 
@@ -59,12 +58,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     }
   }, [groupId, options, layout, fieldAlignment, clientId, setAttributes]);
 
-  /**
-   * Updates an option's label and corresponding value.
-   *
-   * @param {number} index - The option index.
-   * @param {string} newLabel - The new label.
-   */
+  // Update an option's label and corresponding value.
   const updateOption = (index, newLabel) => {
     const newOptions = options.map((option, i) => {
       if (i === index) {
@@ -82,10 +76,16 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
    * Adds a new button option.
    */
   const addOption = () => {
-    const maxNumber = options.reduce((acc, option) => {
+    let maxNumber = 0;
+    options.forEach((option) => {
       const match = option.label.match(/^Option (\d+)$/);
-      return match ? Math.max(acc, parseInt(match[1], 10)) : acc;
-    }, 0);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > maxNumber) {
+          maxNumber = num;
+        }
+      }
+    });
     const newLabel = `Option ${maxNumber + 1}`;
     const newValue = newLabel.toLowerCase().replace(/\s+/g, '-');
     setAttributes({
@@ -106,6 +106,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
   return (
     <div {...blockProps}>
       <InspectorControls>
+        {/* Main Settings Panel */}
         <PanelBody title={__('Button Settings', 'smartforms')}>
           <ToggleControl
             label={__('Allow Multiple Selections', 'smartforms')}
@@ -123,8 +124,8 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
             ]}
             onChange={(value) => setAttributes({ layout: value })}
           />
-          {/* Note: Style options have been removed here to avoid redundancy with our dedicated Styles page. */}
         </PanelBody>
+        {/* Input Settings Panel */}
         <CommonFieldSettings
           required={required}
           alignment={fieldAlignment}
@@ -133,6 +134,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
             setAttributes({ fieldAlignment: value })
           }
         />
+        {/* Options Panel */}
         <PanelBody
           title={__('Button Options', 'smartforms')}
           initialOpen={true}
@@ -159,53 +161,21 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
       <FieldWrapper
         label={label}
         helpText={helpText}
-        setLabel={(value) => setAttributes({ label: value })}
-        setHelpText={(value) => setAttributes({ helpText: value })}
+        setLabel={(val) => setAttributes({ label: val })}
+        setHelpText={(val) => setAttributes({ helpText: val })}
         labelPlaceholder={placeholders.label}
         helpPlaceholder={placeholders.helpText}
         alignment={fieldAlignment}
       >
-        <div
-          className={`sf-buttons-group sf-buttons-group--${layout}`}
-          data-group-id={groupId}
-          data-layout={layout}
-          style={{ textAlign: fieldAlignment }}
-        >
-          {options.map((option, index) => (
-            <button
-              key={`${index}`}
-              type="button"
-              className={`btn btn-primary ${
-                multiple
-                  ? Array.isArray(currentAnswer) &&
-                    currentAnswer.includes(option.value)
-                    ? 'active'
-                    : ''
-                  : currentAnswer === option.value
-                    ? 'active'
-                    : ''
-              }`}
-              data-value={option.value}
-              onClick={() => {
-                if (multiple) {
-                  const currentSelection = Array.isArray(currentAnswer)
-                    ? [...currentAnswer]
-                    : [];
-                  const updatedSelection = currentSelection.includes(
-                    option.value,
-                  )
-                    ? currentSelection.filter((val) => val !== option.value)
-                    : [...currentSelection, option.value];
-                  setAttributes({ currentAnswer: updatedSelection });
-                } else {
-                  setAttributes({ currentAnswer: option.value });
-                }
-              }}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
+        <ButtonGroup
+          options={options}
+          current={currentAnswer}
+          onChange={(value) => setAttributes({ currentAnswer: value })}
+          multiple={multiple}
+          layout={layout}
+          fieldAlignment={fieldAlignment}
+          required={required}
+        />
       </FieldWrapper>
     </div>
   );
