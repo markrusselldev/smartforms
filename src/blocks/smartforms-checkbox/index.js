@@ -3,7 +3,7 @@ import edit from './edit';
 import './editor.scss';
 import './style.scss';
 
-// Define a custom icon as a React element:
+// Define a custom icon as a React element for the Checkbox block.
 const customIcon = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <rect

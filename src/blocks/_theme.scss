@@ -30,6 +30,20 @@ $font-size-base: 16px;
   --smartforms-font-size: 16px;
 }
 
+/* Mimic essential Bootstrap 5 utility classes in the editor */
+.d-flex {
+  display: flex;
+}
+.flex-wrap {
+  flex-wrap: wrap;
+}
+.gap-2 {
+  gap: 0.5rem;
+}
+.d-block {
+  display: block;
+}
+
 /* Unified field label styling (used by all field blocks in both editor and frontend) */
 .sf-field-label {
   display: block;

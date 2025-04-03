@@ -3,50 +3,24 @@
 /**
  * Editor styles for the SmartForms Checkbox block.
  *
- * These styles control the layout of the checkbox options based on the
- * saved layout setting (stored in the data-layout attribute).
- * - For "horizontal", options are arranged in a flex row that wraps.
- * - For "vertical", options are arranged in a single column.
- *
- * This file only provides the necessary overrides for the block editor.
- * The primary layout styling is defined in style.scss.
+ * These styles control the layout of the checkbox options based on the saved layout setting.
+ * The block editor will use Bootstrap 5 flexbox utilities where applicable.
  *
  * @package SmartForms
  */
-
 .wp-block-smartforms-checkbox {
-  .sf-checkbox-group {
-    // Default to horizontal (flex row) layout.
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: flex-start;
+  padding: 10px;
 
-    // If the saved layout is vertical, force a block (column) layout.
-    &[data-layout='vertical'] {
-      display: block;
-    }
-  }
-
+  /* The sf-checkbox-group is now rendered with dynamic Bootstrap classes via our CheckboxGroup component.
+	   Additional custom styles can be added here if necessary. */
   .sf-checkbox-option.form-check {
     display: flex;
     align-items: center;
   }
-
   .sf-checkbox-option.form-check label.form-check-label {
     margin-left: 5px;
     font-size: 1rem;
     line-height: 1.25;
     vertical-align: middle;
-  }
-
-  input.form-check-input:checked::before,
-  input.form-check-input:checked::after {
-    display: none;
-  }
-
-  .sf-checkbox-main-label {
-    display: block;
-    margin-bottom: 10px;
   }
 }

@@ -1,21 +1,25 @@
 /**
  * Edit component for the SmartForms Checkbox block.
  *
- * Renders a checkbox field group for the editor with InspectorControls for:
- * - Checkbox Settings: Containing layout control.
- * - Input Settings: Using CommonFieldSettings for "Required" and "Field Alignment".
- * - Checkbox Options: For adding, editing, and removing individual checkbox options.
+ * Renders a checkbox field group in the editor using InspectorControls for:
+ * 1. Main Settings Panel: Checkbox-specific settings (layout selection).
+ * 2. Input Settings Panel: Using CommonFieldSettings for "Required" and "Field Alignment".
+ * 3. Options Panel: For managing checkbox options using OptionRow.
+ *
+ * The output is wrapped with FieldWrapper to ensure a consistent markup structure.
  *
  * @package SmartForms
  */
+
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, SelectControl, Button } from '@wordpress/components';
-import { Fragment, useEffect } from '@wordpress/element';
+import { Fragment, useEffect, useState } from '@wordpress/element';
 import { blockDefaults } from '../../config/blockDefaults';
 import FieldWrapper from '../components/FieldWrapper';
 import OptionRow from '../components/OptionRow';
 import CommonFieldSettings from '../components/CommonFieldSettings';
+import { CheckboxGroup } from '../components/shared/FieldRenderers';
 
 const { placeholders, defaultOptions } = blockDefaults;
 
@@ -30,6 +34,9 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     fieldAlignment,
   } = attributes;
   const blockProps = useBlockProps();
+
+  // Local state for the selected checkboxes in the editor preview.
+  const [selected, setSelected] = useState([]);
 
   // Initialize attributes if not already set.
   useEffect(() => {
@@ -47,12 +54,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     }
   }, [groupId, layout, options, fieldAlignment, clientId, setAttributes]);
 
-  /**
-   * Updates an option's label and corresponding value.
-   *
-   * @param {number} index - The index of the option.
-   * @param {string} newLabel - The new label.
-   */
+  // Update an option's label and corresponding value.
   const updateOption = (index, newLabel) => {
     const newOptions = options.map((option, i) => {
       if (i === index) {
@@ -66,11 +68,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     setAttributes({ options: newOptions });
   };
 
-  /**
-   * Adds a new checkbox option.
-   *
-   * Automatically assigns a sequential label "Option N" based on the current highest option number.
-   */
+  // Add a new checkbox option.
   const addOption = () => {
     let maxNumber = 0;
     options.forEach((option) => {
@@ -89,11 +87,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
     });
   };
 
-  /**
-   * Removes an option by its index.
-   *
-   * @param {number} index - The index to remove.
-   */
+  // Remove an option by its index.
   const removeOption = (index) => {
     const newOptions = options.filter((_, i) => i !== index);
     setAttributes({ options: newOptions });
@@ -102,7 +96,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
   return (
     <div {...blockProps}>
       <InspectorControls>
-        {/* Panel for field specific settings (layout control) */}
+        {/* Main Settings Panel */}
         <PanelBody title={__('Checkbox Settings', 'smartforms')}>
           <SelectControl
             label={__('Layout', 'smartforms')}
@@ -114,7 +108,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
             onChange={(value) => setAttributes({ layout: value })}
           />
         </PanelBody>
-        {/* Panel for Input Settings using CommonFieldSettings */}
+        {/* Input Settings Panel */}
         <CommonFieldSettings
           required={required}
           alignment={fieldAlignment}
@@ -123,7 +117,7 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
             setAttributes({ fieldAlignment: value })
           }
         />
-        {/* Panel for Checkbox Options using OptionRow */}
+        {/* Options Panel */}
         <PanelBody
           title={__('Checkbox Options', 'smartforms')}
           initialOpen={true}
@@ -147,7 +141,6 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
           </Button>
         </PanelBody>
       </InspectorControls>
-      {/* Render the checkbox field using FieldWrapper */}
       <FieldWrapper
         label={label}
         helpText={helpText}
@@ -158,34 +151,14 @@ const Edit = ({ attributes, setAttributes, clientId }) => {
         alignment={fieldAlignment}
         plainText={true}
       >
-        <div
-          className={`sf-checkbox-group sf-checkbox-group-${layout || 'horizontal'}`}
-          data-layout={layout || 'horizontal'}
-        >
-          {options.map((option, index) => (
-            <Fragment key={index}>
-              <div
-                className={`sf-checkbox-option form-check${
-                  layout === 'horizontal' ? ' form-check-inline' : ''
-                }`}
-              >
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id={`${groupId}-${index}`}
-                  name={groupId}
-                  required={required}
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor={`${groupId}-${index}`}
-                >
-                  {option.label}
-                </label>
-              </div>
-            </Fragment>
-          ))}
-        </div>
+        <CheckboxGroup
+          options={options}
+          selected={selected}
+          onChange={setSelected}
+          layout={layout}
+          fieldAlignment={fieldAlignment}
+          required={required}
+        />
       </FieldWrapper>
     </div>
   );

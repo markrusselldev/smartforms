@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use WP_Error;
-use SmartForms\Core\SmartForms; // Import the core SmartForms class for logging;
+use SmartForms\Core\SmartForms; // Import the core SmartForms class for logging.
 
 /**
  * MetaBox class for handling form JSON generation.
@@ -146,6 +146,7 @@ class MetaBox {
 							array(
 								'groupId'        => isset( $block['attrs']['groupId'] ) ? sanitize_text_field( $block['attrs']['groupId'] ) : '',
 								'fieldAlignment' => isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left',
+								'layout'         => isset( $block['attrs']['layout'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal',
 								'options'        => $options,
 							)
 						);
@@ -177,14 +178,15 @@ class MetaBox {
 								),
 							);
 						}
-						$multiple   = isset( $block['attrs']['multiple'] ) ? (bool) $block['attrs']['multiple'] : false;
+						$multiple = isset( $block['attrs']['multiple'] ) ? (bool) $block['attrs']['multiple'] : false;
 						$form_field = array_merge(
 							$form_field,
 							array(
-								'multiple'       => $multiple,
-								'groupId'        => isset( $block['attrs']['groupId'] ) ? sanitize_text_field( $block['attrs']['groupId'] ) : '',
+								'multiple'     => $multiple,
+								'groupId'      => isset( $block['attrs']['groupId'] ) ? sanitize_text_field( $block['attrs']['groupId'] ) : '',
 								'fieldAlignment' => isset( $block['attrs']['fieldAlignment'] ) ? sanitize_text_field( $block['attrs']['fieldAlignment'] ) : 'left',
-								'options'        => $options,
+								'layout'         => isset( $block['attrs']['layout'] ) ? sanitize_text_field( $block['attrs']['layout'] ) : 'horizontal',
+								'options'      => $options,
 							)
 						);
 						break;
